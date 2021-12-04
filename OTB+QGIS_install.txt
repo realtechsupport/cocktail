@@ -1,0 +1,57 @@
+overview
+
+install QGIS on base VM
+install OTB in a conda environment
+
+------------------------------------------
+
+a) create ubuntu 18.04LTS VM
+b) upload basics+qgis.sh
+c) run that batch file to install QGIS
+
+
+> proceed with OTB
+install instructions OTB
+
+0) upload conda-packages.sh and environmentv1.yml
+1) sh conda-packages1.sh
+2) conda env create -f environmentv1.yml
+3) other libs as needed
+	conda install -c conda-forge pillow
+	conda install -c conda-forge geopandas
+(OTB will need python3.7, so to install pcloud with pip:
+#https://stackoverflow.com/questions/2812520/dealing-with-multiple-python-versions-and-pip)
+
+	python3.7 -m pip install pcloud
+
+4)various dirs
+mkdirs data, code, vectorfiles, rasterimages, results, auth
+(add username and password to auth to access pCloud)
+
+5) upload data files...
+
+#---------------------------------------------------------------
+
+(updated nov 3 2021)
+environmentv1.yml
+
+name: OTB
+
+channels:
+  - terradue
+  - conda-forge
+dependencies:
+  - python=3.7
+  - otb=7.2.0
+  - qgis 3.16
+  - gdal=3.1.4
+
+
+#-------------------------------------------------------------
+
+> start with the shell in (base)
+> run the OTB dependent code from the base shell:
+conda run -n OTB python3 /home/marcbohlen/code/tests/OTB_test.py
+
+> then run the QGIS coded from the shell
+

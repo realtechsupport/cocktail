@@ -1,0 +1,29 @@
+{
+	"//--commentA" : "input selection",
+	"rasterimage": "area1_0612_2020.tif",
+	"classifier": "ann",
+	"pointsfile" : "area1_vector_classification.shp",
+	"coord_info" : "area1_4points",
+	"//--commentB" : "path variables",
+	"authfile" : "/home/marcbohlen/auth/pc.txt",
+	"location" : "America/New_York",
+	"colortemplate" : "8colormap_qgis.qml",
+	"rasterpath" : "/home/marcbohlen/data/rasterimages/",
+	"vectorpath" : "/home/marcbohlen/data/vectorfiles/",
+	"resultspath" : "/home/marcbohlen/results/",
+	"segmentation_stats" : "segmentation_vector_stats.shp",
+	"segmentation_points_joined" : "segmentation_points_joined.shp",	
+	"segmentationfile" : "segmentation_vector.shp",
+	"ann_vector_classification" : "ann_vector_classification.shp",
+	"modelname" : "model_vector_ann.model",
+	"confusion_matrix" : "confusionmatrix_vector_ann.csv",
+	"classified_vimage" : "vector_classified",
+	"resultspath" : "/home/marcbohlen/results/",
+	"//--commentC" : "Render variables",
+	"background" : "255, 255, 255",
+	"r_height" : "4800",
+	"r_width" : "3600",
+	"pdir" : "/VM"
+}
+
+

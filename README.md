@@ -31,7 +31,7 @@ Run that file <br>
 step 4 - create a conda environment with defined dependencies.
 (OTB 7.2 requires python 3.7, for example)
 
-	conda env create -f environmentv1.yml
+	conda env create -f environment.yml
 
 step 5 - personalize <br>
 Add other libraries to the OTB environment as needed <br>

@@ -44,7 +44,8 @@ You can cross-access libraries from either environment with python scripts for e
   conda run -n OTB python3 /home/code/otb_code_B.py <br>
   python3 /home/code/qgis_code_B.py <br>
   echo "Process complete"
-  <br>
+  
+  <br> <br>
  Since the directory structure you setup will be identical to the QGIS and OTB environments, intermediate filed produced will be available to processes running in either environment.
 
 

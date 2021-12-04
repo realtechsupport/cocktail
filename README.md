@@ -22,22 +22,32 @@ Upload the batchfile conda-packages.sh and the context file environment.yml <br>
 Make that file executable <br>
 
   	chmod +x conda-packages.sh
+	
 Run that file <br>
 
   	sh conda-packages.sh
+	
+step 4 - create a conda environment with defined dependencies.
+(OTB 7.2 requires python 3.7, for example)
 
-step 4 - personalize <br>
+	conda env create -f environmentv1.yml
+
+step 5 - personalize <br>
 Add other libraries to the OTB environment as needed <br>
 
 	conda install -c conda-forge pillow
 	
 	conda install -c conda-forge geopandas
   
-step 5 - test the setup <br>
+step 6 - test the setup <br>
+a) Test qgis
+
 Run qgis_test in the base environment <br>
 
   	python3 qgis_test.py
 	
+
+b) Test OTB
 Activate the OTB environment <br>
 
   	conda activate OTB

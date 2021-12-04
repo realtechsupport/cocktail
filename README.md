@@ -40,24 +40,25 @@ Add other libraries to the OTB environment as needed <br>
 	conda install -c conda-forge geopandas
   
 step 6 - test the setup <br>
-a) Test qgis
+a) Test QGIS
 
-Run qgis_test in the base environment <br>
+Run the qgis test in the base environment <br>
 
   	python3 qgis_test.py
 	
 
 b) Test OTB
+
 Activate the OTB environment <br>
 
   	conda activate OTB
 	
-Run the otb_test <br>
+Run the otb test <br>
 
   	python3 otb_test.py
   
 You can now use QGIS in the base installation and enable the conda environment to access OTB functionality. 
-You can cross-access libraries from either environment with python scripts for each of the environments: <br>
+You can also move across environments to access libraries from either environment with python scripts as outlined below (see top.sh): <br>
 
   	echo "Starting OTB-QGIS pipeline...\n\n" 
 	

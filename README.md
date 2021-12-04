@@ -11,6 +11,7 @@ Choose Ubuntu 18.04 LTS <br>
 step 2 - install QGIS <br>
 Upload the batch file basics+qgis.sh <br>
 Make that file executable  <br>
+
   	chmod +x basics+qgis.sh
 Run that file <br>
   	sh basics+qgis.sh

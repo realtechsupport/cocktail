@@ -29,8 +29,9 @@ Run that file <br>
 step 4 - personalize <br>
 Add other libraries to the OTB environment as needed <br>
 
-	conda install -c conda-forge pillow <br>
-	conda install -c conda-forge geopandas <br>
+	conda install -c conda-forge pillow
+	
+	conda install -c conda-forge geopandas
   
 step 5 - test the setup <br>
 Run qgis_test in the base environment <br>
@@ -48,15 +49,15 @@ Run the otb_test <br>
 You can now use QGIS in the base installation and enable the conda environment to access OTB functionality. 
 You can cross-access libraries from either environment with python scripts for each of the environments: <br>
 
-  	echo "Starting OTB-QGIS pipeline...\n\n" <br>
+  	echo "Starting OTB-QGIS pipeline...\n\n" 
 	
-  	conda run -n OTB python3 /home/code/otb_code_A.py <br>
+  	conda run -n OTB python3 /home/code/otb_code_A.py 
 	
-  	python3 /home/code/qgis_code_A.py <br>
+  	python3 /home/code/qgis_code_A.py 
 	
-  	conda run -n OTB python3 /home/code/otb_code_B.py <br>
+  	conda run -n OTB python3 /home/code/otb_code_B.py 
 	
-  	python3 /home/code/qgis_code_B.py <br>
+  	python3 /home/code/qgis_code_B.py 
 	
  	echo "Process complete"
 	 

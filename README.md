@@ -2,6 +2,7 @@
 
 The Orfeo (OTB) machine learning library does not play well with QGIS outside of the resource intensive GUI program.
 The systems have differing and partially conflicting dependencies, and the GUI environment makes rapid testing across the various tool boxes cumbersome and slow.
+This fact becomes apparent, for example, when developping a pipeline to perfomr vector based satellite image classification with a neural network.
 This repository shows you how to setup a virtual computer that can support OTB and QGIS functionality efficiently.
 
 step 1 - VM <br>

@@ -74,7 +74,7 @@ You can also move across environments to access libraries from either environmen
  	echo "Process complete"
 	 
   
-Since the directory structure you setup will be identical to the QGIS and OTB environments, intermediate filed produced will be available to processes running in either environment.
+Since the directory structure you setup will be identical in both the QGIS and OTB environments, intermediate filed produced will be available to processes running in either environment, allowing for data to be shared at no extra computational cost.
 
 
 

@@ -1,13 +1,13 @@
 # GDAL OTB QGOS in a virtual environment
 
-The [Orfeo](https://www.orfeo-toolbox.org/tag/machine-learning/) machine learning library, thetranslator library for raster and vector geospatial data formats [GDAL](https://gdal.org/) do not play well with the open source geographic information system [QGIS](https://qgis.org) outside of the resource intensive GUI environment.
+The [Orfeo](https://www.orfeo-toolbox.org/tag/machine-learning/) machine learning library and the translator library for raster and vector geospatial data formats [GDAL](https://gdal.org/) do not play well with the open source geographic information system [QGIS](https://qgis.org) outside of the resource intensive GUI environment.
 The systems have differing and partially conflicting dependencies, and the GUI environment makes rapid testing across the various tool boxes cumbersome.
-This fact becomes apparent, for example, when developping a pipeline to perfomr vector based satellite image classification with a neural network under OTB.
-This repository demonstrates how to setup a virtual computer that can support GDAL, OTB and QGIS functionality efficiently. It also includes examples of how to use the setup to apply various classifiers inlcuding vector support machines, random forests and neural networks across multiple environments.
+This fact becomes apparent, for example, when developping a pipeline to perform vector based satellite image classification with a neural network under OTB.
+This repository demonstrates how to setup a virtual computer that can support GDAL, OTB and QGIS functionality seamlessly. It also includes examples of how to use the setup to apply various classifiers inlcuding vector support machines, random forests and neural networks across GDAL, OTB and QGIS.
 
 step 1 - VM <br>
 Create a virtual computer.<br>
-Choose Ubuntu 18.04 LTS <br>
+Choose Ubuntu 18.04 LTS, with at least 16GB of RAM <br>
 
 step 2 - install QGIS <br>
 Upload the batch file basics+qgis.sh <br>

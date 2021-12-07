@@ -36,11 +36,23 @@
 	"NNepsilon" : "0.01",
 	"NNmaxiterations" : "1000", 
 	
-	"//--commentD" : "Render variables------------",
+	"//--commentD" : "Dissolve variables----------",
+	"perform_dissolve" : "yes",
+	"dissolved_shapefile" : "dissolved_vector_classification.shp",
+	"COMPUTE_AREA" : "False",
+        "COMPUTE_STATISTICS" : "False",
+        "COUNT_FEATURES" : "False",
+        "EXPLODE_COLLECTIONS" : "False",
+        "FIELD" : "predicted", 
+        "GEOMETRY" : "geometry",
+        "KEEP_ATTRIBUTES" : "False",
+        "OPTIONS" : " ",
+        "STATISTICS_ATTRIBUTE" : " ",	
+
+	"//--commentE" : "Render variables------------",
+	"T2P" : "yes",
 	"background" : "255, 255, 255",
 	"r_height" : "4800",
 	"r_width" : "3600",
 	"pdir" : "/VM"
 }
-
-

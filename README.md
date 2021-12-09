@@ -59,7 +59,7 @@ Run the otb test <br>
   	python3 otb_test.py
   
 You can now use QGIS in the base installation and enable the conda environment to access OTB functionality. 
-You can also move across environments to access libraries from either environment with python scripts as outlined below (see top.sh): <br>
+You can also move across environments to access libraries from either environment with python scripts as outlined below (see vector_classify_top.sh): <br>
 
   	echo "Starting OTB-QGIS pipeline...\n\n" 
 	
@@ -73,7 +73,7 @@ You can also move across environments to access libraries from either environmen
 	
 	 
   
-Since the directory structure you setup will be identical in both the QGIS and OTB environments, intermediate filed produced will be available to processes running in either environment, allowing for data to be shared at no extra computational cost.
+Since the directory structure you setup will be identical in both the QGIS and OTB environments, intermediate filed produced will be available to processes running in either environment, allowing for data to be shared at no extra computational cost. All settings across the script modules are stored in the 'settings.txt' resource file and imported to the individual modules.
 
 
 

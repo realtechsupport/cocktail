@@ -1,4 +1,4 @@
-#top level script to run OTB and QGIS programs sequentially
+#top level script to run OTB and QGIS scripts sequentially
 #rts
 #december 2021
 #---------------------------------------------------------------------------
@@ -10,17 +10,17 @@
 #---------------------------------------------------------------------------
 # OTB and QGIS sequence for vector based classification (ANN)
 
-# 1 OTB_part1 (otb_object_classify_1)
+# 1 OTB_part1 (otb_vectir_classify_1)
 # 2 QGIS_join
-# 3 OTB_part2 (otb_object_classify_2)
+# 3 OTB_part2 (otb_vector_classify_2)
 # 4 QGIS_render
 
 #---------------------------------------------------------------------------
-echo "Starting OTB-QGIS pipeline...\n\n"
+echo "Starting OTB-QGIS pipeline for vector based object classification with ANN...\n\n"
 
-conda run -n OTB python3 /home/marcbohlen/code/otb_object_classify_1.py
+conda run -n OTB python3 /home/marcbohlen/code/otb_vector_classify_1.py
 python3 /home/marcbohlen/code/qgis_join.py
-conda run -n OTB python3 /home/marcbohlen/code/otb_object_classify_2.py
+conda run -n OTB python3 /home/marcbohlen/code/otb_vector_classify_2.py
 python3 /home/marcbohlen/code/qgis_render.py
  
 echo "Process complete\n\n"

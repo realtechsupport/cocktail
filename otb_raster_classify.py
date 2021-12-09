@@ -1,10 +1,10 @@
 # ORFEO Toolbox 
 # raster classifier training and image classification
-# classifiers: Support Vector Machine, Random Forest, Artificial Neural Net
+# classifiers: Support Vector Machine, Random Forest, Artificial Neural Net (todo)
 # color map
 # transport to pCloud
 # install on Ubuntu 18 LTS with conda (conda-packages1.sh and environmentv1.yml.)
-# RTS, Nov 2021
+# RTS, Nov/Dec 2021
 # -------------------------------------------------------------
 import sys, os
 import json

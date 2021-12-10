@@ -15,6 +15,7 @@ import sys
 import os, sys, json
 from datetime import datetime
 import pytz
+from zipfile import ZipFile
 from pcloud import PyCloud
 
 #---------------------------------------------------------------------------------------
@@ -63,6 +64,7 @@ else:
 	classified_vimage = jdata['classified_vimage']
 
 	perform_dissolve = jdata['perform_dissolve']
+	do_zip = jdata['do_zip']
 	dissolved_shapefile = jdata['dissolved_shapefile']
 	compute_area = jdata['COMPUTE_AREA']
 	compute_statistics = jdata['COMPUTE_STATISTICS']
@@ -79,6 +81,7 @@ else:
 	r_height = int(jdata['r_height'])
 	r_width = int(jdata['r_width'])
 	background = jdata['background']
+	add_shps = jdata['add_result_shapefiles']
 
 #output from OTB_part2
 render_shapefile = resultspath + ann_vector_classification
@@ -169,7 +172,7 @@ else:
 
 #add color template
 vlayer.loadNamedStyle(datapath + colortemplate)
-    
+
 #render the results (from the layer file)
 image_location = resultspath + classified_vimage
 
@@ -198,7 +201,18 @@ print('\nRender complete; ending QGIS')
 qgs.exitQgis()
 
 #-----------------------------------------------------------
+if((do_zip == "yes") and (perform_dissolve == "yes")):
+	base = dissolved_shapefile.split('.shp')[0]
+	ziped =  jdata['ziped']
+	zipOb = ZipFile(resultspath + ziped , 'w')
+	zipOb.write(base + '.shp')
+	zipOb.write(base + '.shx')
+	zipOb.write(base + '.prj')
+	zipOb.write(base + '.dbf')
+	zipOb.close()
+	print('\nResult shapefiles compressed..')
 
+#-----------------------------------------------------------
 if(t2p == "yes"):
 	f = open(authfile, 'r')
 	lines = f.readlines()
@@ -207,7 +221,7 @@ if(t2p == "yes"):
 	f.close()
 	try:
 		conn = PyCloud(username, password, endpoint='nearest')
-		filelist = [resultspath + classified_vimage]
+		filelist = [resultspath + classified_vimage, resultspath + ziped]
 		conn.uploadfile(files=filelist, path=pdir)
 		print('\n\nUploading to remote storage: ' , filelist)
 	except:

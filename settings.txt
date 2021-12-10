@@ -74,6 +74,8 @@
 
 	"//--commentF" : "Dissolve settings ----------",
 	"perform_dissolve" : "yes",
+	"do_zip" : "yes",
+	"ziped" : "dissolved_shapedata.zip",
 	"dissolved_shapefile" : "dissolved_vector_classification.shp",
 	"COMPUTE_AREA" : "False",
         "COMPUTE_STATISTICS" : "False",
@@ -87,6 +89,7 @@
 
 	"//--commentG" : "Render settings ------------",
 	"T2P" : "yes",
+	"add_result_shapefiles" : "yes",
 	"background" : "255, 255, 255",
 	"r_height" : "4800",
 	"r_width" : "3600",

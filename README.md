@@ -6,35 +6,34 @@ This fact becomes apparent, for example, when developing a pipeline to perform v
 This repository demonstrates how to setup a virtual computer that can support GDAL, OTB and QGIS functionality seamlessly. It also includes examples of how to use the setup to apply various classifiers including vector support machines, random forests and neural networks across GDAL, OTB and QGIS.
 
 1 - VM <br>
-Create a virtual computer.<br>
-Choose Ubuntu 18.04 LTS, with at least 16GB of RAM <br>
+Create a virtual computer. Choose Ubuntu 18.04 LTS, with at least 16GB of RAM. <br>
 
-2- Get the repo files from this Github site <br>
+2- Get the repo files from this Github site. <br>
 You will have all the files in the correct directory structure on your computer after the download. <br>
 
-3 - Install QGIS <br>
+3 - Install QGIS. <br>
 Make the file basics+qgis.sh executable.<br>
 
   	chmod +x basics+qgis.sh
-Run that file <br>
+	
+Run that file. <br>
 
   	sh basics+qgis.sh
 
-4 - Install OTB in a virtual environment with conda <br>
+4 - Install OTB in a virtual environment with conda. <br>
 Make the file conda-packages.sh executable. <br>
 
   	chmod +x conda-packages.sh
 	
-Run that file <br>
+Run that file. <br>
 
   	sh conda-packages.sh
 	
-5 - Create a conda environment with defined dependencies.
-(OTB 7.2 requires python 3.7, for example)
+5 - Create a conda environment with defined dependencies.<br>
+(OTB 7.2 requires python 3.7, for example. Also check the path to the environment.yml file)
 
 	conda env create -f environment.yml
 	
-(Check the path to the environment.yml file)
 
 6 - Customize <br>
 Add other libraries to the OTB environment as needed <br>

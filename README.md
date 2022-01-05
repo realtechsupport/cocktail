@@ -33,14 +33,15 @@ Run that file <br>
 (OTB 7.2 requires python 3.7, for example)
 
 	conda env create -f environment.yml
+	
+(Check the path to the environment.yml file)
 
 6 - Customize <br>
 Add other libraries to the OTB environment as needed <br>
 
 	conda install -c conda-forge pillow
-	
 	conda install -c conda-forge geopandas
-	
+(Enable the OTB environment to install geopandas… the install may take some time…)<br>
 	
 7 – Setup the directory structure <br>
 The directories code, data, results should be ready made in your repository directory.

@@ -36,11 +36,11 @@ Run that file. <br>
 	
 
 6 - Customize <br>
-Add other libraries to the OTB environment as needed <br>
+Add other libraries to the OTB environment as needed. Enable the OTB environment to install geopandas… the install may take some time… <br>
 
 	conda install -c conda-forge pillow
 	conda install -c conda-forge geopandas
-(Enable the OTB environment to install geopandas… the install may take some time…)<br>
+
 	
 7 – Setup the directory structure <br>
 The directories code, data, results should be ready made in your repository directory.

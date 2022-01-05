@@ -5,22 +5,23 @@ The systems have differing and partially conflicting dependencies, and the GUI e
 This fact becomes apparent, for example, when developing a pipeline to perform vector based satellite image classification with a neural network under OTB.
 This repository demonstrates how to setup a virtual computer that can support GDAL, OTB and QGIS functionality seamlessly. It also includes examples of how to use the setup to apply various classifiers including vector support machines, random forests and neural networks across GDAL, OTB and QGIS.
 
-step 1 - VM <br>
+1 - VM <br>
 Create a virtual computer.<br>
 Choose Ubuntu 18.04 LTS, with at least 16GB of RAM <br>
 
-step 2 - install QGIS <br>
-Upload the batch file basics+qgis.sh <br>
-Make that file executable  <br>
+2- Get the repo files from this Github site <br>
+You will have all the files in the correct directory structure on your computer after the download. <br>
+
+3 - Install QGIS <br>
+Make the file basics+qgis.sh executable.<br>
 
   	chmod +x basics+qgis.sh
 Run that file <br>
 
   	sh basics+qgis.sh
 
-step 3 - install OTB in a virtual environment with conda <br>
-Upload the batchfile conda-packages.sh and the context file environment.yml <br>
-Make that file executable <br>
+4 - Install OTB in a virtual environment with conda <br>
+Make the file conda-packages.sh executable. <br>
 
   	chmod +x conda-packages.sh
 	
@@ -28,19 +29,27 @@ Run that file <br>
 
   	sh conda-packages.sh
 	
-step 4 - create a conda environment with defined dependencies.
+5 - Create a conda environment with defined dependencies.
 (OTB 7.2 requires python 3.7, for example)
 
 	conda env create -f environment.yml
 
-step 5 - personalize <br>
+6 - Customize <br>
 Add other libraries to the OTB environment as needed <br>
 
 	conda install -c conda-forge pillow
 	
 	conda install -c conda-forge geopandas
+	
+	
+7 – Setup the directory structure <br>
+The directories code, data, results should be ready made in your repository directory.
+Put the rasterimages and vectorfiles directories into the data directory. Place image assets (.tif) in the
+rasterimages directory and vector assets (.shp) into the vectorfiles directory. Add the
+corresponding .dbf, .prj, .shx files for each .shp file.
+
   
-step 6 - test the setup <br>
+8 - Test<br>
 a) Test QGIS
 
 Run the qgis test in the base environment <br>
@@ -62,22 +71,10 @@ You can now use QGIS in the base installation and enable the conda environment t
 You can also move across environments to access libraries from either environment with python scripts as outlined below (see vector_classify_top.sh): <br>
 
   	echo "Starting OTB-QGIS pipeline...\n\n" 
-	
   	conda run -n OTB python3 /home/code/otb_code_A.py 
-	
   	python3 /home/code/qgis_code_A.py 
-	
   	conda run -n OTB python3 /home/code/otb_code_B.py 
-	
   	python3 /home/code/qgis_code_B.py 
-	
 	 
   
 Since the directory structure you setup will be identical in both the QGIS and OTB environments, intermediate filed produced will be available to processes running in either environment, allowing for data to be shared. All settings across the script modules are stored in the 'settings.txt' resource file and imported to the individual modules.
-
-
-
-  
- 
-
-

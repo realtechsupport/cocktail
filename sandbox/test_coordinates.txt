@@ -1,0 +1,4 @@
+-8.123456, 115.123456, urban_dwelling, pemukiman
+-8.234567, 115.234567, mixed_forest, hutan_campuran
+-8.230000, 115.230000, mixed_forest, hutan_campuran
+-8.345678, 115.345678, urban_dwelling, pemukiman

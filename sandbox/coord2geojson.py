@@ -1,8 +1,8 @@
 # coord2geojson.py
 #
 # Generate geojson conform information from field notes.
-# Latitude [north or south]. Longitude [east or west] and land use category in English and Bahasa. 
-# Example: -8.123, 115.123, urban_dwelling, pemukiman
+# Latitude [north or south]. Longitude [east or west] and land use category in English and Bahasa, and comments. 
+# Example: -8.123, 115.123, urban_dwelling, pemukiman, hard to reach area
 # Assumes elements are comma separated with one entry per line.
 # No trailing new lines at the end of the last line of the input file, please..
 # Jan 2022
@@ -52,14 +52,22 @@ for item in f:
 	else:
 		P = Point((float(elements[1]), float(elements[0])))
 
-	if(Bahasa_categories):
-		k = elements[3].strip()
-		v = area2_cats_bahasa[k]
-	else:
-		k = elements[2].strip()
-		v = area2_cats_english[k]
+	try:
+		if(Bahasa_categories):
+			k = elements[3].strip()
+			v = area2_cats_bahasa[k]
+		else:
+			k = elements[2].strip()
+			v = area2_cats_english[k]
+	except:
+		k = 'error'
+		v = -1
+	try:
+		c = elements[4].strip()
+	except:
+		c = 'empty'
 
-	F = Feature(geometry = P, properties={"class":v, "name":k})
+	F = Feature(geometry = P, properties={"class":v, "name":k, "comment":c})
 	features_list.append(F)
 
 feature_collection = FeatureCollection(features_list)

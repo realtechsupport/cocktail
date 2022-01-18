@@ -1,4 +1,4 @@
-# GDAL+ OTB + QGIS in a virtual environment
+# GDAL + OTB + QGIS in a virtual environment
 
 The [Orfeo](https://www.orfeo-toolbox.org/tag/machine-learning/) machine learning library and the translator library for raster and vector geospatial data formats [GDAL](https://gdal.org/) do not play well with the open source geographic information system [QGIS](https://qgis.org) outside of the resource intensive GUI environment.
 The systems have differing and partially conflicting dependencies, and the GUI environment makes rapid testing across the various tool boxes cumbersome.

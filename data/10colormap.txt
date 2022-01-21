@@ -1,0 +1,24 @@
+1 5 5 230
+2 190 60 15
+3 65 240 125
+4 105 200 95
+5 30 115 10
+6 25 170 110
+7 255 196 34
+8 235 235 220
+9 197 163 122
+10 120 216 47
+
+#1 water 5 5 230
+#2 urban dwelling 190 60 15
+#3 shrubs 65 240 125
+#4 grass 105 200 95
+#5 homogeneous forest 30 115 10
+#6 mixed forest 25 170 110
+#7 kampung agriculture 255 196 34
+#8 open area 235 235 220
+#9 mixed garden 197 163 122
+#10 glove garden 120 216 47
+
+
+

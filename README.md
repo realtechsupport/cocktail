@@ -49,7 +49,7 @@ Put the rasterimages and vectorfiles directories into the data directory. Place 
 rasterimages directory and vector assets (.shp) into the vectorfiles directory. Add the
 corresponding .dbf, .prj, .shx files for each .shp file.
 
-Use the settings.txt file (in data) to set the names of the files and the settings for processing.
+Use the settings.txt file (in the data directory) to set your file names, process preferences and classification parameters. The content of this file is parsed and passed to the classification steps.
 
   
 8 - Test<br>

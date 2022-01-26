@@ -6,7 +6,7 @@
 	"raster_classifier_ann" : "ann",
 	"vector_classifier_ann" : "ann",
 	"pointsfile" : "area2_raster_classification_0612_2020.shp",
-	"rastershapefile" : "area2_vector_classification_0612_2020.shp",
+	"rastershapefile" : "area2_0612_2020_raster_classification.shp",
 	"coord_info" : "area1_4points",
 	
 	"//--commentB" : "Path settings -----------",
@@ -71,6 +71,9 @@
 	"rf_var" : "0",
 	"rf_ntrees" : "100",
 	"rf_acc" : "0.01",
+
+	"//==comment-stats" : "Save the classifier statistics ---",
+	"stats_save" : "yes",
 
 	"//--commentF" : "Dissolve settings ----------",
 	"perform_dissolve" : "yes",

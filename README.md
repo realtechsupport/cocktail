@@ -49,6 +49,8 @@ Put the rasterimages and vectorfiles directories into the data directory. Place 
 rasterimages directory and vector assets (.shp) into the vectorfiles directory. Add the
 corresponding .dbf, .prj, .shx files for each .shp file.
 
+Use the settings.txt file (in data) to set the names of the files and the settings for processing.
+
   
 8 - Test<br>
 a) Test QGIS

@@ -5,6 +5,7 @@
 # transport to pCloud
 # install on Ubuntu 18 LTS with conda (conda-packages1.sh and environmentv1.yml.)
 # RTS, Nov/Dec 2021
+# updated with classifier statistics, Jan 2022
 # -------------------------------------------------------------
 import sys, os
 import json
@@ -16,15 +17,17 @@ import numpy
 from PIL import Image as PILImage
 from pcloud import PyCloud
 
+from helper import *
+
 # Local path and variables
-datapath = '/home/marcbohlen/data/'
+datapath = '/home/blc/gdal-otb-qgis-combo/data/'
 inputsfile = datapath + 'settings.txt'
 
 #------------------------------------------------------------------------------
 def main():
 	# print command line arguments
 	for arg in sys.argv[1:]:
-		print ("This is your input: ", arg)
+		print ("This the selected input: ", arg)
 
 	classifier = arg.strip()
 	if((classifier == 'libsvm') or (classifier == 'rf')):
@@ -60,6 +63,7 @@ def raster_classify (classifier):
 		colortemplate = jdata['colortemplate']
 		cfieldname = jdata['cfieldname']
 
+		stats_save = jdata['stats_save']
 		t2p = jdata['T2P']
 		pdir = jdata['pdir']
 		r_height = int(jdata['r_height'])
@@ -70,6 +74,10 @@ def raster_classify (classifier):
 
 	rimage = rasterpath + rasterimage
 	sfile = vectorpath +  rastershapefile
+	print('\nHere are the inputs') 
+	print('Shapefile: ', sfile)
+	print('Rasterimage: ', rasterimage)
+	print('\n')
 	b_rimage = rasterimage.split('.tif')[0] + '_'
 
 #------------------------------------------------------------------------------
@@ -133,10 +141,18 @@ def raster_classify (classifier):
 	app.ExecuteAndWriteOutput()
 
 #--------------------------------------------------------------------------------
-	#step 3 - apply colormap
+	#step 3 - calculate classifier statistics
+
+	stats = get_classifier_statistics(resultspath, con_matrix, stats_save)
+	print('\nHere are the classifier statistics, based on the confusion matrix\n')
+	print(stats)
+	print('\n')
+
+#--------------------------------------------------------------------------------
+	#step 4 - apply colormap
 
 	if(addcolor == "yes"):
-		print('\n\nApplying colormap\n\n')
+		print('\n\nApplying colormap\n')
 		apptype = "ColorMapping"
 		app = otbApplication.Registry.CreateApplication(apptype)
 		app.SetParameterString("in", resultspath + classified_rimage)  		#the output of step 2
@@ -145,7 +161,7 @@ def raster_classify (classifier):
 		app.SetParameterString("out", resultspath + color_classified_rimage)
 		app.ExecuteAndWriteOutput()
 #---------------------------------------------------------------------------------
-	#step 4 - transfer to storage (pCloud)
+	#step 5 - transfer to storage (pCloud)
 
 	if(t2p == "yes"):
         	f = open(authfile, 'r')

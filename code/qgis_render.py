@@ -18,6 +18,7 @@ import pytz
 from zipfile import ZipFile
 from pcloud import PyCloud
 
+from helper import *
 #---------------------------------------------------------------------------------------
 def create_timestamp(location):
     tz = pytz.timezone(location)
@@ -41,7 +42,7 @@ qgispath = '/usr/bin/qgis'
 
 #---------------------------------------------------------------------------------------
 #collect the variables
-datapath = '/home/marcbohlen/data/'
+datapath = '/home/blc/gdal-otb-qgis-combo/data/'
 inputsfile = datapath + 'settings.txt'
 
 try:
@@ -75,7 +76,9 @@ else:
 	keep_attributes = jdata['KEEP_ATTRIBUTES']
 	options = jdata['OPTIONS']
 	statistics_attribute = jdata['STATISTICS_ATTRIBUTE']
-
+	
+	con_matrix = jdata["confusion_matrix_vector_ann"]
+	stats_save = jdata['stats_save']
 	t2p = jdata['T2P']
 	pdir = jdata['pdir']
 	r_height = int(jdata['r_height'])
@@ -126,9 +129,11 @@ from processing.core.Processing import Processing
 processing.core.Processing.Processing.initialize()
 from processing.tools import *
 
+tstamp = create_timestamp(location)
+
 if(perform_dissolve == "yes"):
 	#dissolve the layer ----------------------------------------------------------------------
-	classified_vimage = rastername + '_' + classified_vimage + '_' + classifier + '_dissolved.png'
+	classified_vimage = rastername + '_' + tstamp + '_' + classified_vimage + '_' + classifier + '_dissolved.png'
 	dissolved_shapefile =  resultspath + dissolved_shapefile
 	algorithmname = "gdal:dissolve"
 	print('\n\nRunning GDAL dissolve ...this step takes about 20 minutes [16GB RAM]\n')
@@ -159,7 +164,7 @@ if(perform_dissolve == "yes"):
 
 else:
 	print('\n\nNot performing the dissolve operation...')
-	classified_vimage = rastername + '_' + classified_vimage + '_' + classifier + '.png'
+	classified_vimage = rastername + '_' + tstamp + '_' + classified_vimage + '_' + classifier + '.png'
 	working_shapefile = render_shapefile
 
 #--------------------------------------------------------------------------------------
@@ -200,6 +205,12 @@ loop.exec_()
 print('\nRender complete; ending QGIS')
 qgs.exitQgis()
 
+#----------------------------------------------------------
+stats, fname = get_classifier_statistics(resultspath, con_matrix, stats_save)
+print('\nHere are the classifier statistics, based on the confusion matrix\n')
+print(stats)
+print('\n')
+
 #-----------------------------------------------------------
 if((do_zip == "yes") and (perform_dissolve == "yes")):
 	base = dissolved_shapefile.split('.shp')[0]
@@ -219,9 +230,16 @@ if(t2p == "yes"):
 	username = lines[0].strip()
 	password = lines[1].strip()
 	f.close()
+
+	#zip up the settings and stats (classifier precision, recall and fscore)
+	stats_settings = jdata['stats+settings']
+	zipOb = ZipFile(resultspath + stats_settings, 'w')
+	zipOb.write(resultspath + fname)
+	zipOb.write(inputsfile)
+
 	try:
 		conn = PyCloud(username, password, endpoint='nearest')
-		filelist = [resultspath + classified_vimage, resultspath + ziped]
+		filelist = [resultspath + classified_vimage, resultspath + ziped, resultspath + stats_settings]
 		conn.uploadfile(files=filelist, path=pdir)
 		print('\n\nUploading to remote storage: ' , filelist)
 	except:

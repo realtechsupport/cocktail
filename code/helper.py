@@ -36,5 +36,5 @@ def get_classifier_statistics(datapath, confusion_matrix, save):
 		stats_results.write('\n'.join(stats))
 		stats_results.close()
 
-	return(stats)
+	return(stats, fname)
 # ------------------------------------------------------------------------------

@@ -6,6 +6,7 @@
 # install on Ubuntu 18 LTS with conda (conda-packages1.sh and environmentv1.yml.)
 # RTS, Nov/Dec 2021
 # updated with classifier statistics, Jan 2022
+# updated with download package (image, settings, stats)
 # -------------------------------------------------------------
 import sys, os
 import json
@@ -16,6 +17,7 @@ import otbApplication
 import numpy
 from PIL import Image as PILImage
 from pcloud import PyCloud
+from zipfile import ZipFile
 
 from helper import *
 
@@ -143,7 +145,7 @@ def raster_classify (classifier):
 #--------------------------------------------------------------------------------
 	#step 3 - calculate classifier statistics
 
-	stats = get_classifier_statistics(resultspath, con_matrix, stats_save)
+	stats, fname = get_classifier_statistics(resultspath, con_matrix, stats_save)
 	print('\nHere are the classifier statistics, based on the confusion matrix\n')
 	print(stats)
 	print('\n')
@@ -164,22 +166,28 @@ def raster_classify (classifier):
 	#step 5 - transfer to storage (pCloud)
 
 	if(t2p == "yes"):
-        	f = open(authfile, 'r')
-        	lines = f.readlines()
-        	username = lines[0].strip()
-        	password = lines[1].strip()
-        	f.close()
+		f = open(authfile, 'r')
+		lines = f.readlines()
+		username = lines[0].strip()
+		password = lines[1].strip()
+		f.close()
 
-        	conn = PyCloud(username, password, endpoint='nearest')
+		#zip up the settings and stats (classifier precision, recall and fscore calculated from the confusion matrix)
+		stats_settings = jdata['stats+settings']
+		zipOb = ZipFile(resultspath + stats_settings, 'w')
+		zipOb.write(resultspath + fname)
+		zipOb.write(inputsfile)
+		zipOb.close()
 
-        	if(addcolor == "yes"):
-                	filelist = [resultspath + color_classified_rimage]
-        	else:
-                	filelist = [resultspath + classified_rimage]
+		conn = PyCloud(username, password, endpoint='nearest')
+		if(addcolor == "yes"):
+			filelist = [resultspath + color_classified_rimage, resultspath + stats_settings]
+		else:
+			filelist = [resultspath + classified_rimage, resultspath + stats_settings]
 
-        	conn.uploadfile(files=filelist, path=pdir)
-        	print('\n\nUploaded: ' , filelist)
-        	print('\n\n')
+		conn.uploadfile(files=filelist, path=pdir)
+		print('\n\nUploaded: ' , filelist)
+		print('\n\n')
 #---------------------------------------------------------------------------------
 
 if __name__ == "__main__":

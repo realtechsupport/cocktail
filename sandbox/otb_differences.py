@@ -1,22 +1,27 @@
-# ORFEO Toolbox 
+# ORFEO Toolbox
 # otb_differences.py
 #--------------------------------------------------------------
-# MultivariateAlterationDetector
-# Change detection by Multivariate Alteration Detector (MAD) algorithm 
-# Activate the OTB conda environment before you run this code
-# conda activate OTB
+# change detection - various approches
+# MAD
+# Change detection between two multispectral images using the Multivariate Alteration Detector (MAD) algorithm
+# https://www.orfeo-toolbox.org/CookBook/Applications/app_MultivariateAlterationDetector.html
+# Input images 1 and 2 should share exactly the same origin, spacing, size, and projection if any.
 # Inputs set in the settings.txt file
 # rasterimage: before state (older image)
 # rasterimage2: after state (newer image)
+
+# Activate the OTB conda environment before you run this code
+# conda activate OTB
 # RTS, Feb 2022
 # -------------------------------------------------------------
-
-#CHECK - RadimetricIndices
+# Radiometric Indeces
 # https://www.orfeo-toolbox.org/CookBook/Applications/app_RadiometricIndices.html
-# CHECK - BandX
-# https://www.orfeo-toolbox.org/CookBook/recipes/bandmathX.html#advanced-image-operations-using-bandmathx 
+# https://www.orfeo-toolbox.org/SoftwareGuide/SoftwareGuidech12.html
 
-
+# Thresholding
+# https://github.com/orfeotoolbox/OTB-Documents/blob/master/Courses/2014-OGRS/multitemp.org
+# https://www.orfeo-toolbox.org/CookBook/Applications/app_BandMath.html
+# https://github.com/orfeotoolbox/OTB-Documents/blob/master/Courses/2014-OGRS/mvdapps.org
 #-------------------------------------------------------------
 import sys, os
 import json
@@ -34,22 +39,22 @@ from helper import *
 # Local path and variables
 datapath = '/home/blc/gdal-otb-qgis-combo/data/'
 inputsfile = datapath + 'settings.txt'
-
 #------------------------------------------------------------------------------
 def main():
-	create_change_map()
+	#changetype = 'simple_ndvi' 
+	#changetype = 'multivariatedetector'
+	changetype =  'radiometricindices'
 
+	create_change_map(changetype)
 #------------------------------------------------------------------------------
 def create_timestamp(location):
     tz = pytz.timezone(location)
     now = datetime.now(tz)
     current_time = now.strftime("%d-%m-%Y-%H-%M")
-    return(current_time) 
+    return(current_time)
 
 #------------------------------------------------------------------------------
-def create_change_map ():
-#inputs set in the setting.txt file
-
+def create_change_map (changetype):
 	try:
         	f = open(inputsfile, 'r')
         	data = f.read()
@@ -79,56 +84,99 @@ def create_change_map ():
 	rimage = rasterpath + rasterimage
 	rimage2 = rasterpath + rasterimage2
 
-	print('\nHere are the inputs') 
+	print('\nHere are the inputs')
 	print('Before...image 1: ', rasterimage)
 	print('After... image 2: ', rasterimage2)
 	print('Here is the band math expression: ', bandmathexpression)
 	print('\n')
 
-	#craete the name here with the dates of the input images
+	#create the name here with the dates of the input images
 	b_rimage = rasterimage.split('.tif')[0] + '_'
 
+	filelist = []
 #------------------------------------------------------------------------------
+	if(changetype == 'multivariatedetector'):
+		print("\nPerforming multivariatedetector\n")
+		apptype = "MultivariateAlterationDetector"
+		app = otbApplication.Registry.CreateApplication(apptype)
+		app.SetParameterString("in1", rimage)
+		app.SetParameterString("in2", rimage2) #after, newer image
+		app.SetParameterString("out", resultspath + changeimage)
+		app.ExecuteAndWriteOutput()
+		filelist = [inputsfile, resultspath + changeimage]
+	#--------------------------------------------------------------------------
+	elif(changetype == 'simple_ndvi'):
+		print("\nPerforming simple_ndvi\n")
+		apptype = "BandMathX"
+		app = otbApplication.Registry.CreateApplication(apptype)
+		app.SetParameterStringList("il", [rimage, rimage2])
+		app.SetParameterString("out", resultspath + bandmathchangeimage)
+		app.SetParameterString("exp", "(ndvi(im1b1,im1b4) - ndvi(im2b1,im2b4))")
+		app.ExecuteAndWriteOutput()
 
-	# Change detection between two multispectral images using the Multivariate Alteration Detector (MAD) algorithm
-	# https://www.orfeo-toolbox.org/CookBook/Applications/app_MultivariateAlterationDetector.html
-	# Input images 1 and 2 should share exactly the same origin, spacing, size, and projection if any.
-	
-	# differencing
-	apptype = "MultivariateAlterationDetector"
+		apptype = "ColorMapping"
+		c_out = "ndvi_diff_colormap.png"
+		app = otbApplication.Registry.CreateApplication(apptype)
+		app.SetParameterString("in", resultspath + bandmathchangeimage)
 
-	app = otbApplication.Registry.CreateApplication(apptype)
-	app.SetParameterString("in1", rimage)
-	app.SetParameterString("in2", rimage2) #after, newer image
-	app.SetParameterString("out", resultspath + changeimage)
-	#tstamp = create_timestamp(location)
+		app.SetParameterString("method","continuous")
+		app.SetParameterString("method.continuous.min", "-0.3")	#min value is -0.6
+		app.SetParameterString("method.continuous.max", "0.7")	#max is 0.7
+		app.SetParameterString("method.continuous.lut", "jet")
+		app.SetParameterString("out", resultspath + c_out)
+		filelist = [inputsfile, resultspath + bandmathchangeimage, resultspath + c_out]
+	#--------------------------------------------------------------------------
+	elif(changetype == 'radiometricindices'):
+		print("\nPerforming radiometric based difference image\n")
+		apptype = "RadiometricIndices"
+		ind_selection = ["Vegetation:NDVI", "Vegetation:TNDVI", "Vegetation:SAVI"]
+		#ind_selection = ["Vegetation:NDVI", "Vegetation:RVI", "Vegetation:TNDVI", "Vegetation:SAVI"]
+		#ind_selection = ["Vegetation:NDVI"]
+		app = otbApplication.Registry.CreateApplication(apptype)
 
-	app.ExecuteAndWriteOutput()
+		rm1 = 'RM1.tif'
+		rm2 = 'RM2.tif'
+		rmdiff = 'RMdifference.tif'
 
-	#thresholding
-	# https://github.com/orfeotoolbox/OTB-Documents/blob/master/Courses/2014-OGRS/multitemp.org
- 	# https://www.orfeo-toolbox.org/CookBook/Applications/app_BandMath.html
+		#operate on first image ... CHECK channels !!!
+		app.SetParameterString("in", rimage)
+		app.SetParameterString("channels.red", "1")
+		app.SetParameterString("channels.green","2")
+		app.SetParameterString("channels.blue", "3")
+		app.SetParameterString("channels.nir", "4")
+		app.SetParameterStringList("list", ind_selection)
+		app.SetParameterString("out", resultspath + rm1)
+		app.ExecuteAndWriteOutput()
 
-	apptype = "BandMath"
-	app = otbApplication.Registry.CreateApplication(apptype)
-	app.SetParameterStringList("il", [resultspath + changeimage])
-	app.SetParameterString("out", resultspath + bandmathchangeimage)
-	app.SetParameterString("exp", bandmathexpression) #defined in the settings
+		#operate on second image
+		app.SetParameterString("in", rimage2)
+		app.SetParameterString("channels.red", "1")
+		app.SetParameterString("channels.green","2")
+		app.SetParameterString("channels.blue", "3")
+		app.SetParameterString("channels.nir", "4")
+		app.SetParameterStringList("list", ind_selection)
+		app.SetParameterString("out", resultspath + rm2)
+		app.ExecuteAndWriteOutput()
 
-	app.ExecuteAndWriteOutput()
-	
-	'''
-	#NDVI difference
-	# https://www.youtube.com/watch?v=Q9kgA2BGs4E
-	apptype = "BandMathX" 
-	app = otbApplication.Registry.CreateApplication(apptype)
-	app.SetParameterStringList("il", [rimage, rimage2])
-	app.SetParameterString("out", resultspath + bandmathchangeimage)
-	#app.SetParameterString("exp", bandmathexpression) #defined in the settings
-	#app.SetParameterString("exp", "(ndvi(im1b1,im1b4) - ndvi(im2b1,im2b4)) > 0.20 ? 255:0")
-	app.SetParameterString("exp", "((im2b1 / im1b1) / (im2b1 + im1b1))*256")
-	app.ExecuteAndWriteOutput()
-	'''
+		apptype = "BandMathX"
+		app = otbApplication.Registry.CreateApplication(apptype)
+		app.SetParameterStringList("il", [resultspath + rm1, resultspath + rm2])
+		app.SetParameterString("out", resultspath + rmdiff)
+		app.SetParameterString("exp", "im2-im1") #ISSUE HERE
+		app.ExecuteAndWriteOutput()
+
+		apptype = "ColorMapping"
+		c_out = "RMI_diff_colormap.png"
+		app = otbApplication.Registry.CreateApplication(apptype)
+		app.SetParameterString("in", resultspath + rmdiff)
+		app.SetParameterString("method","continuous")
+		app.SetParameterString("method.continuous.min", "-0.3")	#check !
+		app.SetParameterString("method.continuous.max", "0.7")	#check !
+		app.SetParameterString("method.continuous.lut", "jet")
+		app.SetParameterString("out", resultspath + c_out)
+		app.ExecuteAndWriteOutput()
+		filelist = [inputsfile, resultspath + rmdiff, resultspath + c_out]
+
 #---------------------------------------------------------------------------------
 	#step 2 - transfer to storage (pCloud)
 
@@ -140,8 +188,7 @@ def create_change_map ():
 		f.close()
 
 		conn = PyCloud(username, password, endpoint='nearest')
-		filelist = [inputsfile, resultspath + bandmathchangeimage]
-
+		#filelist = [inputsfile, resultspath + bandmathchangeimage, resultspath + "RMI_differenceimage.tif", resultspath + c_out]
 		conn.uploadfile(files=filelist, path=pdir)
 		print('\n\nUploaded: ' , filelist)
 		print('\n\n')

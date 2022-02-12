@@ -1,4 +1,4 @@
-#Cocktail 
+## Cocktail 
 
 Mixing GDAL + OTB + QGIS in a virtual environment for easy collaboration
 

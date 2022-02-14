@@ -20,6 +20,10 @@
 	"colormap_rmi_min" : "-0.3",
 	"colormap_rmi_max" : "0.7",
 	"colormap_rmi_type" : "jet",
+	
+	"texture_map" : "texture.tif",
+	"concat_raster_texture" : "raster_texture.tif",
+	"texture_channel" : "2",
 
 	"raster_classifier_svm" : "libsvm",
 	"raster_classifier_rf" : "rf",

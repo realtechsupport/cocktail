@@ -22,6 +22,7 @@
 	"colormap_rmi_type" : "jet",
 	
 	"texture_map" : "texture.tif",
+	"texture_map_3bands" : "texture_3bands.tif",
 	"concat_raster_texture" : "raster_texture.tif",
 	"texture_channel" : "2",
 
@@ -34,13 +35,13 @@
 	"coord_info" : "area1_4points",
 	
 	"//--commentB" : "Path settings -----------",
-	"authfile" : "/home/blc/gdal-otb-qgis-combo/auth/pc.txt",
+	"authfile" : "/home/blc/cocktail/data/auth/pc.txt",
 	"location" : "America/New_York",
 	"colortemplate" : "11colormap.txt",
 	"colortemplate_qgis" : "11colormap_qgis.qml",
-	"rasterpath" : "/home/blc/gdal-otb-qgis-combo/data/rasterimages/",
-	"vectorpath" : "/home/blc/gdal-otb-qgis-combo/data/vectorfiles/",
-	"resultspath" : "/home/blc/gdal-otb-qgis-combo/results/",
+	"rasterpath" : "/home/blc/cocktail/data/rasterimages/",
+	"vectorpath" : "/home/blc/cocktail/data/vectorfiles/",
+	"resultspath" : "/home/blc/cocktail/results/",
 
 	"//--commentC" : "Intermediate files ---------",
 	"segmentation_stats" : "segmentation_vector_stats.shp",

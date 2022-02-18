@@ -4,6 +4,11 @@
 # RTS, Jan 2022
 # ------------------------------------------------------------------------------
 import os, sys, numpy
+from datetime import datetime
+import pytz
+import glob, shutil, zipfile
+from zipfile import ZipFile
+
 #-------------------------------------------------------------------------------
 # Precision, Recall and Fscore gleaned from a multi-class confusion matrix
 # https://en.wikipedia.org/wiki/Precision_and_recall
@@ -38,3 +43,13 @@ def get_classifier_statistics(datapath, confusion_matrix, save):
 
 	return(stats, fname)
 # ------------------------------------------------------------------------------
+
+def create_timestamp(location):
+    tz = pytz.timezone(location)
+    now = datetime.now(tz)
+    current_time = now.strftime("%d-%m-%Y-%H-%M")
+    return(current_time)
+
+#------------------------------------------------------------------------------
+
+

@@ -5,8 +5,9 @@
 # transport to pCloud
 # install on Ubuntu 18 LTS with conda (conda-packages1.sh and environmentv1.yml.)
 # RTS, Nov/Dec 2021
-# updated with classifier statistics, Jan 2022
+# updated with classifier statistics, Feb 2022
 # updated with download package (image, settings, stats)
+# updated input selection: zipped vectorshape file name
 # -------------------------------------------------------------
 import sys, os
 import json
@@ -17,35 +18,29 @@ import otbApplication
 import numpy
 from PIL import Image as PILImage
 from pcloud import PyCloud
-from zipfile import ZipFile
+#from zipfile import ZipFile
 
 from helper import *
 
 # Local path and variables
-datapath = '/home/blc/gdal-otb-qgis-combo/data/'
+datapath = '/home/blc/cocktail/data/'
 inputsfile = datapath + 'settings.txt'
 
 #------------------------------------------------------------------------------
 def main():
 	# print command line arguments
 	for arg in sys.argv[1:]:
-		print ("This the selected input: ", arg)
+		print ("\nThis the selected input: ", arg)
 
 	classifier = arg.strip()
 	if((classifier == 'libsvm') or (classifier == 'rf')):
-		print("\nProceeding to vector processing with ", classifier)
+		print("Proceeding to vector processing with: ", classifier)
 		raster_classify (classifier)
 	else:
-		print("\nOnly libsvm and rf classifiers supported now... Try again.\n")
+		print("Only libsvm and rf classifiers supported now... Try again.\n")
 		exit()
 #------------------------------------------------------------------------------
-def create_timestamp(location):
-    tz = pytz.timezone(location)
-    now = datetime.now(tz)
-    current_time = now.strftime("%d-%m-%Y-%H-%M")
-    return(current_time) 
 
-#------------------------------------------------------------------------------
 def raster_classify (classifier):
 	try:
         	f = open(inputsfile, 'r')
@@ -58,10 +53,11 @@ def raster_classify (classifier):
 		#print(jdata)
 		authfile = jdata['authfile']
 		rasterimage = jdata['rasterimage']
-		rastershapefile = jdata['rastershapefile']
+		rastershapezipfile = jdata['rastershapezipfile']
 		rasterpath = jdata['rasterpath']
 		vectorpath = jdata['vectorpath']
 		resultspath = jdata['resultspath']
+		collectionpath = jdata['collectionpath']
 		colortemplate = jdata['colortemplate']
 		cfieldname = jdata['cfieldname']
 
@@ -74,16 +70,32 @@ def raster_classify (classifier):
 		location = jdata['location']
 		addcolor = jdata['raster_addcolor']
 
+
 	rimage = rasterpath + rasterimage
-	sfile = vectorpath +  rastershapefile
+	key = "classification"
+	s = rastershapezipfile.split(key)
+	sf = s[0] + key + ".shp"
+	sfile = vectorpath + sf
+	
 	print('\nHere are the inputs') 
-	print('Shapefile: ', sfile)
+	print('Zipped raster shapefile: ', rastershapezipfile) 
+	print('Unzipped raster shapefile: ' , sfile)
 	print('Rasterimage: ', rasterimage)
-	print('\n')
+
 	b_rimage = rasterimage.split('.tif')[0] + '_'
 
+#-----------------------------------------------------------------------------
+	# step 1 - preparation - copy the selected zipfiles to the vectordata folder and uncompress
+	
+	shutil.copy(collectionpath + rastershapezipfile, vectorpath + rastershapezipfile)
+
+	with zipfile.ZipFile(vectorpath + rastershapezipfile, 'r') as zip_ref:
+  		zip_ref.extractall(vectorpath)
+
+	print("Selected zipped files moved to vector directory and unzipped..")
+
 #------------------------------------------------------------------------------
-	#step 1 - train a classifiers with the raster input image and the shapefile with ROIs
+	#step 2 - train a classifiers with the raster input image and the shapefile with ROIs
 
 	apptype = "TrainImagesClassifier"
 	samplemv = 100
@@ -133,7 +145,7 @@ def raster_classify (classifier):
 	app.ExecuteAndWriteOutput()
 
 #--------------------------------------------------------------------------------
-	#step 2  - classify an input image with the trained model
+	#step 3  - classify an input image with the trained model
 
 	apptype = "ImageClassifier"
 	app = otbApplication.Registry.CreateApplication(apptype)
@@ -143,7 +155,7 @@ def raster_classify (classifier):
 	app.ExecuteAndWriteOutput()
 
 #--------------------------------------------------------------------------------
-	#step 3 - calculate classifier statistics
+	#step 4 - calculate classifier statistics
 
 	stats, fname = get_classifier_statistics(resultspath, con_matrix, stats_save)
 	print('\nHere are the classifier statistics, based on the confusion matrix\n')
@@ -151,7 +163,7 @@ def raster_classify (classifier):
 	print('\n')
 
 #--------------------------------------------------------------------------------
-	#step 4 - apply colormap
+	#step 5 - apply colormap
 
 	if(addcolor == "yes"):
 		print('\n\nApplying colormap\n')
@@ -163,7 +175,7 @@ def raster_classify (classifier):
 		app.SetParameterString("out", resultspath + color_classified_rimage)
 		app.ExecuteAndWriteOutput()
 #---------------------------------------------------------------------------------
-	#step 5 - transfer to storage (pCloud)
+	#step 6 - transfer to storage (pCloud)
 
 	if(t2p == "yes"):
 		f = open(authfile, 'r')
@@ -188,6 +200,7 @@ def raster_classify (classifier):
 		conn.uploadfile(files=filelist, path=pdir)
 		print('\n\nUploaded: ' , filelist)
 		print('\n\n')
+
 #---------------------------------------------------------------------------------
 
 if __name__ == "__main__":

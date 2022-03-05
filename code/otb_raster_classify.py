@@ -138,7 +138,7 @@ def raster_classify (classifier):
 		color_classified_rimage = b_rimage + tstamp + '_' + jdata['classified_rimage_color_svm']
 		con_matrix =  jdata['confusion_matrix_svm']
 		app.SetParameterString("classifier.libsvm.k", jdata['svm_k'])
-		app.SetParameterFloat("classifier.libsvm.c", int(jdata['svm_c']))
+		app.SetParameterFloat("classifier.libsvm.c", float(jdata['svm_c']))
 		app.SetParameterString("classifier.libsvm.opt", jdata['svm_opt'])
 
 	app.SetParameterString("io.confmatout", resultspath + con_matrix)
@@ -157,7 +157,7 @@ def raster_classify (classifier):
 #--------------------------------------------------------------------------------
 	#step 4 - calculate classifier statistics
 
-	stats, fname = get_classifier_statistics(resultspath, con_matrix, stats_save)
+	stats, fname = get_classifier_statistics(location, resultspath, con_matrix, stats_save)
 	print('\nHere are the classifier statistics, based on the confusion matrix\n')
 	print(stats)
 	print('\n')
@@ -186,16 +186,18 @@ def raster_classify (classifier):
 
 		#zip up the settings and stats (classifier precision, recall and fscore calculated from the confusion matrix)
 		stats_settings = jdata['stats+settings']
-		zipOb = ZipFile(resultspath + stats_settings, 'w')
+		tstamp = create_timestamp(location)
+		stats_settings_tstamp = stats_settings.split('.zip')[0] + '_' + tstamp + '.zip'
+		zipOb = ZipFile(resultspath + stats_settings_tstamp, 'w')
 		zipOb.write(resultspath + fname)
 		zipOb.write(inputsfile)
 		zipOb.close()
 
 		conn = PyCloud(username, password, endpoint='nearest')
 		if(addcolor == "yes"):
-			filelist = [resultspath + color_classified_rimage, resultspath + stats_settings]
+			filelist = [resultspath + color_classified_rimage, resultspath + stats_settings_tstamp]
 		else:
-			filelist = [resultspath + classified_rimage, resultspath + stats_settings]
+			filelist = [resultspath + classified_rimage, resultspath + stats_settings_tstamp]
 
 		conn.uploadfile(files=filelist, path=pdir)
 		print('\n\nUploaded: ' , filelist)

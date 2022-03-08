@@ -59,9 +59,14 @@
 	"classified_rimage_rf" : "raster_classified_rf.tif",
 	"classified_rimage_svm" : "raster_classified_svm.tif",
 	"classified_rimage_ann" : "raster_classified_ann.tif",
-        "classified_rimage_color_rf" : "raster_classified_color_rf.png",
+        
+	"classified_rimage_color_rf" : "raster_classified_color_rf.png",
         "classified_rimage_color_svm" : "raster_classified_color_svm.png",
         "classified_rimage_color_ann" : "raster_classified_color_ann.png",
+
+        "classified_rimage+texture_color_rf" : "raster+texture_classified_color_rf.png",
+        "classified_rimage+texture_color_svm" : "raster+texture_classified_color_svm.png",
+        "classified_rimage+texture_color_ann" : "raster+texture_classified_color_ann.png",	
 
 	"raster_addcolor" : "yes",
 	
@@ -86,7 +91,7 @@
 	
 	"//-commentE-svm" : "SVM training settings ---",
 	"svm_k" : "linear",
-	"svm_c" : "1",
+	"svm_c" : "1.0",
 	"svm_opt" : "false",
 
 	"//-commentE-rf" : "RF training settings -----",

@@ -18,7 +18,6 @@ import otbApplication
 import numpy
 from PIL import Image as PILImage
 from pcloud import PyCloud
-#from zipfile import ZipFile
 
 from helper import *
 
@@ -119,7 +118,6 @@ def raster_classify (classifier):
 		modelname = jdata['modelname_rf']
 		app.SetParameterString("io.out", resultspath + modelname)
 		classified_rimage = b_rimage + tstamp + '_' + jdata['classified_rimage_rf']
-		color_classified_rimage = b_rimage + tstamp + '_' + jdata['classified_rimage_color_rf']
 		con_matrix = jdata['confusion_matrix_rf']
 		app.SetParameterInt("classifier.rf.max", int(jdata['rf_max']))
 		app.SetParameterInt("classifier.rf.min", int(jdata['rf_min']))
@@ -135,7 +133,6 @@ def raster_classify (classifier):
 		modelname =  jdata['modelname_svm']
 		app.SetParameterString("io.out", resultspath + modelname)
 		classified_rimage = b_rimage + tstamp + '_' + jdata['classified_rimage_svm']
-		color_classified_rimage = b_rimage + tstamp + '_' + jdata['classified_rimage_color_svm']
 		con_matrix =  jdata['confusion_matrix_svm']
 		app.SetParameterString("classifier.libsvm.k", jdata['svm_k'])
 		app.SetParameterFloat("classifier.libsvm.c", float(jdata['svm_c']))
@@ -172,6 +169,14 @@ def raster_classify (classifier):
 		app.SetParameterString("in", resultspath + classified_rimage)  		#the output of step 2
 		app.SetParameterString("method", "custom")
 		app.SetParameterString("method.custom.lut", datapath + colortemplate)
+
+		#add timestamp now..
+		tstamp = create_timestamp(location)
+		if(classifier == 'libsvm'):
+			color_classified_rimage = b_rimage + tstamp + '_' + jdata['classified_rimage_color_svm']
+		elif(classifier == 'rf'):
+			color_classified_rimage = b_rimage + tstamp + '_' + jdata['classified_rimage_color_rf']
+
 		app.SetParameterString("out", resultspath + color_classified_rimage)
 		app.ExecuteAndWriteOutput()
 #---------------------------------------------------------------------------------

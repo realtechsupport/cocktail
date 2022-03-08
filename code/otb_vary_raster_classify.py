@@ -18,14 +18,18 @@ orgfile = "settings_org.txt"
 infile = settingsname
 outfile = infile
 #-------------------------------------------------------------------------------
-# set the the classifier to call
-program = 'otb_raster_classify.py'
-selection  =  'libsvm' #or rf
+# set the the script to call
+program = 'otb_raster+texture_classify.py'
+#program = 'otb_raster_classify.py'
+
+#set the classifier the script should use
+selection  = 'libsvm'	# 'libsvm' #or rf
 
 #-------------------------------------------------------------------------------
 def main():
 	# print command line arguments
-	print('\nRunning this classifier with parameter permutations: ', selection)
+	print('\nRunning this script: ', program) 
+	print('... with this classifier: ', selection)
 	vary_raster_classify(datapath, codepath, infile, orgfile, outfile, selection)
 	print('\nFinished parameter permutations\n')
 
@@ -37,7 +41,7 @@ def vary_raster_classify(datapath, codepath, infile, orgfile, outfile, selection
 		token2_name = "svm_c"
 		#default values
 		token1_value = "linear"
-		token2_value = "1"
+		token2_value = "1.0"
 
 		#leave unchanged ... token1_list = ["linear"]
 		#OR multiple values [a,b,c]
@@ -74,6 +78,13 @@ def vary_raster_classify(datapath, codepath, infile, orgfile, outfile, selection
 	except:
 		print('\nError running classifier...')
 
+	
+	# set a delay between iterations...
+	delay_seconds = 120
+	minutes = int(delay_seconds/60)
+	print('\n Wait, in minutes: ' + str(minutes) + '\n')
+	time.sleep(delay_seconds)
+
 	#make change based on list of token1_list, token2_list and run classifier after each change
 	for i in range (0, len(token1_list)):
 		for j in range (0, len(token2_list)):
@@ -86,9 +97,8 @@ def vary_raster_classify(datapath, codepath, infile, orgfile, outfile, selection
 				print('\n\nRunning classifier with settings..', i, j, change1, change2)
 				command = 'python3 ' + codepath + program + ' ' + selection
 				os.system(command)
-				#wait one minute
-				print('\nWaiting for 2 minutes...\n')
-				time.sleep(120)
+				print('\n Wait, in minutes: ' + str(minutes) + '\n')
+				time.sleep(delay_seconds)
 			except:
 				print('\nError running classifier...')
 				break

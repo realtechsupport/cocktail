@@ -18,10 +18,10 @@
 #---------------------------------------------------------------------------
 echo "Starting OTB-GDAL-QGIS pipeline...\n\n"
 
-conda run -n OTB python3 /home/marcbohlen/code/otb_vector_classify_1.py
-python3 /home/marcbohlen/code/qgis_join.py
-conda run -n OTB python3 /home/marcbohlen/code/otb_vector_classify_2.py
-python3 /home/marcbohlen/code/qgis_render.py
+conda run -n OTB python3 /home/blc/cocktail/code/otb_vector_classify_1.py
+python3 /home/blc/cocktail/code/qgis_join.py
+conda run -n OTB python3 /home/blc/cocktail/code/otb_vector_classify_2.py
+python3 /home/blc/cocktail/code/qgis_render.py
  
 echo "Process complete\n\n"
 #---------------------------------------------------------------------------

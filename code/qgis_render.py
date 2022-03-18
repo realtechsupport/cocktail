@@ -20,12 +20,6 @@ from pcloud import PyCloud
 
 from helper import *
 #---------------------------------------------------------------------------------------
-def create_timestamp(location):
-    tz = pytz.timezone(location)
-    now = datetime.now(tz)
-    current_time = now.strftime("%d-%m-%Y-%H-%M")
-    return(current_time) 
-
 def finished():
     img = render.renderedImage()
     img.save(image_location, "png")
@@ -42,7 +36,7 @@ qgispath = '/usr/bin/qgis'
 
 #---------------------------------------------------------------------------------------
 #collect the variables
-datapath = '/home/blc/gdal-otb-qgis-combo/data/'
+datapath = '/home/blc/cocktail/data/'
 inputsfile = datapath + 'settings.txt'
 
 try:
@@ -206,7 +200,7 @@ print('\nRender complete; ending QGIS')
 qgs.exitQgis()
 
 #----------------------------------------------------------
-stats, fname = get_classifier_statistics(resultspath, con_matrix, stats_save)
+stats, fname = get_classifier_statistics(location, resultspath, con_matrix, stats_save)
 print('\nHere are the classifier statistics, based on the confusion matrix\n')
 print(stats)
 print('\n')
@@ -224,6 +218,8 @@ if((do_zip == "yes") and (perform_dissolve == "yes")):
 	print('\nResult shapefiles compressed..')
 
 #-----------------------------------------------------------
+#step 6 - transfer to storage (pCloud)
+
 if(t2p == "yes"):
 	f = open(authfile, 'r')
 	lines = f.readlines()
@@ -231,20 +227,25 @@ if(t2p == "yes"):
 	password = lines[1].strip()
 	f.close()
 
-	#zip up the settings and stats (classifier precision, recall and fscore)
+	#zip up the settings and stats (classifier precision, recall and fscore calculated from the confusion matrix)
 	stats_settings = jdata['stats+settings']
-	zipOb = ZipFile(resultspath + stats_settings, 'w')
+	#tstamp = create_timestamp(location)
+	stats_settings_tstamp = stats_settings.split('.zip')[0] + '_' + tstamp + '.zip'
+	zipOb = ZipFile(resultspath + stats_settings_tstamp, 'w')
 	zipOb.write(resultspath + fname)
 	zipOb.write(inputsfile)
-
+	zipOb.close()
 	try:
 		conn = PyCloud(username, password, endpoint='nearest')
-		filelist = [resultspath + classified_vimage, resultspath + ziped, resultspath + stats_settings]
+		filelist = [resultspath + classified_vimage, resultspath + ziped, resultspath + stats_settings_tstamp]
 		conn.uploadfile(files=filelist, path=pdir)
-		print('\n\nUploading to remote storage: ' , filelist)
+		print('\n\nUploaded: ' , filelist)
+		print('\n\n')
 	except:
 		print('\npCloud error...upload failed..')
 		pass
+
 else:
 	print('\nNot uploading result...\n')
+
 #-----------------------------------------------------------

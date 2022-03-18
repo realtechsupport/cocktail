@@ -20,7 +20,7 @@ import numpy
 from PIL import Image as PILImage
 #------------------------------------------------------------------------------
 # Local path and variables
-datapath = '/home/marcbohlen/data/'
+datapath = '/home/blc/cocktail/data/'
 inputsfile = datapath + 'settings.txt'
 #collect the variables
 try:

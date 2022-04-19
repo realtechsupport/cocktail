@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # helper.py
 # routines to support the OTB-QGIS toolchain COCKTAIL
-# RTS, Jan/March 2022
+# RTS, Jan/April 2022
 # ------------------------------------------------------------------------------
 import os, sys, numpy
 from datetime import datetime
@@ -75,3 +75,17 @@ def get_classifier_statistics(location, datapath, confusion_matrix, save):
 
 	return(stats, fname)
 # ------------------------------------------------------------------------------
+# get the .tif sentinel2 file with the correct band 
+def findband (band, token, ext, path):
+	result = 'n.a.'
+	files = os.listdir(path)
+	for file in files:
+		if((token in file) and (ext in file) and (band in file)):
+			result = file
+			break
+		else:
+			pass
+
+	return(result)
+
+#-------------------------------------------------------------------------------

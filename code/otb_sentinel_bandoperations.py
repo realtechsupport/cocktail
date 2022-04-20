@@ -91,7 +91,9 @@ def create_change_map (changetype):
 	ext2 = '.png'
 
 	do_colormap = 'true'
-
+	cmap = 'relief'				#'hsv'	'jet'
+	min_val = "-0.7805907"			#import to QGIS, do color map (symbology)
+	max_val = "0.2358491"
 	#------------------------------------------------------------------------------
 	if(changetype == 'ndbi'):
 		print("\nPerforming Normalised Difference Built-up Index\n")
@@ -198,9 +200,9 @@ def create_change_map (changetype):
 		app = otbApplication.Registry.CreateApplication(apptype)
 		app.SetParameterString("in", resultspath + sentinelbandmathimage)
 		app.SetParameterString("method","continuous")
-		app.SetParameterString("method.continuous.min", "0")       #check min !
-		app.SetParameterString("method.continuous.max", "255")       #check max !
-		app.SetParameterString("method.continuous.lut", 'jet')
+		app.SetParameterString("method.continuous.min", min_val)
+		app.SetParameterString("method.continuous.max", max_val)
+		app.SetParameterString("method.continuous.lut", cmap)
 		app.SetParameterString("out", resultspath + color_sentinelbandmathimage)
 		app.ExecuteAndWriteOutput()
 		filelist = [inputsfile, resultspath + color_sentinelbandmathimage]

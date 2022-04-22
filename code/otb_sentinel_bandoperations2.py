@@ -156,15 +156,24 @@ def create_change_map (changetype):
 		# crop larger image B11
 		#window = (minx, miny, maxx, maxy)
 
-		window = (281020, 9091640, 294960, 9079480)
-		print(window)
+		#projWin
+		pwindow = [281020, 9091650, 294960, 9079470]
+		#srcWin
+		#swindow = [20, 10, 13920, 12140]
 
 		im1 = 'crop_' + im1_s
-		gdal.Translate(sentinelrasterpath + im1, sentinelrasterpath + im1_s, projWin = window)
+		ds = gdal.Open(sentinelrasterpath + im1_s)
+		gdal.Translate(sentinelrasterpath + im1, ds, projWin = pwindow)
+		#gdal.Translate(sentinelrasterpath + im1, ds, srcWin = swindow)
+		ds = None
 
+		#swindow = [20, 20, 13930, 12150]
+		pwindow = [281020, 9091650, 294960, 9079470]
 		im2 = 'crop_' + im2_s
-		gdal.Translate(sentinelrasterpath + im2, sentinelrasterpath + im2_s, projWin = window)
-
+		ds = gdal.Open(sentinelrasterpath +im2_s)
+		gdal.Translate(sentinelrasterpath + im2, ds, projWin = pwindow)
+		#gdal.Translate(sentinelrasterpath + im2, ds, srcWin = swindow)
+		ds = None
 
 		#TRY ----------------------------
 		#1 window = [a,b,c,d] NOT (a,b,c,d)

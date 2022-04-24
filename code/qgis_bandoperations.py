@@ -5,6 +5,7 @@
 #sequence
 # otb_clip.py > clip all bands to defined shapefile ROI
 # qgis_bandoperations > do the band math
+#--------------------------------------------------------------------------------------
 
 import os, sys
 import json
@@ -26,98 +27,142 @@ qgispath = '/usr/bin/qgis'
 # Local path and variables
 datapath = '/home/blc/cocktail/data/'
 inputsfile = datapath + 'settings.txt'
+#----------------------------------------------------------------------------------------
 
-#collect the variables
-try:
-	f = open(inputsfile, 'r')
-	data = f.read()
-	jdata = json.loads(data)
-	f.close()
-except:
-	print('\n...data access error...\n')
-else:
-	rasterpath = jdata['rasterpath']
-	vectorpath = jdata['vectorpath']
-	resultspath = jdata['resultspath']
-	collectionpath = jdata['collectionpath']
-	sentinelrasterpath = jdata['sentinelrasterpath']
-	authfile = jdata['authfile']
+def main():
+	# print command line arguments
+	for arg in sys.argv[1:]:
+		print ("This the selected input: ", arg)
 
-	t2p = jdata['T2P']
-	pdir = jdata['pdir']
-	r_height = int(jdata['r_height'])
-	r_width = int(jdata['r_width'])
-	background = jdata['background']
-	location = jdata['location']
+	type = arg.strip()
+	if((type == 'ibi') or (type  == 'nbi') or (type  == 'ui') or (type  == 'ndbi')):
+		print("\nProceeding to create change map with: ", type)
+		perform_bandoperation(type)
+	else:
+		print("\nOnly ibi, nbi, ui or ndbi operations possible... Try again.\n")
+		exit()
+#------------------------------------------------------------------------------
+def perform_bandoperation(type):
+	#collect the variables
+	try:
+		f = open(inputsfile, 'r')
+		data = f.read()
+		jdata = json.loads(data)
+		f.close()
+	except:
+		print('\n...data access error...\n')
+	else:
+		rasterpath = jdata['rasterpath']
+		vectorpath = jdata['vectorpath']
+		resultspath = jdata['resultspath']
+		collectionpath = jdata['collectionpath']
+		sentinelrasterpath = jdata['sentinelrasterpath']
+		authfile = jdata['authfile']
+
+		t2p = jdata['T2P']
+		pdir = jdata['pdir']
+		r_height = int(jdata['r_height'])
+		r_width = int(jdata['r_width'])
+		background = jdata['background']
+		location = jdata['location']
 
 #-------------------------------------------------------------
-#qgis core module imports
-from qgis.core import (
-        QgsApplication,
-        QgsProcessingFeedback,
-        QgsProcessingException,
-        QgsProcessingParameters,
-        QgsVectorLayer,
-        QgsRasterLayer
-)
+	#qgis core module imports
+	from qgis.core import (
+        	QgsApplication,
+        	QgsProcessingFeedback,
+        	QgsProcessingException,
+        	QgsProcessingParameters,
+        	QgsVectorLayer,
+        	QgsRasterLayer
+	)
 
-#start Qgis
-print('\nStarting QGIS')
-QgsApplication.setPrefixPath(qgispath, True)
-qgs = QgsApplication([], False)
-qgs.initQgis()
+	#start Qgis
+	print('\nStarting QGIS')
+	QgsApplication.setPrefixPath(qgispath, True)
+	qgs = QgsApplication([], False)
+	qgs.initQgis()
 
-#import additional modules
-import processing
-from processing.core.Processing import Processing
+	#import additional modules
+	import processing
+	from processing.core.Processing import Processing
 
-#start the processing module
-processing.core.Processing.Processing.initialize()
+	#start the processing module
+	processing.core.Processing.Processing.initialize()
 
-#parameters and inputs
-rastershapezipfile =  'area2_0717_2017_sentinel2.zip'
-parts = rastershapezipfile.split('_')
-token = parts[2] + parts[1]
-ext = '.tif'
+	#parameters and inputs
+	rastershapezipfile =  'area2_0717_2017_sentinel2.zip'
+	parts = rastershapezipfile.split('_')
+	token = parts[2] + parts[1]
+	ext = '.tif'
 
-B11 = findband_roi('B11', token, ext, sentinelrasterpath)
-B8A = findband_roi('B8A', token, ext, sentinelrasterpath)
 
-print(B11)
-print(B8A)
+	if(type == 'ui'):
+		print("\nUrban Index\n")
+		B11 = findband_roi('B11', token, ext, sentinelrasterpath)
+		B04 = findband_roi('B04', token, ext, sentinelrasterpath)
+		imgA = sentinelrasterpath + B11
+		imgB = sentinelrasterpath + B04
+		imgC = imgA
+		formula = "(A - B) / (A + B)"
 
-B11_r = sentinelrasterpath + B11
-B8A_r = sentinelrasterpath + B8A
+	elif(type == 'ndbi'):
+		print("\nNormalized Difference Built-Up Index\n")
+		B11 = findband_roi('B11', token, ext, sentinelrasterpath)
+		B8A = findband_roi('B8A', token, ext, sentinelrasterpath)
+		imgA = sentinelrasterpath + B11
+		imgB = sentinelrasterpath + B8A
+		imgC = imgA
+		formula = "(A - B) / (A + B)"
 
-result = resultspath + rastershapezipfile.split('.zip')[0] + ext
 
-algorithmname = "qgis:rastercalculator"
-#expression = 
+	elif(type == 'nbi'):
+		#something wrong here...
+		print("\nNew Built-Up Index\n")
+		B04 = findband_roi('B04', token, ext, sentinelrasterpath)
+		B11 = findband_roi('B11', token, ext, sentinelrasterpath)
+		#B08 = findband_roi('B08', token, ext, sentinelrasterpath)
+		B8A = findband_roi('B8A', token, ext, sentinelrasterpath)
+		imgA = sentinelrasterpath + B04
+		imgB = sentinelrasterpath + B11
+		imgC = sentinelrasterpath + B8A
+		#imgC = sentinelrasterpath + B08
+		formula = "(A * B) / C"
 
-#https://docs.qgis.org/3.22/en/docs/user_manual/processing/console.html?highlight=input
-#https://qgis.org/pyqgis/3.4/analysis/QgsRasterCalculator.html
-#https://gis.stackexchange.com/questions/218835/raster-calculation-in-qgis-using-python-script
-parameters = {
-	#'INPUT': B11_r; B8A_r,
-	'CELLSIZE' : 0,
-	'CRS' : None,
-	'EXPRESSION' : (B11_r - B8A_r) / (B11_r + B8A_r),
-	'EXTENT' : None,
-	#'LAYERS' : ??
-	'OUTPUT' : result}
 
-'''
-feedback = QgsProcessingFeedback()
+	result = resultspath + type + '_' + rastershapezipfile.split('.zip')[0] + ext
+	print(result)
 
-try:
-	results = processing.run(algorithmname, parameters, feedback=feedback)
-	print('...completed: ', algorithmname)
-except QgsProcessingException as e:
-	print('\n\n ERROR in this operation..')
-	print(str(e))
-'''
-#finish
-print('JOIN complete ... ending QGIS')
-qgs.exitQgis()
+	#run the gdal rastercalculator
+	algorithmname = "gdal:rastercalculator"
+	#https://gis.stackexchange.com/questions/218835/raster-calculation-in-qgis-using-python-script
+	#https://gis.stackexchange.com/questions/216851/python-script-for-raster-calculation-using-gdal 
+	parameters = {
+		'INPUT_A' : imgA,
+		'BAND_A' : 1,
+		'INPUT_B' : imgB,
+		'BAND_B' : 1,
+		#'INPUT_C' : imgC,
+		#'BAND_C' : 1,
+		'FORMULA' : formula,
+		'OUTPUT' : result}
 
-#-----------------------------------------------------------------
+	feedback = QgsProcessingFeedback()
+
+	try:
+		results = processing.run(algorithmname, parameters, feedback=feedback)
+		print('\n...completed: ', algorithmname, type)
+	except QgsProcessingException as e:
+		print('\n\n ERROR in this operation..')
+		print(str(e))
+
+	#finish
+	print('...ending QGIS\n')
+	qgs.exitQgis()
+
+#---------------------------------------------------------------------------------
+
+if __name__ == "__main__":
+    main()
+
+#---------------------------------------------------------------------------------

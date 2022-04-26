@@ -1,18 +1,14 @@
 # ORFEO Toolbox
-# otb_sentinel_bandoperations.py
+# otb_sentinel_landsat_urban.py
 #--------------------------------------------------------------
 # band math on the sentinel image data
 # get sentinel data via planet lab
 # or directly from sentinel and convert .jp2 to geotif (.tif)
-
+#
+# get landsat data from https://earthexplorer.usgs.gov/
 # urban build up band Band operations
-# set the image names in the settings file
 
 # Normalised Difference Built-up Index (NDBI)
-# Index based Built-up index (IBI)
-# Urban Index (UI)
-# New Built-up Index (NBI)
-# source: VIVEK: A New Three Band Index for Identifying Urban Areas using Satellite Images
 
 # General comments
 # Input images must share same origin, spacing, size, projection
@@ -22,6 +18,25 @@
 # RTS, April 2022
 # -------------------------------------------------------------
 
+#Landsat bands
+# https://www.usgs.gov/faqs/what-are-band-designations-landsat-satellites
+
+#Sentinel bands
+# https://gisgeography.com/sentinel-2-bands-combinations/
+
+'''
+ndbi on Sentinel:
+swir: B11
+nir: B08A
+operation: (B11 − B8A) / ( B11 + B8A)
+
+ndbi on Landsat8: 
+swir1: B06
+nir: B05
+operation: (B06 - B05) / (B06 + B05)
+
+'''
+#-------------------------------------------------------------
 import sys, os
 import json
 import gdal
@@ -43,16 +58,17 @@ def main():
 	for arg in sys.argv[1:]:
 		print ("This the selected input: ", arg)
 
-	changetype = arg.strip()
-	if((changetype == 'ibi') or (changetype  == 'nbi') or (changetype  == 'ui') or (changetype  == 'ndbi')):
-		print("\nProceeding to create change map with: ", changetype)
-		create_change_map(changetype)
+	type = arg.strip()
+
+	if(type == 'ndbi'):
+		print("\nProceeding with NDBI index")
+		create_change_map(type)
 	else:
 		print("\nOnly ibi, nbi, ui or ndbi operations possible... Try again.\n")
 		exit()
 #------------------------------------------------------------------------------
 
-def create_change_map (changetype):
+def create_change_map (type):
 	try:
         	f = open(inputsfile, 'r')
         	data = f.read()
@@ -61,11 +77,12 @@ def create_change_map (changetype):
 	except:
         	print('\n...data access error...\n')
 	else:
-		#print(jdata)
 		rasterpath = jdata['rasterpath']
+		vectorpath = jdata['vectorpath']
 		resultspath = jdata['resultspath']
 		collectionpath = jdata['collectionpath']
 		sentinelrasterpath = jdata['sentinelrasterpath']
+		landsat8rasterpath = jdata['landsat8rasterpath']
 		authfile = jdata['authfile']
 
 		t2p = jdata['T2P']
@@ -76,15 +93,26 @@ def create_change_map (changetype):
 		location = jdata['location']
 
 	#---------------------------------------------------------------------------
-	# step 1 - preparation - copy the selected sentineldata to the raster folder and uncompress
+	# step 1 - preparation - copy the selected Sentinel or Landsat data to the raster folder and uncompress
 
-	rastershapezipfile =  'area2_0717_2017_sentinel2.zip'
-	shutil.copy(collectionpath + rastershapezipfile, rasterpath)
-	with zipfile.ZipFile(rasterpath + rastershapezipfile, 'r') as zip_ref:
-		zip_ref.extractall(rasterpath)
+	#rastershapezipfile =  'area2_0726_2021_sentinel2.zip'
+	rastershapezipfile = 'area2_0727_2021_landsat8.zip'
+
+
+
+	if('landsat8' in rastershapezipfile):
+		satrasterpath = landsat8rasterpath
+	else:
+		satrasterpath = sentinelrasterpath
+
+	shutil.copy(collectionpath + rastershapezipfile, satrasterpath)
+	with zipfile.ZipFile(satrasterpath + rastershapezipfile, 'r') as zip_ref:
+		zip_ref.extractall(satrasterpath)
 
 	print("Selected zipped files moved to vector directory and unzipped..")
+
 	parts = rastershapezipfile.split('_')
+	satname = parts[-1].split('.zip')[0]
 	token = parts[2] + parts[1]
 	ext = '.tif'
 	c_ext = '.png'
@@ -95,29 +123,37 @@ def create_change_map (changetype):
 	# step 2  - band operations
 	#---------------------------------------------------------------------------
 	if(changetype == 'ndbi'):
-		print("\nIndex based Built-up index\n")
+		print("\nNormalized Difference Built-up Index\n")
+		# select the appropriate bands
+		if('landsat8' in rastershapezipfile):
+			nirband = 'B5'
+			swirband = 'B6'
+		else:
+			nirband = 'B8A'
+			swirband = 'B11'
 
-		# B11, B8A both have 20m resolution
-		im1 = findband('B11', token, ext, sentinelrasterpath)
-		im2 = findband('B8A', token, ext, sentinelrasterpath)
+		im1 = findband(swirband, token, ext, satrasterpath)
+		im2 = findband(nirband, token, ext, satrasterpath)
+
 		print('This is the swir band: ', im1)
 		print('This is the nir band: ', im2)
+		print('\n\n')
 
 		apptype = "BandMathX"
 
-		sentinelbandmathimage = 'sentinel2_' + changetype +  '_' + token + ext
-		color_sentinelbandmathimage = 'color_sentinel2_' + changetype + '_' + token + c_ext
+		satbandmathimage = satname + '_' + type +  '_' + token + ext
+		color_satbandmathimage = 'color_' + satname + '_' + type + '_' + token + c_ext
 
 		app = otbApplication.Registry.CreateApplication(apptype)
-		app.SetParameterStringList("il", [sentinelrasterpath + im1, sentinelrasterpath + im2])
+		app.SetParameterStringList("il", [satrasterpath + im1, satrasterpath + im2])
 		expression = "(im1b1 - im2b1) / (im1b1 + im2b1)"
-		app.SetParameterString("out", resultspath + sentinelbandmathimage)
+		app.SetParameterString("out", resultspath + satbandmathimage)
 		app.SetParameterString("exp", expression)
 		app.ExecuteAndWriteOutput()
 
-		filelist = [inputsfile, resultspath + sentinelbandmathimage]
-
+		filelist = [inputsfile, resultspath + satbandmathimage]
 	#---------------------------------------------------------------------------
+	'''
 	elif(changetype == 'ui'):
 		print("\nPerforming Urban Index\n")
 
@@ -146,6 +182,37 @@ def create_change_map (changetype):
 		im2_s = im2_parts[0] + '_20m_' + ext
 		ds = gdal.Warp(sentinelrasterpath + im2_s, sentinelrasterpath + im2_10m, xRes=20, yRes=20)
 		ds = None
+
+		#check resolutions
+		print('\n\n')
+		print('im1_s: ', im1_s)
+		print('im2_s: ', im2_s)
+		print('\n\n')
+		print(gdal.Info(sentinelrasterpath + im1_s))
+		print(gdal.Info(sentinelrasterpath + im2_s))
+
+
+		#now try with gdal.Warp
+		#https://gis.stackexchange.com/questions/45053/gdalwarp-cutline-along-with-shapefile
+		#move and unpack the shapefile to the ROI dir in the vectorpath
+		roishapezipfile =  'area2_shape_crop.zip'
+		roishape = roishapezipfile.split('.zip')[0] + '.shp'
+		roipath = vectorpath + 'roi/'
+		shutil.copy(collectionpath + roishapezipfile, roipath)
+		with zipfile.ZipFile(roipath + roishapezipfile, 'r') as zip_ref:
+			zip_ref.extractall(roipath)
+
+
+		ds = gdal.Warp(sentinelrasterpath + im1, sentinelrasterpath + im1_s, cutlineDSname = roipath+roishape)
+		ds = None
+		#ds = gdal.Warp(-cutline roipath+roishape -crop_to_cutline sentinelrasterpath+im2_s sentinelrasterpath+im2)
+		#ds = None
+
+		print('\n\nim1\n')
+		print(gdal.Info(sentinelrasterpath + im1))
+		#print('\n\nim2\n')
+		#print(gdal.Info(sentinelrasterpath + im2))
+
 
 		rasterarray = [im1_s, im2_s]
 		minx, miny, maxx, maxy = get_minmax_points_multiple(sentinelrasterpath, rasterarray)
@@ -185,15 +252,12 @@ def create_change_map (changetype):
 		#https://www.geos.ed.ac.uk/~smudd/TopoTutorials/html/tutorial_raster_conversion.html
 		#gdalwarp -te <x_min> <y_min> <x_max> <y_max> input.bil clipped_output.bil
 
-
-		'''
 		print('\n\n')
 		minx1, miny1, maxx1, maxy1 = get_minmax_points(sentinelrasterpath, im1)
 		print(minx1, miny1, maxx1, maxy1)
 		minx2, miny2, maxx2, maxy2 = get_minmax_points(sentinelrasterpath, im2_10m)
 		print(minx2, miny2, maxx2, maxy2)
 		print('\n\n')
-
 
 
 		im1_check = gdal.Open(sentinelrasterpath + im1)
@@ -203,15 +267,13 @@ def create_change_map (changetype):
 		im2_10m_check = gdal.Open(sentinelrasterpath + im2_10m)
 		_, xres, _, _, _, yres  = im2_10m_check.GetGeoTransform()
 		print('IMAGE2: ', xres, yres)
-		
+
 		#convert B04 to 20m resolution
 		im2_parts = im2_10m.split(ext)
 		im2 = im2_parts[0] + '_20m_' + ext
 		ds = gdal.Warp(sentinelrasterpath + im2, sentinelrasterpath + im2_10m, xRes=20, yRes=20)
 		ds = None
-		'''
 
-		
 		#check resolutions
 		print('\n\n')
 		print('im1: ', im1)
@@ -219,7 +281,6 @@ def create_change_map (changetype):
 		print('\n\n')
 		print(gdal.Info(sentinelrasterpath + im1))
 		print(gdal.Info(sentinelrasterpath + im2))
-		'''
 
 
 		apptype = "BandMathX"
@@ -261,26 +322,27 @@ def create_change_map (changetype):
 
 		filelist = [inputsfile, resultspath + sentinelbandmathimage]
 
+	'''
 #-------------------------------------------------------------------------------
 # step 3 - color mapping
 #-------------------------------------------------------------------------------
 	if(do_colormap == 'true'):
 		#get min and max for colormap
-		img = gdal.Open(resultspath + sentinelbandmathimage)
+		img = gdal.Open(resultspath + satbandmathimage)
 		img_stats = img.GetRasterBand(1).GetStatistics(0,1)
 		min_val = str(img_stats[0])
 		max_val = str(img_stats[1])
 
 		apptype = "ColorMapping"
 		app = otbApplication.Registry.CreateApplication(apptype)
-		app.SetParameterString("in", resultspath + sentinelbandmathimage)
+		app.SetParameterString("in", resultspath + satbandmathimage)
 		app.SetParameterString("method","continuous")
 		app.SetParameterString("method.continuous.min", min_val)
 		app.SetParameterString("method.continuous.max", max_val)
 		app.SetParameterString("method.continuous.lut", cmap)
-		app.SetParameterString("out", resultspath + color_sentinelbandmathimage)
+		app.SetParameterString("out", resultspath + color_satbandmathimage)
 		app.ExecuteAndWriteOutput()
-		filelist = [inputsfile, resultspath + color_sentinelbandmathimage]
+		filelist = [inputsfile, resultspath + color_satbandmathimage]
 
 #-------------------------------------------------------------------------------
 # step 4 - file transfer
@@ -296,7 +358,7 @@ def create_change_map (changetype):
 		conn.uploadfile(files=filelist, path=pdir)
 		print('\n\nUploaded: ' , filelist)
 		print('\n\n')
-	'''
+
 #---------------------------------------------------------------------------------
 
 if __name__ == "__main__":

@@ -5,6 +5,7 @@
 # ------------------------------------------------------------------------------
 import os, sys, numpy
 from datetime import datetime
+import gdal
 import pytz
 import glob, shutil, zipfile
 from zipfile import ZipFile
@@ -87,5 +88,61 @@ def findband (band, token, ext, path):
 			pass
 
 	return(result)
-
 #-------------------------------------------------------------------------------
+def findband_roi(band, token, ext, path):
+	result = 'n.a'
+	area = 'roi'
+	skip = '.xml'
+	files = os.listdir(path)
+	for file in files:
+		if((token in file) and (ext in file) and (band in file) and (area in file) and not (skip in file)):
+			result = file
+			break
+		else:
+			pass
+	return(result)
+#-------------------------------------------------------------------------------
+def get_minmax_points(path, rasterimage):
+#https://stackoverflow.com/questions/2922532/obtain-latitude-and-longitude-from-a-geotiff-file
+
+	ds = gdal.Open(path + rasterimage)
+	width = ds.RasterXSize
+	height = ds.RasterYSize
+	gt = ds.GetGeoTransform()
+	minx = gt[0]
+	miny = gt[3] + width*gt[4] + height*gt[5]
+	maxx = gt[0] + width*gt[1] + height*gt[2]
+	maxy = gt[3]
+	ds = None
+
+	return(minx, miny, maxx, maxy)
+#------------------------------------------------------------------------------
+def get_minmax_points_multiple(path, rasterimages):
+#https://stackoverflow.com/questions/2922532/obtain-latitude-and-longitude-from-a-geotiff-file
+	minxs = []
+	minys = []
+	maxxs = []
+	maxys = []
+
+	for i in range(0, len(rasterimages)):
+		ds = gdal.Open(path + rasterimages[i])
+		width = ds.RasterXSize
+		height = ds.RasterYSize
+		gt = ds.GetGeoTransform()
+		minx = gt[0]
+		miny = gt[3] + width*gt[4] + height*gt[5]
+		maxx = gt[0] + width*gt[1] + height*gt[2]
+		maxy = gt[3]
+		minxs.append(minx)
+		minys.append(miny)
+		maxxs.append(maxx)
+		maxys.append(maxy)
+		ds = None
+
+	mminx = min(minxs)
+	mminy = min(minys)
+	mmaxx = min(maxxs)
+	mmaxy = min(maxys)
+
+	return(mminx, mminy, mmaxx, mmaxy)
+#------------------------------------------------------------------------------

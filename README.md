@@ -43,6 +43,7 @@ Add other libraries to the OTB environment as needed. Enable the OTB environment
 	conda install -c conda-forge pillow
 	conda install -c conda-forge geojson
 	conda install -c conda-forge geopandas
+	conda install -c conda-forge sentinelsat
 
 	
 7 – Setup the directory structure <br>

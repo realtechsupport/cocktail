@@ -1,4 +1,12 @@
 {
+	"//--comment0" : "Data collection settings ---------",
+	"rawsatpath" : "/home/blc/cocktail/data/rawsat/",
+	"startdate" : "2021_7_24",
+	"enddate" : "2021_7_27",
+	"geojsonmap": "area2_square.geojson",
+	"maxcloudcover" : "20",
+	"sentinelauthfile" : "/home/blc/cocktail/data/auth/sent.txt",
+
 	"//--commentA" : "Input settings ---------",
 	"rasterimage": "area2_0612_2020.tif",
 	"rasterimage2" : "area2_0501_2021.tif",
@@ -6,7 +14,7 @@
 	"bandmathchangeimage" : "bandmathchange.tif",
 	"bandmathexpression" : "im1b4>1.0 ? 255:0",
 	"rmi_ind_selection" : ["Vegetation:NDVI", "Vegetation:TNDVI", "Vegetation:SAVI"],
-	"ndviexpression" : "(ndvi(im1b1,im1b4) - ndvi(im2b1,im2b4))", 
+	"ndviexpression" : "(ndvi(im1b1,im1b4) - ndvi(im2b1,im2b4))",
 	"ndvi_diff_color" : "ndvi_diff_colormap.png",
 	"rmi1" : "RMI_1.tif",
 	"rmi2" : "RMI_2.tif",
@@ -20,7 +28,7 @@
 	"colormap_rmi_min" : "-0.3",
 	"colormap_rmi_max" : "0.7",
 	"colormap_rmi_type" : "jet",
-	
+
 	"texture_map" : "texture.tif",
 	"texture_map_3bands" : "texture_3bands.tif",
 	"concat_raster_texture" : "raster_texture.tif",
@@ -33,7 +41,7 @@
 	"pointsfile" : "area2_0612_2020_vector_classification.shp",
 	"rastershapezipfile" : "area2_0612_2020_raster_classification_Mar16.zip",
 	"coord_info" : "area1_4points",
-	
+
 	"//--commentB" : "Path settings -----------",
 	"authfile" : "/home/blc/cocktail/data/auth/pc.txt",
 	"location" : "America/New_York",
@@ -43,11 +51,12 @@
 	"rasterpath" : "/home/blc/cocktail/data/rasterimages/",
 	"vectorpath" : "/home/blc/cocktail/data/vectorfiles/",
 	"resultspath" : "/home/blc/cocktail/results/",
-	"sentinelrasterpath" : "/home/blc/cocktail/data/rasterimages/files/",	
+	"sentinelrasterpath" : "/home/blc/cocktail/data/rasterimages/files/",
+	"landsat8rasterpath" : "/home/blc/cocktail/data/rasterimages/landsat8/",
 
 	"//--commentC" : "Intermediate files ---------",
 	"segmentation_stats" : "segmentation_vector_stats.shp",
-	"segmentation_points_joined" : "segmentation_points_joined.shp",	
+	"segmentation_points_joined" : "segmentation_points_joined.shp",
 	"segmentationfile" : "segmentation_vector.shp",
 	"ann_vector_classification" : "ann_vector_classification.shp",
 	"modelname_vector_ann" : "model_vector_ann.model",
@@ -60,17 +69,17 @@
 	"classified_rimage_rf" : "raster_classified_rf.tif",
 	"classified_rimage_svm" : "raster_classified_svm.tif",
 	"classified_rimage_ann" : "raster_classified_ann.tif",
-        
+
 	"classified_rimage_color_rf" : "raster_classified_color_rf.png",
         "classified_rimage_color_svm" : "raster_classified_color_svm.png",
         "classified_rimage_color_ann" : "raster_classified_color_ann.png",
 
         "classified_rimage+texture_color_rf" : "raster+texture_classified_color_rf.png",
         "classified_rimage+texture_color_svm" : "raster+texture_classified_color_svm.png",
-        "classified_rimage+texture_color_ann" : "raster+texture_classified_color_ann.png",	
+        "classified_rimage+texture_color_ann" : "raster+texture_classified_color_ann.png",
 
 	"raster_addcolor" : "yes",
-	
+
 	"//--commentD" : "Join settings ------------",
 	"joinmethod" : "1",
 	"joinprefix" : " ",
@@ -88,8 +97,8 @@
 	"NNupdatedelta" : "1e-07",
 	"NNterminationcriteria" : "all",
 	"NNepsilon" : "0.01",
-	"NNmaxiterations" : "1000", 
-	
+	"NNmaxiterations" : "1000",
+
 	"//-commentE-svm" : "SVM training settings ---",
 	"svm_k" : "linear",
 	"svm_c" : "1.0",
@@ -117,11 +126,11 @@
         "COMPUTE_STATISTICS" : "False",
         "COUNT_FEATURES" : "False",
         "EXPLODE_COLLECTIONS" : "False",
-        "FIELD" : "predicted", 
+        "FIELD" : "predicted",
         "GEOMETRY" : "geometry",
         "KEEP_ATTRIBUTES" : "False",
         "OPTIONS" : " ",
-        "STATISTICS_ATTRIBUTE" : " ",	
+        "STATISTICS_ATTRIBUTE" : " ",
 
 	"//--commentG" : "Render settings ------------",
 	"T2P" : "yes",

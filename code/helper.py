@@ -9,7 +9,7 @@ import gdal
 import pytz
 import glob, shutil, zipfile
 from zipfile import ZipFile
-
+from pcloud import PyCloud
 #------------------------------------------------------------------------------
 # Create a time stamp, based on location
 def create_timestamp(location):
@@ -159,4 +159,14 @@ def zip_nopath (src, dst):
 	zf.close()
 #-----------------------------------------------------------------------------
 
+def send_to_pcloud(filelist, authfile, pclouddir):
+	f = open(authfile, 'r')
+	lines = f.readlines()
+	username = lines[0].strip()
+	password = lines[1].strip()
+	f.close()
 
+	conn = PyCloud(username, password, endpoint='nearest')
+	conn.uploadfile(files=filelist, path=pclouddir)
+	print('\n\nUploaded: ' , filelist)
+#------------------------------------------------------------------------------

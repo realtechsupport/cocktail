@@ -1,4 +1,4 @@
-# sentinel2_getdata.py
+# sentinel2_getdata.py bandselection
 # Get Sentinel2 data products based on an area of interest, cloudcover and date interval
 # Preparations:
 # 1
@@ -13,9 +13,12 @@
 # Please note that the maximum number of products that a single user can request on SciHub is 1 every 30 minutes.
 # An additional quota limit is applied to users of the APIHub of maximum 20 products every 12 hours.
 #
+# path_filter
+# https://github.com/sentinelsat/sentinelsat/issues/540#issuecomment-920883495
+
 # Usage:
-# python3 sentinel2_getdata.py start, end, map, maxcloudcover
-# python3 sentinel2_getdata.py date(2021, 7, 24), date(2021, 7, 27), area2.geojson, 20
+# python3 sentinel2_getdata.py [tci or all)
+# python3 sentinel2_getdata.py (bandselection)
 # ------------------------------------------------------------------------------
 
 import sys, os
@@ -24,7 +27,7 @@ import gdal
 import otbApplication
 import numpy
 from zipfile import ZipFile
-from sentinelsat import SentinelAPI, read_geojson, geojson_to_wkt
+from sentinelsat import SentinelAPI, read_geojson, geojson_to_wkt, make_path_filter
 from datetime import date
 
 from helper import *
@@ -37,12 +40,21 @@ inputsfile = datapath + 'settings.txt'
 #-------------------------------------------------------------------------------
 
 def main():
-	print("\nProceeding with data collection")
-	get_sentinel_data()
+	for arg in sys.argv[1:]:
+		print("Received this input: ", arg)
+
+	bandselection = arg.strip()
+
+	if((bandselection == 'tci') or (bandselection == 'all')):
+		print("Getting sentinel2 data with this band selection: ", bandselection)
+		get_sentinel2_data(bandselection)
+	else:
+		print("input arguments accepted are:  tci or all ONLY. Try again.")
+		exit()
 
 #--------------------------------------------------------------------------------
 
-def get_sentinel_data():
+def get_sentinel2_data(bandselection):
 	try:
         	f = open(inputsfile, 'r')
         	data = f.read()
@@ -63,6 +75,7 @@ def get_sentinel_data():
 		enddate = jdata['enddate']
 		maxcloudcover = jdata['maxcloudcover']
 		map = jdata['geojsonmap']
+		pclouddir = jdata['pdir']
 
 	#set sentinel parameters
 	maxitems = 1
@@ -108,8 +121,19 @@ def get_sentinel_data():
 		print('\nNumber of items being downloaded: ', maxitems)
 		products_df_sorted = products_df_sorted.head(maxitems)
 		print('\nGetting this/these item/s: ', products_df_sorted)
+
+		# ISSUE using the filter option...code has workaround...
+		'''
+		# https://github.com/sentinelsat/sentinelsat/issues/540
+		if(bandselection == 'tci'):
+			pathfilter = make_path_filter("*_tci.jp2")
+			api.download_all(products_df_sorted.index, directory_path = rawsatpath, nodefilter = pathfilter)
+		else:
+			api.download_all(products_df_sorted.index, directory_path = rawsatpath)
+		'''
 		api.download_all(products_df_sorted.index, directory_path = rawsatpath)
 		print('\nDownload attempt complete ...  check sentinel folder')
+
 	# catch all exceptions
 	except Exception as ex:
 		template = "\nAn exception occurred. This is the reported error:\n{1!r}"
@@ -124,10 +148,12 @@ def get_sentinel_data():
 		unpack(rawsatpath)
 
 	tci_path = get_tci_path(rawsatpath)
-	jp2_list = [band for band in os.listdir(tci_path) if band [-4:] == '.jp2']
 
-	# two versions here: 1: clip and make thubmnail from the TCI only
-	# 2. convert all bands, clip, zip and move to collection
+	# get only the bands requested
+	if(bandselection == 'tci'):
+		jp2_list = [band for band in os.listdir(tci_path) if band [-7:] == 'TCI.jp2']
+	else:
+		jp2_list = [band for band in os.listdir(tci_path) if band [-4:] == '.jp2']
 
 	#convert .jp2 to .tif
 	print('\nconverting .jp2 to .tif\n')
@@ -138,7 +164,7 @@ def get_sentinel_data():
 		ds = None
 
 	tif_list =[band for band in os.listdir(tci_path) if band[-4:] == '.tif']
-	print(tif_list) 
+	#print(tif_list)
 
 	# move and unpack the shapefile to the ROI dir in the vectorpath
 	roishapezipfile =  'area2_shape_crop.zip'
@@ -157,12 +183,27 @@ def get_sentinel_data():
 	for b in tif_list:
 		b_new = b.split('.tif')[0] + '_roi' + '.tif'
 		print(b, b_new)
+		if('TCI' in b):
+			tci_tif = b
 		ds = gdal.Warp(tci_path + b_new, tci_path + b, options = warp_options)
 		ds = None
 
-	# got this far ----------------------------------------------------------
-	# zip up and move to collection, then delete everything in rawsat directory
-	# https://stackoverflow.com/questions/1855095/how-to-create-a-zip-archive-of-a-directory 
+	# send tci thumbnail to pcloud
+	if(bandselection == 'tci'):
+		#convert to jpeg and reduce in size
+		tci_jpeg = tci_tif.split('.tif')[0] + '.jpeg'
+		ds = gdal.Translate(tci_path + tci_jpeg, tci_path + tci_tif, format='JPEG', width = 800, height=0, scaleParams=[[]])
+		ds = None
+		#sent to pcloud
+		print('\nSending to pCloud..')
+		filelist = [tci_path +  tci_jpeg]
+		send_to_pcloud(filelist, authfile, pclouddir)
+	else:
+		print('zip up and move to collection for processing...')
+		# toDO zip up and move to collection ...
+		# https://stackoverflow.com/questions/1855095/how-to-create-a-zip-archive-of-a-directory
+
+	#toDO delete content of rawsat ...
 
 #--------------------------------------------------------------------------------
 

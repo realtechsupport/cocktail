@@ -1,4 +1,5 @@
-# sentinel2_getdata.py bandselection
+# sentinel2_getdata.py bandselection enddate
+# 
 # Get Sentinel2 data products based on an area of interest, cloudcover and date interval
 # Preparations:
 # 1
@@ -13,12 +14,16 @@
 # Please note that the maximum number of products that a single user can request on SciHub is 1 every 30 minutes.
 # An additional quota limit is applied to users of the APIHub of maximum 20 products every 12 hours.
 #
-# path_filter
+# path_filter - not working. See below for workaround
 # https://github.com/sentinelsat/sentinelsat/issues/540#issuecomment-920883495
 
 # Usage:
-# python3 sentinel2_getdata.py [tci or all)
-# python3 sentinel2_getdata.py (bandselection)
+# python3 sentinel2_getdata.py [tci or all empty or now)
+# python3 sentinel2_getdata.py (bandselection, now)
+# if the second option is empty, end date in settings.txt will be used
+
+# Todo:
+# 1. option all: zip up all bands and move to collection
 # ------------------------------------------------------------------------------
 
 import sys, os
@@ -40,21 +45,42 @@ inputsfile = datapath + 'settings.txt'
 #-------------------------------------------------------------------------------
 
 def main():
-	for arg in sys.argv[1:]:
-		print("Received this input: ", arg)
 
-	bandselection = arg.strip()
+	inputs = []
+	bandseletion = 'na'
+	enddate = 'na'
+
+	if (len(sys.argv) == 3):
+		for arg in sys.argv[1:]:
+			inputs.append(arg)
+
+		bandselection = inputs[0].strip()
+		enddate = inputs[1].strip()
+
+	elif(len(sys.argv) == 2):
+		bandselection = sys.argv[1].strip()
+
+	else:
+		print("At least one input - tci or all required. Second possible input for end date - now -  for the latest image")
+		exit()
+
+	print('\nReceived these inputs: ', bandselection, enddate)
+	print('\n\n')
+	get_sentinel2_data(bandselection, enddate)
+
+	'''
+	bandselection = inputs[0].strip()
 
 	if((bandselection == 'tci') or (bandselection == 'all')):
 		print("Getting sentinel2 data with this band selection: ", bandselection)
-		get_sentinel2_data(bandselection)
+		#get_sentinel2_data(bandselection)
 	else:
 		print("input arguments accepted are:  tci or all ONLY. Try again.")
 		exit()
-
+	'''
 #--------------------------------------------------------------------------------
 
-def get_sentinel2_data(bandselection):
+def get_sentinel2_data(bandselection, enddate):
 	try:
         	f = open(inputsfile, 'r')
         	data = f.read()
@@ -87,14 +113,16 @@ def get_sentinel2_data(bandselection):
 	starts_year = int(starts[0])
 	starts_month = int(starts[1])
 	starts_day = int(starts[2])
-
-	ends = enddate.split('_')
-	ends_year = int(ends[0])
-	ends_month = int(ends[1])
-	ends_day = int(ends[2])
-
 	start = date(starts_year, starts_month, starts_day)
-	end = date(ends_year, ends_month, ends_day)
+
+	if(enddate == 'na'):
+		ends = enddate.split('_')
+		ends_year = int(ends[0])
+		ends_month = int(ends[1])
+		ends_day = int(ends[2])
+		end = date(ends_year, ends_month, ends_day)
+	else:
+		end = 'NOW'
 
 	print('GEOJSON MAP: ', map)
 	print('TIMEFRAME: ', startdate, enddate)
@@ -123,14 +151,13 @@ def get_sentinel2_data(bandselection):
 		print('\nGetting this/these item/s: ', products_df_sorted)
 
 		# ISSUE using the filter option...code has workaround...
-		'''
 		# https://github.com/sentinelsat/sentinelsat/issues/540
-		if(bandselection == 'tci'):
-			pathfilter = make_path_filter("*_tci.jp2")
-			api.download_all(products_df_sorted.index, directory_path = rawsatpath, nodefilter = pathfilter)
-		else:
-			api.download_all(products_df_sorted.index, directory_path = rawsatpath)
-		'''
+		#if(bandselection == 'tci'):
+		#	pathfilter = make_path_filter("*_tci.jp2")
+		#	api.download_all(products_df_sorted.index, directory_path = rawsatpath, nodefilter = pathfilter)
+		#else:
+		#	api.download_all(products_df_sorted.index, directory_path = rawsatpath)
+
 		api.download_all(products_df_sorted.index, directory_path = rawsatpath)
 		print('\nDownload attempt complete ...  check sentinel folder')
 
@@ -164,7 +191,6 @@ def get_sentinel2_data(bandselection):
 		ds = None
 
 	tif_list =[band for band in os.listdir(tci_path) if band[-4:] == '.tif']
-	#print(tif_list)
 
 	# move and unpack the shapefile to the ROI dir in the vectorpath
 	roishapezipfile =  'area2_shape_crop.zip'
@@ -204,9 +230,8 @@ def get_sentinel2_data(bandselection):
 		# https://stackoverflow.com/questions/1855095/how-to-create-a-zip-archive-of-a-directory
 
 	# delete content of rawsat
-	for file in os.listdir(rawsatpath):
-		os.remove(os.path.join(rawsatpath, file))
-
+	shutil.rmtree(rawsatpath)
+	os.makedirs(rawsatpath)
 #--------------------------------------------------------------------------------
 
 if __name__ == "__main__":

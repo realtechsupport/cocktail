@@ -184,7 +184,7 @@ def get_sentinel2_data(bandselection):
 		b_new = b.split('.tif')[0] + '_roi' + '.tif'
 		print(b, b_new)
 		if('TCI' in b):
-			tci_tif = b
+			tci_tif = b_new
 		ds = gdal.Warp(tci_path + b_new, tci_path + b, options = warp_options)
 		ds = None
 
@@ -203,7 +203,9 @@ def get_sentinel2_data(bandselection):
 		# toDO zip up and move to collection ...
 		# https://stackoverflow.com/questions/1855095/how-to-create-a-zip-archive-of-a-directory
 
-	#toDO delete content of rawsat ...
+	# delete content of rawsat
+	for file in os.listdir(rawsatpath):
+		os.remove(os.path.join(rawsatpath, file))
 
 #--------------------------------------------------------------------------------
 

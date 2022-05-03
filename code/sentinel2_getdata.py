@@ -1,5 +1,7 @@
 # sentinel2_getdata.py bandselection enddate
-# 
+# sentinelsat version 1.1.1
+# https://sentinelsat.readthedocs.io/en/v1.1.1/api_reference.html
+
 # Get Sentinel2 data products based on an area of interest, cloudcover and date interval
 # Preparations:
 # 1
@@ -14,8 +16,17 @@
 # Please note that the maximum number of products that a single user can request on SciHub is 1 every 30 minutes.
 # An additional quota limit is applied to users of the APIHub of maximum 20 products every 12 hours.
 #
+
+# increase download speeds my placing the Cocktail server in Europe
+# https://github.com/sentinelsat/sentinelsat/issues/187
+# ...move closer to the DHuS endpoint ...using a national mirror or for instance using a server located close to the Copernicus Open Access Hub, 
+# which is in Frankfurt.
+
 # path_filter - not working. See below for workaround
 # https://github.com/sentinelsat/sentinelsat/issues/540#issuecomment-920883495
+
+# assert result
+# https://github.com/gijs/sentinelsat/blob/master/tests/test_mod.py
 
 # Usage:
 # python3 sentinel2_getdata.py [tci or all empty or now)
@@ -68,16 +79,6 @@ def main():
 	print('\n\n')
 	get_sentinel2_data(bandselection, enddate)
 
-	'''
-	bandselection = inputs[0].strip()
-
-	if((bandselection == 'tci') or (bandselection == 'all')):
-		print("Getting sentinel2 data with this band selection: ", bandselection)
-		#get_sentinel2_data(bandselection)
-	else:
-		print("input arguments accepted are:  tci or all ONLY. Try again.")
-		exit()
-	'''
 #--------------------------------------------------------------------------------
 
 def get_sentinel2_data(bandselection, enddate):
@@ -87,7 +88,8 @@ def get_sentinel2_data(bandselection, enddate):
         	jdata = json.loads(data)
         	f.close()
 	except:
-        	print('\n...data access error...\n')
+        	print('\n...data access error...check settings.txt\n')
+
 	else:
 		sentinelrasterpath = jdata['sentinelrasterpath']
 		landsat8rasterpath = jdata['landsat8rasterpath']
@@ -97,11 +99,12 @@ def get_sentinel2_data(bandselection, enddate):
 		authfile = jdata['authfile']
 		sentinelauthfile = jdata['sentinelauthfile']
 		location = jdata['location']
-		startdate = jdata['startdate']
-		enddate = jdata['enddate']
+		sent_startdate = jdata['sent_startdate']
+		sent_enddate = jdata['sent_enddate']
 		maxcloudcover = jdata['maxcloudcover']
 		map = jdata['geojsonmap']
 		pclouddir = jdata['pdir']
+		sentinelpclouddir = jdata['pdir_sentinel']
 
 	#set sentinel parameters
 	maxitems = 1
@@ -109,14 +112,14 @@ def get_sentinel2_data(bandselection, enddate):
 	product = 'S2MSI1C'
 	footprint = geojson_to_wkt(read_geojson(datapath + map))
 
-	starts = startdate.split('_')
+	starts = sent_startdate.split('_')
 	starts_year = int(starts[0])
 	starts_month = int(starts[1])
 	starts_day = int(starts[2])
 	start = date(starts_year, starts_month, starts_day)
 
 	if(enddate == 'na'):
-		ends = enddate.split('_')
+		ends = sent_enddate.split('_')
 		ends_year = int(ends[0])
 		ends_month = int(ends[1])
 		ends_day = int(ends[2])
@@ -125,7 +128,6 @@ def get_sentinel2_data(bandselection, enddate):
 		end = 'NOW'
 
 	print('GEOJSON MAP: ', map)
-	print('TIMEFRAME: ', startdate, enddate)
 	print('MAX CLOUD COVER: ', maxcloudcover)
 	print('PLATFORM, PRODUCT: ', platform, product)
 	print('START, END: ', start, end)
@@ -138,9 +140,11 @@ def get_sentinel2_data(bandselection, enddate):
 	f.close()
 
 	api = SentinelAPI(username, password, 'https://scihub.copernicus.eu/dhus')
+	#areatype = 'iswithin'		#'intersects', 'contains'
 
 	#fetch the data
 	try:
+		#products = api.query(footprint, date = (start, end), platformname = platform, producttype = product, cloudcoverpercentage = (0, maxcloudcover), area_relation = areatype)
 		products = api.query(footprint, date = (start, end), platformname = platform, producttype = product, cloudcoverpercentage = (0, maxcloudcover))
 		products_df = api.to_dataframe(products)
 		# ascending=[False] > newest item; ascending=[True] > oldest item;
@@ -167,8 +171,8 @@ def get_sentinel2_data(bandselection, enddate):
 		message = template.format(type(ex).__name__, ex.args)
 		print (message)
 		print('\n... Something went wrong ... see below...')
-		print('possible error sources: geojson file, ndays, nmonths and cloud cover setting ...')
-
+		print('possible error sources: gateway timeout, geojson file, start and end dates, cloud cover setting.')
+		exit()
 
 	# unpack the package if it has been received
 	if(len(products_df_sorted) > 0):
@@ -214,22 +218,48 @@ def get_sentinel2_data(bandselection, enddate):
 		ds = gdal.Warp(tci_path + b_new, tci_path + b, options = warp_options)
 		ds = None
 
-	# send tci thumbnail to pcloud
+	# Check image stats (75% valid min, resize and send tci thumbnail to pcloud
 	if(bandselection == 'tci'):
 		#convert to jpeg and reduce in size
 		tci_jpeg = tci_tif.split('.tif')[0] + '.jpeg'
 		ds = gdal.Translate(tci_path + tci_jpeg, tci_path + tci_tif, format='JPEG', width = 800, height=0, scaleParams=[[]])
 		ds = None
-		#sent to pcloud
-		print('\nSending to pCloud..')
-		filelist = [tci_path +  tci_jpeg]
-		send_to_pcloud(filelist, authfile, pclouddir)
+
+		#check stats
+		minimum = 0
+		threshold = 75
+		percentage_good_pixels = check_image(tci_path + tci_jpeg, minimum)
+
+		if(percentage_good_pixels > threshold):
+			#send to pcloud
+			print('\nImage passes test: ', percentage_good_pixels)
+			print('Sending to pCloud..')
+			filelist = [tci_path +  tci_jpeg]
+			send_to_pcloud(filelist, authfile, sentinelpclouddir)
+
+		else:
+			print('\nImage does not pass test: ', percentage_good_pixels)
+			print('NOT sending to pCloud..')
 	else:
 		print('zip up and move to collection for processing...')
-		# toDO zip up and move to collection ...
-		# https://stackoverflow.com/questions/1855095/how-to-create-a-zip-archive-of-a-directory
+		roi_list =[band for band in os.listdir(tci_path) if band[-7:] == 'roi.tif']
+
+		maparea = map.split('.geojson')[0]
+		monthday = roi_list[0].split('_')[1][4:8]
+		year = roi_list[0].split('_')[1][0:4]
+		sentinelasset = maparea + '_' + monthday + '_' + year + '_sentinel2' 
+		print(sentinelasset)
+
+		os.mkdir(tci_path + '/temp')
+		for roi in roi_list:
+			shutil.copy(tci_path + roi, tci_path + '/temp/' + roi)
+
+		archivename = os.path.join(collectionpath, sentinelasset)
+		datasource = os.path.join(tci_path, 'temp')
+		shutil.make_archive(archivename, 'zip', datasource)
 
 	# delete content of rawsat
+	print('\nDeleting temporary files...')
 	shutil.rmtree(rawsatpath)
 	os.makedirs(rawsatpath)
 #--------------------------------------------------------------------------------

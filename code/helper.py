@@ -6,6 +6,8 @@
 import os, sys, numpy
 from datetime import datetime
 import gdal
+from PIL import Image
+
 import pytz
 import glob, shutil, zipfile
 from zipfile import ZipFile
@@ -170,3 +172,13 @@ def send_to_pcloud(filelist, authfile, pclouddir):
 	conn.uploadfile(files=filelist, path=pclouddir)
 	print('\n\nUploaded: ' , filelist)
 #------------------------------------------------------------------------------
+def check_image(image, threshold):
+	c = Image.open(image)
+	cg = c.convert("L")
+	cga = numpy.array(cg)
+	cgaf = cga.ravel()
+	good  = cgaf[cgaf > threshold]
+	percentage_good = int(100 * (len(good) / len(cgaf)))
+
+	return(percentage_good)
+#-----------------------------------------------------------------------------

@@ -10,32 +10,36 @@
 # 2
 # Generate a geojson file for area of interest (https://geojson.io/)
 # Save the file as somearea.geojson and place a copy on into your data directory (see below)
-
+# 3
+# put the ESA credential in a file in the auth folder
+# -------------------------------------------------------------------------------------------
 # ESA quotas:
 # https://forum.step.esa.int/t/esa-copernicus-data-access-long-term-archive-and-its-drawbacks/15394/14
-# Please note that the maximum number of products that a single user can request on SciHub is 1 every 30 minutes.
-# An additional quota limit is applied to users of the APIHub of maximum 20 products every 12 hours.
+# "Please note that the maximum number of products that a single user can request on SciHub is 1 every 30 minutes.
+# An additional quota limit is applied to users of the APIHub of maximum 20 products every 12 hours".
 #
-
-# increase download speeds my placing the Cocktail server in Europe
-# https://github.com/sentinelsat/sentinelsat/issues/187
-# ...move closer to the DHuS endpoint ...using a national mirror or for instance using a server located close to the Copernicus Open Access Hub, 
-# which is in Frankfurt.
-
 # path_filter - not working. See below for workaround
 # https://github.com/sentinelsat/sentinelsat/issues/540#issuecomment-920883495
 
-# assert result
-# https://github.com/gijs/sentinelsat/blob/master/tests/test_mod.py
-
-# Usage:
+# Usage: -------------------------------------------------------------------------------------
 # python3 sentinel2_getdata.py [tci or all empty or now)
 # python3 sentinel2_getdata.py (bandselection, now)
 # if the second option is empty, end date in settings.txt will be used
-
-# Todo:
-# 1. option all: zip up all bands and move to collection
-# ------------------------------------------------------------------------------
+# do   1. sentinel2_getdata.py tci now ... to see if htere is a useable image
+# then 2. sentinel2_getdata.py all now ... to fetch the bands and save them in the collection
+# or
+#	  sentinel2_getdata.py tci ... to get the latest tci between dates in the settings.txt
+#         sentinel2_getdata.py all ... to get th bands...
+#
+# if the script does not fetch an asset within 30 seconds, something might be amiss with the connection
+# CTRL C to stop and then try again later...
+#
+# Note on downloading ------------------------------------------------------------------------
+# download speeds from ESA vary ... can be slow 200kB/s even ...
+# increase download speeds my placing the Cocktail server in Europe
+# https://github.com/sentinelsat/sentinelsat/issues/187
+# ...move closer to the DHuS endpoint ...using a national mirror or for instance using a server located $# which is in Frankfurt.
+# --------------------------------------------------------------------------------------------
 
 import sys, os
 import json
@@ -232,13 +236,13 @@ def get_sentinel2_data(bandselection, enddate):
 
 		if(percentage_good_pixels > threshold):
 			#send to pcloud
-			print('\nImage passes test: ', percentage_good_pixels)
+			print('\nImage passes test. Percentage of non-black pixels:', percentage_good_pixels)
 			print('Sending to pCloud..')
 			filelist = [tci_path +  tci_jpeg]
 			send_to_pcloud(filelist, authfile, sentinelpclouddir)
 
 		else:
-			print('\nImage does not pass test: ', percentage_good_pixels)
+			print('\nImage does not pass test. Percentage of non-black pixels: ', percentage_good_pixels)
 			print('NOT sending to pCloud..')
 	else:
 		print('zip up and move to collection for processing...')

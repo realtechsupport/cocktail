@@ -120,7 +120,6 @@ def get_minmax_points(path, rasterimage):
 	return(minx, miny, maxx, maxy)
 #------------------------------------------------------------------------------
 def get_minmax_points_multiple(path, rasterimages):
-#https://stackoverflow.com/questions/2922532/obtain-latitude-and-longitude-from-a-geotiff-file
 	minxs = []
 	minys = []
 	maxxs = []
@@ -182,3 +181,8 @@ def check_image(image, threshold):
 
 	return(percentage_good)
 #-----------------------------------------------------------------------------
+def log(filename, comment, method):
+	file = open(filename, method)
+	value = file.write(comment)
+	file.close()
+#------------------------------------------------------------------------------

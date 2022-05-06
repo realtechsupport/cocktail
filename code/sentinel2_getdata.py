@@ -1,4 +1,4 @@
-# sentinel2_getdata.py bandselection enddate
+# sentinel2_getdata.py 
 # sentinelsat version 1.1.1
 # https://sentinelsat.readthedocs.io/en/v1.1.1/api_reference.html
 
@@ -22,25 +22,29 @@
 # https://github.com/sentinelsat/sentinelsat/issues/540#issuecomment-920883495
 
 # Usage: -------------------------------------------------------------------------------------
-# python3 sentinel2_getdata.py [tci or all empty or now)
-# python3 sentinel2_getdata.py (bandselection, now)
-# if the second option is empty, end date in settings.txt will be used
-# do   1. sentinel2_getdata.py tci now ... to see if htere is a useable image
-# then 2. sentinel2_getdata.py all now ... to fetch the bands and save them in the collection
+# python3 sentinel2_getdata.py
+#
+# enter choices at the prompt
+# inputs: bandselection, now, uuid
+# if the second input is empty, end date in settings.txt will be used
+# do   1. tci now ... to see if htere is a useable image
+# then 2. all now ... to fetch the bands and save them in the collection
 # or
-#	  sentinel2_getdata.py tci ... to get the latest tci between dates in the settings.txt
-#         sentinel2_getdata.py all ... to get th bands...
+#	  tci ... to get the latest tci between dates in the settings.txt
+#         all ... to get the bands between dates in the settings.txt
+#	  71d7edef-292c-4f4e-af40-72c3f0e9eb64 .. a uuid to get a known asset
 #
 # if the script does not fetch an asset within 30 seconds, something might be amiss with the connection
 # CTRL C to stop and then try again later...
 #
-# Note on downloading ------------------------------------------------------------------------
+# Note on downloading -------------------------------------------------------------------------
 # download speeds from ESA vary ... can be slow 200kB/s even ...
 # increase download speeds my placing the Cocktail server in Europe
 # https://github.com/sentinelsat/sentinelsat/issues/187
 # ...move closer to the DHuS endpoint ...using a national mirror or for instance using a server located $# which is in Frankfurt.
-# --------------------------------------------------------------------------------------------
-
+# ---------------------------------------------------------------------------------------------
+# RTS, May 2022
+#----------------------------------------------------------------------------------------------
 import sys, os
 import json
 import gdal
@@ -57,35 +61,45 @@ from sentinel2_helper import *
 datapath = '/home/blc/cocktail/data/'
 inputsfile = datapath + 'settings.txt'
 
-#-------------------------------------------------------------------------------
-
+#----------------------------------------------------------------------------------------------
 def main():
 
 	inputs = []
 	bandseletion = 'na'
 	enddate = 'na'
+	uuid = 'na'
 
-	if (len(sys.argv) == 3):
-		for arg in sys.argv[1:]:
-			inputs.append(arg)
+	print('You can use this routine to get the TCI or all bands of a Sentinel2 asset')
+	print('Edit the start and end dates in the settings.txt file')
+	print('\nTo get  the latest TCI between those dates, enter: tci')
+	print('To get the latest set of all bands between those dates, enter: all')
+	print('To get the latest TCI from the present, enter: tci now')
+	print('To get the lastest set of all bands from the present, enter: all now')
+	print('To get all bands from a known UUID, enter that long UUID: a-b-c-d-e')
 
-		bandselection = inputs[0].strip()
-		enddate = inputs[1].strip()
 
-	elif(len(sys.argv) == 2):
-		bandselection = sys.argv[1].strip()
+	response = input("\nEnter your choice: ")
+	long = 20
+	try:
+		elements = response.split(' ')
+		bandselection = elements[0]
+		enddate = elements[1]
+	except:
+		if(len(response) > long):
+			uuid = response
+			bandselection = 'all'
+		else:
+			bandselection = response
 
+	if((bandselection == 'tci') or (bandselection == 'all')):
+		print('\n Getting the sentinel2 asset with choices: ', bandselection, enddate, uuid)
+		get_sentinel2_data(bandselection, enddate, uuid)
 	else:
-		print("At least one input - tci or all required. Second possible input for end date - now -  for the latest image")
-		exit()
+		print("\ntci, all or the uiid is required. Try again...\n")
 
-	print('\nReceived these inputs: ', bandselection, enddate)
-	print('\n\n')
-	get_sentinel2_data(bandselection, enddate)
+#----------------------------------------------------------------------------------------------
+def get_sentinel2_data(bandselection, enddate, uuid):
 
-#--------------------------------------------------------------------------------
-
-def get_sentinel2_data(bandselection, enddate):
 	try:
         	f = open(inputsfile, 'r')
         	data = f.read()
@@ -109,6 +123,7 @@ def get_sentinel2_data(bandselection, enddate):
 		map = jdata['geojsonmap']
 		pclouddir = jdata['pdir']
 		sentinelpclouddir = jdata['pdir_sentinel']
+		logfile = jdata['logfile']
 
 	#set sentinel parameters
 	maxitems = 1
@@ -144,21 +159,26 @@ def get_sentinel2_data(bandselection, enddate):
 	f.close()
 
 	api = SentinelAPI(username, password, 'https://scihub.copernicus.eu/dhus')
-	#areatype = 'iswithin'		#'intersects', 'contains'
 
 	#fetch the data
 	try:
-		#products = api.query(footprint, date = (start, end), platformname = platform, producttype = product, cloudcoverpercentage = (0, maxcloudcover), area_relation = areatype)
-		products = api.query(footprint, date = (start, end), platformname = platform, producttype = product, cloudcoverpercentage = (0, maxcloudcover))
-		products_df = api.to_dataframe(products)
-		# ascending=[False] > newest item; ascending=[True] > oldest item;
-		products_df_sorted = products_df.sort_values(['ingestiondate'], ascending=[False])
-		# usually only 1 (large files, upto 1GB )
-		print('\nNumber of items being downloaded: ', maxitems)
-		products_df_sorted = products_df_sorted.head(maxitems)
-		print('\nGetting this/these item/s: ', products_df_sorted)
+		this_uuid = 'na'
 
-		# ISSUE using the filter option...code has workaround...
+		if(uuid == 'na'):
+			products = api.query(footprint, date = (start, end), platformname = platform, producttype = product, cloudcoverpercentage = (0, maxcloudcover))
+			products_df = api.to_dataframe(products)
+			# ascending=[False] > newest item; ascending=[True] > oldest item;
+			products_df_sorted = products_df.sort_values(['ingestiondate'], ascending=[False])
+			products_df_sorted = products_df_sorted.head(maxitems)
+			this_uuid = products_df_sorted['uuid'][0]
+			print('\nCorresponding uuid: ', this_uuid)
+
+		else:
+			print('\Manually entered uuid: ', uuid)
+			this_uuid = uuid
+
+		api.download(this_uuid, directory_path = rawsatpath)
+
 		# https://github.com/sentinelsat/sentinelsat/issues/540
 		#if(bandselection == 'tci'):
 		#	pathfilter = make_path_filter("*_tci.jp2")
@@ -166,7 +186,6 @@ def get_sentinel2_data(bandselection, enddate):
 		#else:
 		#	api.download_all(products_df_sorted.index, directory_path = rawsatpath)
 
-		api.download_all(products_df_sorted.index, directory_path = rawsatpath)
 		print('\nDownload attempt complete ...  check sentinel folder')
 
 	# catch all exceptions
@@ -179,7 +198,7 @@ def get_sentinel2_data(bandselection, enddate):
 		exit()
 
 	# unpack the package if it has been received
-	if(len(products_df_sorted) > 0):
+	if(this_uuid != 'na'):
 		unpack(rawsatpath)
 
 	tci_path = get_tci_path(rawsatpath)
@@ -244,6 +263,11 @@ def get_sentinel2_data(bandselection, enddate):
 		else:
 			print('\nImage does not pass test. Percentage of non-black pixels: ', percentage_good_pixels)
 			print('NOT sending to pCloud..')
+
+		#create log message
+		timestamp = create_timestamp(location)
+		comment = timestamp + ': TCI test: ' + str(percentage_good_pixels) + ' for uuid ' + this_uuid 
+
 	else:
 		print('zip up and move to collection for processing...')
 		roi_list =[band for band in os.listdir(tci_path) if band[-7:] == 'roi.tif']
@@ -251,7 +275,7 @@ def get_sentinel2_data(bandselection, enddate):
 		maparea = map.split('.geojson')[0]
 		monthday = roi_list[0].split('_')[1][4:8]
 		year = roi_list[0].split('_')[1][0:4]
-		sentinelasset = maparea + '_' + monthday + '_' + year + '_sentinel2' 
+		sentinelasset = maparea + '_' + monthday + '_' + year + '_sentinel2'
 		print(sentinelasset)
 
 		os.mkdir(tci_path + '/temp')
@@ -262,13 +286,21 @@ def get_sentinel2_data(bandselection, enddate):
 		datasource = os.path.join(tci_path, 'temp')
 		shutil.make_archive(archivename, 'zip', datasource)
 
+		#create log message
+		timestamp = create_timestamp(location)
+		comment = timestamp + ': All bands in collection for uuid ' + this_uuid
+
+	#log the results
+	print('\nAdding log entry...')
+	method = 'a'
+	log(datapath + logfile, comment, method)
+
 	# delete content of rawsat
 	print('\nDeleting temporary files...')
 	shutil.rmtree(rawsatpath)
 	os.makedirs(rawsatpath)
-#--------------------------------------------------------------------------------
 
+#----------------------------------------------------------------------------------------------
 if __name__ == "__main__":
     main()
-
-#---------------------------------------------------------------------------------
+#----------------------------------------------------------------------------------------------

@@ -1,8 +1,12 @@
+# COCKTAIL
 # sentinel2_getdata.py 
+# RTS, April 2022
+#--------------------------------------------------------------------------------------------
+# get sentinel 2 satellite assets based on area of interest, cloudcover and date interval
+#--------------------------------------------------------------------------------------------
 # sentinelsat version 1.1.1
 # https://sentinelsat.readthedocs.io/en/v1.1.1/api_reference.html
 
-# Get Sentinel2 data products based on an area of interest, cloudcover and date interval
 # Preparations:
 # 1
 # Create an account with Copernicus Open Access Hub (https://scihub.copernicus.eu/dhus)

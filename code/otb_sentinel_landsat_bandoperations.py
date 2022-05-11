@@ -1,8 +1,8 @@
-# ORFEO Toolbox
+# COCKTAIL
 # otb_sentinel_landsat_bandoperations.py
+# RTS, May 2022
 #-------------------------------------------------------------------------------
 # band math on  sentinel and landsat image data
-# activate OTB libraries with: conda activate OTB
 # ------------------------------------------------------------------------------
 # get sentinel data via planet lab
 # or directly from sentinel and convert .jp2 to geotif (.tif)
@@ -39,7 +39,6 @@
 # Select / set the settings in the settings.txt file !
 # Activate the OTB conda environment before you run this code
 # conda activate OTB
-# RTS, April 2022
 # ------------------------------------------------------------------------
 
 import sys, os
@@ -53,9 +52,8 @@ from zipfile import ZipFile
 
 from helper import *
 
-# these files should be in the collection directory
-# rastershapezipfile =  'area2_0726_2021_sentinel2.zip'
-# rastershapezipfile = 'area2_0727_2021_landsat8.zip'
+# zipped .tif band files should be in the collection directory
+# 'area2_0726_2021_sentinel2.zip', 'area2_0727_2021_landsat8.zip'
 
 # Local path and variables
 datapath = '/home/blc/cocktail/data/'
@@ -130,12 +128,11 @@ def create_change_map (satellitesource, type):
 	print("Selected zipped files moved to vector directory and unzipped..")
 
 	parts = satellitesource.split('_')
-	satname = parts[-1].split('.zip')[0]
+	satname = parts[0] + '_' + parts[-1].split('.zip')[0]
 	token = parts[2] + parts[1]
 	ext = '.tif'
 	c_ext = '.png'
 	do_colormap = 'true'
-	cmap = 'relief'				#'hsv'	'jet'
 
 	print('\nThis is the satellite source and date: ', satname, token)
 
@@ -154,6 +151,7 @@ def create_change_map (satellitesource, type):
 
 		im1 = findband(swirband, token, ext, satrasterpath)
 		im2 = findband(nirband, token, ext, satrasterpath)
+		cmap = 'relief'
 
 		print('This is the swir band: ', im1)
 		print('This is the nir band: ', im2)
@@ -162,7 +160,6 @@ def create_change_map (satellitesource, type):
 	elif(type == 'ndvi'):
 		print("\nNormalized Difference Vegetation Index\n")
 
-		# CHECK THIS
 		if('landsat8' in satellitesource):
 			nirband = 'B5'
 			redband = 'B4'
@@ -172,7 +169,7 @@ def create_change_map (satellitesource, type):
 
 		im1 = findband(nirband, token, ext, satrasterpath)
 		im2 = findband(redband, token, ext, satrasterpath)
-
+		cmap = 'jet'
 		print('This is the nir band: ', im1)
 		print('This is the red band: ', im2)
 		print('\n\n')

@@ -1,4 +1,7 @@
-# ORFEO Toolbox 
+# COCKTAIL
+# otb_raster_classify.py
+# RTS, March 2022
+#---------------------------------------------------------------------------------
 # raster classifier training and image classification
 # classifiers: Support Vector Machine, Random Forest, Artificial Neural Net (todo)
 # color map
@@ -8,7 +11,7 @@
 # updated with classifier statistics, Feb 2022
 # updated with download package (image, settings, stats)
 # updated input selection: zipped vectorshape file name
-# -------------------------------------------------------------
+# --------------------------------------------------------------------------------
 import sys, os
 import json
 from datetime import datetime
@@ -25,22 +28,45 @@ from helper import *
 datapath = '/home/blc/cocktail/data/'
 inputsfile = datapath + 'settings.txt'
 
-#------------------------------------------------------------------------------
+#---------------------------------------------------------------------------------
 def main():
-	# print command line arguments
-	for arg in sys.argv[1:]:
-		print ("\nThis the selected input: ", arg)
 
-	classifier = arg.strip()
-	if((classifier == 'libsvm') or (classifier == 'rf')):
-		print("Proceeding to vector processing with: ", classifier)
-		raster_classify (classifier)
-	else:
-		print("Only libsvm and rf classifiers supported now... Try again.\n")
+	response = ''
+	elements = []
+
+	print('\nYou can use this routine to perform Support Vector Machine or Random Forest classification on PlanetLab, Sentinel2 or Landsat8 data')
+	print('The raster image must be in the rasterimages directory and the ROI vectordata in the vectorfiles directory.')
+	print('The corresponding vectordata file is set in the settings.txt file.')
+	print('Supported classification options are: rf or libsvm')
+	print('Enter the name of the raster image, followed by the classifier.')
+	print('Example: area2_0612_2020.tif rf')
+	print('If you enter only the classifier choice, the raster image in the settings.txt file will be used.')
+
+	response = input("\nEnter your choices: ")
+	input_classifier = ''
+	input_rasterimage = ''
+
+	try:
+		elements = response.split(' ')
+		if(len(elements) == 2):
+			elements = response.split(' ')
+			input_rasterimage = elements[0]
+			input_classifier = elements[1]
+			raster_classify(input_rasterimage, input_classifier)
+
+		elif((len(elements) == 1) and ((elements[0] == 'rf') or (elements[0] == 'libsvm'))):
+			input_classifier = elements[0]
+			raster_classify(input_rasterimage, input_classifier)
+		else:
+			print('\Input error... try again..')
+			exit()
+	except:
+		print('\nInput error - enter rastername and classifier or only the classifier (rf or libsvm)')
 		exit()
-#------------------------------------------------------------------------------
 
-def raster_classify (classifier):
+#---------------------------------------------------------------------------------
+
+def raster_classify (input_rasterimage, input_classifier):
 	try:
         	f = open(inputsfile, 'r')
         	data = f.read()
@@ -70,22 +96,28 @@ def raster_classify (classifier):
 		addcolor = jdata['raster_addcolor']
 
 
+	if(input_rasterimage == ''):
+		pass
+	else:
+		rasterimage = input_rasterimage
+
+
 	rimage = rasterpath + rasterimage
 	key = "classification"
 	s = rastershapezipfile.split(key)
 	sf = s[0] + key + ".shp"
 	sfile = vectorpath + sf
-	
-	print('\nHere are the inputs') 
-	print('Zipped raster shapefile: ', rastershapezipfile) 
-	print('Unzipped raster shapefile: ' , sfile)
+
+	print('\n\nHere are the inputs') 
 	print('Rasterimage: ', rasterimage)
+	print('Raster shapefile: ', rastershapezipfile) 
+	print('Classifier: ', input_classifier)
 
 	b_rimage = rasterimage.split('.tif')[0] + '_'
 
 #-----------------------------------------------------------------------------
 	# step 1 - preparation - copy the selected zipfiles to the vectordata folder and uncompress
-	
+
 	shutil.copy(collectionpath + rastershapezipfile, vectorpath + rastershapezipfile)
 
 	with zipfile.ZipFile(vectorpath + rastershapezipfile, 'r') as zip_ref:
@@ -100,6 +132,8 @@ def raster_classify (classifier):
 	samplemv = 100
 	samplemt = 100
 	samplevtr = 0.5
+
+	classifier = input_classifier
 
 	app = otbApplication.Registry.CreateApplication(apptype)
 	app.SetParameterStringList("io.il", [rimage])

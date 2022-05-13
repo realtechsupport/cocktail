@@ -1,21 +1,21 @@
-# ORFEO Toolbox
-# raster classifier training and image classification
+# COCKTAIL
+# otb_raster+texture_classify.py
+# raster with haralick texture features classifier training and image classification
 # ------------------------------------------------------------------------------
+# Random Forest or Support Vector Machine based classification of raster data
+# Requires vector based ROI data for training
 # Combine with texture map that produces an output with the following texture measures:
 # 1-Energy, 2-Entropy, 3-Correlation, 4-Inverse Difference Moment, 5-Inertia, 6-Cluster Shade, 7-Cluster Prominence, 8-Haralick Correlation
 # http://wiki.awf.forst.uni-goettingen.de/wiki/index.php/Haralick_Texture
-# Concatenate
-# Then classify: classifiers: Support Vector Machine, Random Forest
-# Check variation in LIBSVM
-# https://www.orfeo-toolbox.org/CookBook/Applications/app_TrainImagesClassifier.html?highlight=libsvm
-
-# Add color map
-# Transport to pCloud
-# install on Ubuntu 18 LTS with conda (conda-packages1.sh and environmentv1.yml.)
-# RTS, Nov/Dec 2021
-# updated with classifier statistics, Jan 2022
-# updated with texture, Feb 2022
+# All pertinent parameters and selections, including the colormap and appropriate ROI vector file are collected
+# from the settings.txt file
+# Usage: activate OTB (conda activate OTB)
+#	 python3 otb_raster+texture_classify.py
+#	 > enter choices...
+# Updated settings file is saved.
+# RTS, March 2022
 # ------------------------------------------------------------------------------
+
 import sys, os
 import json
 import gdal
@@ -32,19 +32,43 @@ inputsfile = datapath + 'settings.txt'
 
 #------------------------------------------------------------------------------
 def main():
-	# print command line arguments
-	for arg in sys.argv[1:]:
-		print ("This the selected input: ", arg)
 
-	classifier = arg.strip()
-	if((classifier == 'libsvm') or (classifier == 'rf')):
-		print("\nProceeding to vector processing with ", classifier)
-		raster_texture_classify (classifier)
-	else:
-		print("\nOnly libsvm and rf classifiers supported now... Try again.\n")
+	response = ''
+	elements = []
+
+	print('\nYou can use this routine to perform Support Vector Machine or Random Forest classification on PlanetLab, Sentinel2 or Landsat8 data')
+	print('This script will include texture information calculated via Haralick features.')
+	print('The raster image must be in the rasterimages directory and the corresponding ROI vectordata in the vectorfiles directory.')
+	print('The corresponding vectordata file is set in the settings.txt file.')
+	print('Supported classification options are: rf or libsvm')
+	print('Enter the name of the raster image, followed by the classifier.')
+	print('Example: area2_0612_2020.tif rf')
+	print('If you enter only the classifier choice, the raster image in the settings.txt file will be used.')
+
+	response = input("\nEnter your choices: ")
+	input_classifier = ''
+	input_rasterimage = ''
+
+	try:
+		elements = response.split(' ')
+		if(len(elements) == 2):
+			elements = response.split(' ')
+			input_rasterimage = elements[0]
+			input_classifier = elements[1]
+			raster_texture_classify(input_rasterimage, input_classifier)
+
+		elif((len(elements) == 1) and ((elements[0] == 'rf') or (elements[0] == 'libsvm'))):
+			input_classifier = elements[0]
+			raster_texture_classify(input_rasterimage, input_classifier)
+		else:
+			print('\Input error... try again..')
+			exit()
+	except:
+		print('\nInput error - enter rastername and classifier or only the classifier (rf or libsvm)')
 		exit()
+
 #------------------------------------------------------------------------------
-def raster_texture_classify (classifier):
+def raster_texture_classify (input_rasterimage, input_classifier):
 	try:
         	f = open(inputsfile, 'r')
         	data = f.read()
@@ -77,16 +101,22 @@ def raster_texture_classify (classifier):
 		location = jdata['location']
 		addcolor = jdata['raster_addcolor']
 
+
+	if(input_rasterimage == ''):
+		pass
+	else:
+		rasterimage = input_rasterimage
+
 	rimage = rasterpath + rasterimage
 	key = "classification"
 	s = rastershapezipfile.split(key)
 	sf = s[0] + key + ".shp"
 	sfile = vectorpath + sf
 
-	print('\nHere are the inputs')
-	print('Zipped raster shapefile: ', rastershapezipfile)
-	print('Unzipped raster shapefile: ' , sfile)
+	print('\n\nHere are the inputs')
 	print('Rasterimage: ', rasterimage)
+	print('Raster shapefile: ', rastershapezipfile)
+	print('Classifier: ', input_classifier)
 
 	b_rimage = rasterimage.split('.tif')[0] + '_'
 
@@ -98,10 +128,10 @@ def raster_texture_classify (classifier):
 	with zipfile.ZipFile(vectorpath + rastershapezipfile, 'r') as zip_ref:
   		zip_ref.extractall(vectorpath)
 
-	print("Selected zipped files moved to vector directory and unzipped..")
+	print("Selected zipped files moved to vector directory and unzipped..\n\n")
 
 #------------------------------------------------------------------------------
-	# step 2: get texture information (missing select only bands 8,3,1 ....)
+	# step 2: get texture information
 
 	apptype = "HaralickTextureExtraction"
 	app = otbApplication.Registry.CreateApplication(apptype)
@@ -135,13 +165,15 @@ def raster_texture_classify (classifier):
 	app.SetParameterString("out", resultspath + concat_raster_texture)
 	app.ExecuteAndWriteOutput()
 
-
+#------------------------------------------------------------------------------
 	#step 4 - train a classifiers with the raster input image and the shapefile with ROIs
 
 	apptype = "TrainImagesClassifier"
 	samplemv = 100
 	samplemt = 100
 	samplevtr = 0.5
+
+	classifier = input_classifier
 
 	app = otbApplication.Registry.CreateApplication(apptype)
 	app.SetParameterStringList("io.il", [resultspath + concat_raster_texture])
@@ -225,7 +257,54 @@ def raster_texture_classify (classifier):
 		app.ExecuteAndWriteOutput()
 
 #---------------------------------------------------------------------------------
-	#step 8 - transfer to storage (pCloud)
+	#step 8 - update settings file with user inputs
+
+	imagetoken = jdata['input_rasterimage']
+	classifiertoken = jdata['input_classifier']
+
+	#read in the data from the settings file
+	try:
+		f = open(inputsfile, 'r')
+		data = f.readlines()
+		c = 0
+		for line in data:
+			if(imagetoken in line):
+				imagereplacement = line.replace(imagetoken, rasterimage)
+				iline = c
+				#print(imagereplacement)
+			elif(classifiertoken in line):
+				classificationreplacement = line.replace(classifiertoken, input_classifier)
+				cline = c
+				#print(classificationreplacement)
+			c = c+1
+		f.close()
+
+	except:
+		print('settings file error...')
+
+	#write out the data to the updated settings file
+	try:
+
+		inputsfile_updated = datapath + 'settings_updated.txt'
+		f = open(inputsfile_updated, 'w')
+		cc = 0
+		for line in data:
+			if(cc == iline):
+				f.write(imagereplacement)
+			elif(cc == cline):
+				f.write(classificationreplacement)
+			else:
+				f.write(line)
+			cc = cc+1
+		f.close()
+		print('\nUpdated settings file saved...')
+
+	except:
+		print('Updated settings file error...')
+		exit()
+#---------------------------------------------------------------------------------
+
+	#step 9 - transfer to storage (pCloud)
 
 	if(t2p == "yes"):
 		f = open(authfile, 'r')
@@ -240,7 +319,7 @@ def raster_texture_classify (classifier):
 		stats_settings =  st_settings.split('.zip')[0] + '_' + tstamp + '.zip'
 		zipOb = ZipFile(resultspath + stats_settings, 'w')
 		zipOb.write(resultspath + fname)
-		zipOb.write(inputsfile)
+		zipOb.write(inputsfile_updated)			#use the updated file
 		zipOb.close()
 
 		conn = PyCloud(username, password, endpoint='nearest')
@@ -252,6 +331,7 @@ def raster_texture_classify (classifier):
 		conn.uploadfile(files=filelist, path=pdir)
 		print('\n\nUploaded: ' , filelist)
 		print('\n\n')
+
 #---------------------------------------------------------------------------------
 
 if __name__ == "__main__":

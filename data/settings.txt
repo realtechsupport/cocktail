@@ -142,5 +142,10 @@
 	"//--commentH" : "Transport and logging -------",
 	"pdir" : "/VM",
 	"pdir_sentinel" : "/VM/sentinel",
-	"logfile" : "logfile.txt"
+	"logfile" : "logfile.txt",
+
+	"//--commentI" : "User inputs -----------------",
+	"input_rasterimage" : "user_rasterimage.tif",
+	"input_classifier" : "user_classifier"
+
 }

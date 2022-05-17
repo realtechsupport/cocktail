@@ -1,7 +1,8 @@
-# -*- coding: utf-8 -*-
+# COCKTAIL
 # helper.py
 # routines to support the OTB-QGIS toolchain COCKTAIL
 # RTS, Jan/April 2022
+
 # ------------------------------------------------------------------------------
 import os, sys, numpy
 from datetime import datetime
@@ -12,6 +13,7 @@ import pytz
 import glob, shutil, zipfile
 from zipfile import ZipFile
 from pcloud import PyCloud
+
 #------------------------------------------------------------------------------
 # Create a time stamp, based on location
 def create_timestamp(location):
@@ -43,6 +45,7 @@ def change_settings(path, infile, token1_name, token1_value, token2_name, token2
     file.close()
 
 #-----------------------------------------------------------------------------
+
 # Precision, Recall and Fscore gleaned from a multi-class confusion matrix
 # https://en.wikipedia.org/wiki/Precision_and_recall
 def get_classifier_statistics(location, datapath, confusion_matrix, save):
@@ -78,6 +81,7 @@ def get_classifier_statistics(location, datapath, confusion_matrix, save):
 
 	return(stats, fname)
 # ------------------------------------------------------------------------------
+
 # get the .tif sentinel2 file with the correct band 
 def findband (band, token, ext, path):
 	result = 'n.a.'
@@ -91,6 +95,7 @@ def findband (band, token, ext, path):
 
 	return(result)
 #-------------------------------------------------------------------------------
+
 def findband_roi(band, token, ext, path):
 	result = 'n.a'
 	area = 'roi'
@@ -104,6 +109,7 @@ def findband_roi(band, token, ext, path):
 			pass
 	return(result)
 #-------------------------------------------------------------------------------
+
 def get_minmax_points(path, rasterimage):
 #https://stackoverflow.com/questions/2922532/obtain-latitude-and-longitude-from-a-geotiff-file
 
@@ -119,6 +125,7 @@ def get_minmax_points(path, rasterimage):
 
 	return(minx, miny, maxx, maxy)
 #------------------------------------------------------------------------------
+
 def get_minmax_points_multiple(path, rasterimages):
 	minxs = []
 	minys = []
@@ -166,11 +173,15 @@ def send_to_pcloud(filelist, authfile, pclouddir):
 	username = lines[0].strip()
 	password = lines[1].strip()
 	f.close()
-
-	conn = PyCloud(username, password, endpoint='nearest')
-	conn.uploadfile(files=filelist, path=pclouddir)
-	print('\n\nUploaded: ' , filelist)
+	try:
+		conn = PyCloud(username, password, endpoint='nearest')
+		conn.uploadfile(files=filelist, path=pclouddir)
+		print('\n\nUploaded: ' , filelist)
+	except:
+		print('\npCloud error ... upload failed..')
+		pass
 #------------------------------------------------------------------------------
+
 def check_image(image, threshold):
 	c = Image.open(image)
 	cg = c.convert("L")
@@ -181,6 +192,7 @@ def check_image(image, threshold):
 
 	return(percentage_good)
 #-----------------------------------------------------------------------------
+
 def log(filename, comment, method):
 	file = open(filename, method)
 	value = file.write(comment)

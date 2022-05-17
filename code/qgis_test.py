@@ -1,10 +1,8 @@
-# qgis_basics.py
+# COCKTAIL
+# qgis_test.py
 # QGIS test routine - checking the basics
 # RTS, October 2021
-# https://docs.qgis.org/3.16/en/docs/pyqgis_developer_cookbook/loadlayer.html
 # https://qgis.org/pyqgis/3.16/index.html
-# --------------------------------------------------------------------------
-# place all the shape file data (.shp, shx, dbf,.prj, .qix) into one folder
 #--------------------------------------------------------------------------
 import sys
 import time
@@ -22,6 +20,7 @@ qgispath = '/usr/bin/qgis'
 
 #qgis core module imports
 from qgis.core import (
+	Qgis,
 	QgsApplication,
 	QgsProcessingFeedback,
 	QgsVectorLayer,
@@ -33,6 +32,8 @@ from qgis.core import (
 	QgsProcessingFeatureSourceDefinition,
 	QgsProcessingOutputLayerDefinition
 )
+
+print('\nThis is the QGIS version: ', Qgis.QGIS_VERSION)
 #----------------------------------------------------------------------------
 
 #start Qgis
@@ -49,10 +50,17 @@ from processing.core.Processing import Processing
 processing.core.Processing.Processing.initialize()
 
 #search available algorithms for a specific item
-sterm = 'nearest'
+sterm = 'join'
+algolist = []
+print('\nChecking QGIS for instances of: ', sterm)
 for algo in QgsApplication.processingRegistry().algorithms():
+	algolist.append(algo.name())
 	if(re.search(sterm, algo.name(), re.IGNORECASE)):
 		print(algo.name())
+
+print('\n\nHere are all available algorithms in this version of QGIS.')
+print(algolist)
+
 
 #finish
 print('\nEnding QGIS')

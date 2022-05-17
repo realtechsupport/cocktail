@@ -1,16 +1,15 @@
-# ORFEO Toolbox 
+# COCKTAIL 
+# otb_vector_classify_2.py
 # classifier training and image classification
-# install on Ubuntu 18 LTS with conda (conda-packages1.sh and environmentv1.yml.)
-# RTS, Nov 2021
-# OTB_part2
-# reference: https://www.orfeo-toolbox.org/CookBook-6.2/Applications/app_TrainVectorClassifier.html
+# RTS, Feb 2022
 
 # sequence
-# OTB_part1
+# OTB_vector_classify1
 # QGIS_join
-# OTB_part2
+# OTB_vector_clasify2
 # QGIS_render
-# -------------------------------------------------------------
+
+# -----------------------------------------------------------------------------
 import sys, os, json
 from datetime import datetime
 import pytz
@@ -18,11 +17,16 @@ import gdal
 import otbApplication
 import numpy
 from PIL import Image as PILImage
+
 #------------------------------------------------------------------------------
+print('\nVECTOR_CLASSIFY_2: Training + Classification\n')
+#------------------------------------------------------------------------------
+
 # Local path and variables
 datapath = '/home/blc/cocktail/data/'
 inputsfile = datapath + 'settings.txt'
-#collect the variables
+
+#collect the variables from the settings file
 try:
         f = open(inputsfile, 'r')
         data = f.read()
@@ -31,7 +35,6 @@ try:
 except:
         print('\n...data access error...\n')
 else:
-	#print(jdata)
 	rasterimage = jdata['rasterimage']
 	pointsfile = jdata['pointsfile']
 	classifier = jdata['vector_classifier_ann']
@@ -68,8 +71,7 @@ if(classifier == 'ann'):
 	mean_std_list = ["mean_0", "stdev_0", "mean_1", "stdev_1", "mean_2", "stdev_2", "mean_3", "stdev_3"]
 	app.SetParameterStringList("io.vd", [sfile])
 	app.SetParameterString("io.out", resultspath + modelname)
-	
-	#--------------------
+
 	app.SetParameterStringList("feat", mean_std_list)
 	app.SetParameterInt("valid.layer", 0)
 
@@ -86,13 +88,13 @@ if(classifier == 'ann'):
 	app.SetParameterString("classifier.ann.term", NNterminationcriteria)	#iter, eps, all
 	app.SetParameterFloat("classifier.ann.eps", NNepsilon)
 	app.SetParameterInt("classifier.ann.iter", NNmaxiterations)
-	#--------------------
-	
-	print('\n\nTraining Neural Network Model\n\n')
+
+
+	print('\n\nTraining Neural Network Model')
 	app.SetParameterInt("rand", 0)
 	app.SetParameterString("io.confmatout", resultspath + confusion_matrix)
 	app.ExecuteAndWriteOutput()
-	print('\n\nVector train complete... \n\n')
+	print('\n\nVector training complete.')
 
 	#step 2  - classify vector file with the trained model
 	apptype = "VectorClassifier"
@@ -105,7 +107,8 @@ if(classifier == 'ann'):
 	app.SetParameterStringList("feat", mean_std_list)
 	app.SetParameterString("out", resultspath + sfileout)
 	app.ExecuteAndWriteOutput()
-	print('\n\nVector classify complete... \n\n')
+	print('\n\nVector classify complete.')
+
 	#NEXT STEP: QGIS render
-	
+
 #--------------------------------------------------------------------------------

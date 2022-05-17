@@ -1,27 +1,30 @@
-# ORFEO Toolbox 
-# classifier training and image classification
-# install on Ubuntu 18 LTS with conda (conda-packages1.sh and environmentv1.yml.)
-# RTS, Nov 2021
-# OTB_part1
+# COCKTAIL
+# otb_vector_classify_1.py
+# segmentation and zonal statistics
+# RTS, Feb 2022
 
-#sequence
-# OTB_part1
+# sequence
+# OTB_vector_classify1
 # QGIS_join
-# OTB_part2
+# OTB__vector_classify2
 # QGIS_render
-# -------------------------------------------------------------
+
+# ----------------------------------------------------------------------------
 import sys, os
 import json
 import gdal
 import otbApplication
-import numpy 
+import numpy
 import geopandas
 from PIL import Image as PILImage
+#------------------------------------------------------------------------------
+print('\nVECTOR_CLASSIFY_1: Segmentation + Zonal Statistics\n')
 #------------------------------------------------------------------------------
 # Local path and variables
 datapath = '/home/blc/cocktail/data/'
 inputsfile = datapath + 'settings.txt'
-#collect the variables
+
+#collect the variables from the settings file
 try:
 	f = open(inputsfile, 'r')
 	data = f.read()
@@ -30,8 +33,6 @@ try:
 except:
 	print('\n...data access error...\n')
 else:
-	print('\nHere are the settings parameters:\n\n')
-	print(jdata)
 	rasterimage = jdata['rasterimage']
 	pointsfile = jdata['pointsfile']
 	classifier = jdata['vector_classifier_ann']
@@ -40,6 +41,7 @@ else:
 	segmentationfile = jdata['segmentationfile']
 	segmentation_stats = jdata['segmentation_stats']
 	coord_info = jdata['coord_info']
+
 #----------------------------------------------------------------------------
 #only if you are working with a geojson input...
 #geojsonfile = coord_info + '.geojson'
@@ -51,8 +53,8 @@ if(classifier == 'ann'):
 	#c1 shape from geojson
 	#df = geopandas.read_file(datapath + geojsonfile)
 	#df.to_file(vectorpath + shapefile)
-	#print('created shapefile from geojson')	
-	
+	#print('created shapefile from geojson')
+
 	#2 perform segmentation
 	#https://www.orfeo-toolbox.org/CookBook/Applications/app_Segmentation.html
 	app = otbApplication.Registry.CreateApplication("Segmentation")
@@ -61,14 +63,14 @@ if(classifier == 'ann'):
 	app.SetParameterString("mode.vector.out", vectorpath + segmentationfile)
 	app.SetParameterString("filter","meanshift")
 	app.ExecuteAndWriteOutput()
-	
+
 	#3 create statistics (zonalstatistics)
 	app = otbApplication.Registry.CreateApplication("ZonalStatistics")
 	app.SetParameterString("in", rasterpath + rasterimage)
 	app.SetParameterString("inzone.vector.in", vectorpath + segmentationfile)
 	app.SetParameterString("out.vector.filename", vectorpath + segmentation_stats)
 	app.ExecuteAndWriteOutput()
-	
+
 	print('\n\nSegmentation and ZonalStatistics complete \n')
 	#NEXT STEP: QGIS join
 #---------------------------------------------------------------------------------

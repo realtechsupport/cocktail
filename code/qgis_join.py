@@ -1,19 +1,23 @@
+# COCKTAIL
 # qgis_join.py
-# RTS, November 2021
 # join attributes by location
-#---------------------------------------------------------------------------------------
-#sequence
-# OTB_part1
+# RTS, FEB 2022
+
+# sequence
+# OTB_vector_classify1
 # QGIS_join
-# OTB_part2
+# OTB_vector_classify2
 # QGIS_render
 
+# -----------------------------------------------------------------------
 import os, sys
 import json
 import time
 import datetime
 import os, re
-
+#-----------------------------------------------------------------------
+print('\nQGIS_JOIN: Join attributes by location\n')
+#------------------------------------------------------------------------
 #append the path where processing plugin can be found (assumes Debian OS)
 sys.path.append('/usr/share/qgis/python/plugins')
 
@@ -46,13 +50,17 @@ else:
 #-------------------------------------------------------------
 #qgis core module imports
 from qgis.core import (
-        QgsApplication,
-        QgsProcessingFeedback,
-        QgsProcessingException,
-        QgsProcessingParameters,
-        QgsVectorLayer,
-        QgsRasterLayer
+	Qgis,
+	QgsApplication,
+	QgsProcessingFeedback,
+	QgsProcessingException,
+	QgsProcessingParameters,
+	QgsVectorLayer,
+	QgsRasterLayer
 )
+
+#import utils
+print('\nThis is the qgis version: ', Qgis.QGIS_VERSION)
 
 #start Qgis
 print('\nStarting QGIS')
@@ -70,11 +78,11 @@ processing.core.Processing.Processing.initialize()
 #join attributes by location
 segmentationstats =  vectorpath + segmentation_stats
 samplepoints = vectorpath +  pointsfile
-combined = vectorpath + segmentation_points_joined 
+combined = vectorpath + segmentation_points_joined
 
 algorithmname = "qgis:joinattributesbylocation"
 parameters = {'INPUT': segmentationstats,
-	'JOIN': samplepoints, 
+	'JOIN': samplepoints,
 	'JOIN_FIELDS': [],
 	'METHOD': 1,
 	'DISCARD_NONMATCHING': True,
@@ -84,15 +92,17 @@ parameters = {'INPUT': segmentationstats,
 
 
 feedback = QgsProcessingFeedback()
+
 try:
 	results = processing.run(algorithmname, parameters, feedback=feedback)
-	print('...completed: ', algorithmname)
+	print('\nJOIN completed: ', algorithmname)
+
 except QgsProcessingException as e:
 	print('\n\n ERROR in this operation..')
 	print(str(e))
 
 #finish
-print('JOIN complete ... ending QGIS')
+print('\nEnding QGIS')
 qgs.exitQgis()
 
 #NEXT STEP: OTB part2 (vector train and test)

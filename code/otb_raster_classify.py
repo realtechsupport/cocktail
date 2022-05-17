@@ -3,14 +3,7 @@
 # RTS, March 2022
 #---------------------------------------------------------------------------------
 # raster classifier training and image classification
-# classifiers: Support Vector Machine, Random Forest, Artificial Neural Net (todo)
-# color map
-# transport to pCloud
-# install on Ubuntu 18 LTS with conda (conda-packages1.sh and environmentv1.yml.)
-# RTS, Nov/Dec 2021
-# updated with classifier statistics, Feb 2022
-# updated with download package (image, settings, stats)
-# updated input selection: zipped vectorshape file name
+# classifiers: Support Vector Machine, Random Forest
 # --------------------------------------------------------------------------------
 import sys, os
 import json
@@ -108,9 +101,9 @@ def raster_classify (input_rasterimage, input_classifier):
 	sf = s[0] + key + ".shp"
 	sfile = vectorpath + sf
 
-	print('\n\nHere are the inputs') 
+	print('\n\nHere are the inputs')
 	print('Rasterimage: ', rasterimage)
-	print('Raster shapefile: ', rastershapezipfile) 
+	print('Raster shapefile: ', rastershapezipfile)
 	print('Classifier: ', input_classifier)
 
 	b_rimage = rasterimage.split('.tif')[0] + '_'
@@ -193,7 +186,7 @@ def raster_classify (input_rasterimage, input_classifier):
 	print(stats)
 	print('\n')
 
-#--------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------
 	#step 5 - apply colormap
 
 	if(addcolor == "yes"):
@@ -213,8 +206,54 @@ def raster_classify (input_rasterimage, input_classifier):
 
 		app.SetParameterString("out", resultspath + color_classified_rimage)
 		app.ExecuteAndWriteOutput()
-#---------------------------------------------------------------------------------
-	#step 6 - transfer to storage (pCloud)
+#-------------------------------------------------------------------------------
+	#step 6 - update settings file with user inputs
+
+	imagetoken = jdata['input_rasterimage']
+	classifiertoken = jdata['input_classifier']
+
+	#read in the data from the settings file
+	try:
+		f = open(inputsfile, 'r')
+		data = f.readlines()
+		c = 0
+		for line in data:
+			if(imagetoken in line):
+				imagereplacement = line.replace(imagetoken, rasterimage)
+				iline = c
+				#print(imagereplacement)
+			elif(classifiertoken in line):
+				classificationreplacement = line.replace(classifiertoken, input_classifier)
+				cline = c
+				#print(classificationreplacement)
+			c = c+1
+		f.close()
+
+	except:
+		print('settings file error...')
+
+	#write out the data to the updated settings file
+	try:
+
+		inputsfile_updated = datapath + 'settings_updated.txt'
+		f = open(inputsfile_updated, 'w')
+		cc = 0
+		for line in data:
+			if(cc == iline):
+				f.write(imagereplacement)
+			elif(cc == cline):
+				f.write(classificationreplacement)
+			else:
+				f.write(line)
+			cc = cc+1
+		f.close()
+		print('\nUpdated settings file saved...')
+
+	except:
+		print('Updated settings file error...')
+		exit()
+#-------------------------------------------------------------------------------
+	#step 7 - transfer to storage (pCloud)
 
 	if(t2p == "yes"):
 		f = open(authfile, 'r')
@@ -229,7 +268,7 @@ def raster_classify (input_rasterimage, input_classifier):
 		stats_settings_tstamp = stats_settings.split('.zip')[0] + '_' + tstamp + '.zip'
 		zipOb = ZipFile(resultspath + stats_settings_tstamp, 'w')
 		zipOb.write(resultspath + fname)
-		zipOb.write(inputsfile)
+		zipOb.write(inputsfile_updated)			#use the updated file
 		zipOb.close()
 
 		conn = PyCloud(username, password, endpoint='nearest')

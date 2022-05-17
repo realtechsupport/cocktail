@@ -1,17 +1,15 @@
-# qgis_remder.py
-# RTS, December 2021
+# COCKTAIL
+# qgis_render.py
 # select dissolve and then render vector classification with a .qml color map
-#---------------------------------------------------------------------------------------
-#sequence
-# OTB_part1
+# RTS, March 2022
+
+# sequence
+# OTB_vector_classify1
 # QGIS_join
-# OTB_part2
+# OTB__vector_classify2
 # QGIS_render
 
-import sys
-#clear all variables (from last session)
-#sys.modules[__name__].__dict__.clear()
-
+#---------------------------------------------------------------------------------------
 import os, sys, json
 from datetime import datetime
 import pytz
@@ -19,7 +17,12 @@ from zipfile import ZipFile
 from pcloud import PyCloud
 
 from helper import *
+
 #---------------------------------------------------------------------------------------
+print('\nQGIS_RENDER: Dissolve boundaries and apply custom color map\n')
+#---------------------------------------------------------------------------------------
+
+# tiny helper function here...
 def finished():
     img = render.renderedImage()
     img.save(image_location, "png")
@@ -47,7 +50,6 @@ try:
 except:
         print('\n...data access error...\n')
 else:
-	#print(jdata)
 	rasterimage = jdata['rasterimage']
 	vectorpath = jdata['vectorpath']
 	resultspath = jdata['resultspath']
@@ -70,7 +72,7 @@ else:
 	keep_attributes = jdata['KEEP_ATTRIBUTES']
 	options = jdata['OPTIONS']
 	statistics_attribute = jdata['STATISTICS_ATTRIBUTE']
-	
+
 	con_matrix = jdata["confusion_matrix_vector_ann"]
 	stats_save = jdata['stats_save']
 	t2p = jdata['T2P']
@@ -126,7 +128,7 @@ from processing.tools import *
 tstamp = create_timestamp(location)
 
 if(perform_dissolve == "yes"):
-	#dissolve the layer ----------------------------------------------------------------------
+	#dissolve the layer ----------------------------------------------------
 	classified_vimage = rastername + '_' + tstamp + '_' + classified_vimage + '_' + classifier + '_dissolved.png'
 	dissolved_shapefile =  resultspath + dissolved_shapefile
 	algorithmname = "gdal:dissolve"
@@ -162,6 +164,7 @@ else:
 	working_shapefile = render_shapefile
 
 #--------------------------------------------------------------------------------------
+
 #write the features of the vector layer to a file
 vlayer = QgsVectorLayer(working_shapefile, "temp", "ogr")
 if not vlayer.isValid():
@@ -199,13 +202,15 @@ loop.exec_()
 print('\nRender complete; ending QGIS')
 qgs.exitQgis()
 
-#----------------------------------------------------------
+#----------------------------------------------------------------------------------
+#get classifier statistics
 stats, fname = get_classifier_statistics(location, resultspath, con_matrix, stats_save)
 print('\nHere are the classifier statistics, based on the confusion matrix\n')
 print(stats)
 print('\n')
 
-#-----------------------------------------------------------
+#----------------------------------------------------------------------------------
+#collect elements of the resultant shapefile
 if((do_zip == "yes") and (perform_dissolve == "yes")):
 	base = dissolved_shapefile.split('.shp')[0]
 	ziped =  jdata['ziped']
@@ -217,35 +222,22 @@ if((do_zip == "yes") and (perform_dissolve == "yes")):
 	zipOb.close()
 	print('\nResult shapefiles compressed..')
 
-#-----------------------------------------------------------
+#-----------------------------------------------------------------------------------
 #step 6 - transfer to storage (pCloud)
 
 if(t2p == "yes"):
-	f = open(authfile, 'r')
-	lines = f.readlines()
-	username = lines[0].strip()
-	password = lines[1].strip()
-	f.close()
 
-	#zip up the settings and stats (classifier precision, recall and fscore calculated from the confusion matrix)
 	stats_settings = jdata['stats+settings']
-	#tstamp = create_timestamp(location)
 	stats_settings_tstamp = stats_settings.split('.zip')[0] + '_' + tstamp + '.zip'
 	zipOb = ZipFile(resultspath + stats_settings_tstamp, 'w')
 	zipOb.write(resultspath + fname)
 	zipOb.write(inputsfile)
 	zipOb.close()
-	try:
-		conn = PyCloud(username, password, endpoint='nearest')
-		filelist = [resultspath + classified_vimage, resultspath + ziped, resultspath + stats_settings_tstamp]
-		conn.uploadfile(files=filelist, path=pdir)
-		print('\n\nUploaded: ' , filelist)
-		print('\n\n')
-	except:
-		print('\npCloud error...upload failed..')
-		pass
+
+	filelist = [resultspath + classified_vimage, resultspath + ziped, resultspath + stats_settings_tstamp]
+	send_to_pcloud(filelist, authfile, pdir)
 
 else:
 	print('\nNot uploading result...\n')
 
-#-----------------------------------------------------------
+#----------------------------------------------------------------------------------

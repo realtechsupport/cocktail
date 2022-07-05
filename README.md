@@ -1,6 +1,6 @@
 ## Cocktail 
 
-<i> Mixing GDAL + OTB + QGIS in a virtual environment, with a good shot of tip and cue, for satellite asset collection and analysis </i>
+<i> Mixing GDAL + OTB + QGIS in a virtual environment, with a good shot of tip and cue, for resource constrained satellite asset collection and analysis </i>
 <br><br>
 
 <p align="center">

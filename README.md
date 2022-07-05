@@ -14,6 +14,8 @@ Cocktail is designed as a compendium to other GIS investigation environments, co
 Cocktail is intended to facilitate collaborative inquiry. The large collection of parameters set in the individual modules are saved in a file such that collaborators can easily replicate a workflow. Cocktail can and should be combined with an external cloud storage provider to move assets out of the compute environment for storage. The code repository implements a solution for this issue using [pCloud](https://www.pcloud.com/).
 
 
+Here is a brief description of the steps required to get started:
+
 1 - VM <br>
 Create a virtual computer. Choose Ubuntu 18.04 LTS, with at least 16GB of RAM. <br>
 

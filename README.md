@@ -9,6 +9,7 @@ The [Orfeo](https://www.orfeo-toolbox.org/tag/machine-learning/) machine learnin
 The systems have differing and partially conflicting dependencies, and the GUI environment makes rapid testing across the various tool boxes cumbersome.
 This fact becomes apparent, for example, when developing a pipeline to perform vector based satellite image classification with a neural network under OTB.
 This repository demonstrates how to setup a virtual computer that can support GDAL, OTB and QGIS functionality seamlessly. It also includes examples of how to use the setup to apply various classifiers including vector support machines, random forests and neural networks across GDAL, OTB and QGIS.
+
 Cocktail can work with satelite assets from Landsat, Sentinel and Planet Labs. Not unlike the tip and cue concept in which one monitors an area of interest with one sensor and then ‘tips’ another complementary sensor platform to acquire another image over the same area, Cocktail tips and cues based on economic constraints, collecting Sentinel2 data to perform simple band operations and data intensive classification tasks, and to then apply those same classification routines to Planet Lab data if deemed necessary.
 
 1 - VM <br>

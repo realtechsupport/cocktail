@@ -4,7 +4,7 @@
 <br><br>
 
 
-![alt text, img align="center"](https://github.com/realtechsupport/cocktail/blob/main/imgs/tip+cue3.png?raw=true)
+![alt text](https://github.com/realtechsupport/cocktail/blob/main/imgs/tip+cue3.png?raw=true)
 
 
 The [Orfeo](https://www.orfeo-toolbox.org/tag/machine-learning/) machine learning library and the translator library for raster and vector geospatial data formats [GDAL](https://gdal.org/) do not play well with the open source geographic information system [QGIS](https://qgis.org) outside of the resource intensive GUI environment.

@@ -101,7 +101,7 @@ The sandbox folder contains a script to convert field notes in GPS data and land
 
 Cocktail has supported the following research projects:
 
-[FOSS4G2022 - Who speaks for the forest? Participatory mapping and contested land cover classification in Central Bali](https://talks.osgeo.org/foss4g-2022-academic-track/talk/33PMHD/)
+[FOSS4G2022 - Who speaks for the forest? Participatory mapping and contested land cover classification in Central Bali](https://talks.osgeo.org/foss4g-2022-academic-track/talk/33PMHD/) <br>
 [EuroCarto2022 - Combining Landsat, Sentinel2 and Planet Lab satellite assets for resource constrained land cover analysis in the tropics](https://eurocarto2022.org/accepted-submissions/)
 
 

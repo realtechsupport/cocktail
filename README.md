@@ -1,11 +1,13 @@
 ## Cocktail 
 
-<i> Mixing GDAL + OTB + QGIS in a virtual environment, with a good shot of tip and cue, for resource constrained satellite asset collection and analysis </i>
+<i> Mixing GDAL, OTB and QGIS in a virtual environment, with a shot of tip&cue, for resource constrained satellite asset analysis </i>
 <br><br>
 
 <p align="center">
   <img src="https://github.com/realtechsupport/cocktail/blob/main/imgs/tip+cue3.png?raw=true" alt="cocktail tip and cue"/>
 </p>
+
+
 
 The [Orfeo](https://www.orfeo-toolbox.org/tag/machine-learning/) machine learning library and the translator library for raster and vector geospatial data formats [GDAL](https://gdal.org/) do not play well with the open source geographic information system [QGIS](https://qgis.org) outside of the resource intensive GUI environment.
 The systems have differing and partially conflicting dependencies, and the GUI environment makes rapid testing across the various tool boxes cumbersome.

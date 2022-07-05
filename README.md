@@ -4,7 +4,7 @@
 <br><br>
 
 <p align="center">
-  <img src="https://github.com/realtechsupport/cocktail/blob/main/imgs/tip+cue3.png?raw=true" alt="cocktail tip and cue"/>
+  <img src="https://github.com/realtechsupport/cocktail/blob/main/imgs/tip+cue4.png?raw=true" alt="cocktail tip and cue"/>
 </p>
 
 Private sector, high-resolution, daily-updated satellite assets have become a significant resource for remote sensing operations. A case in point is PlanetScope (PS), currently operating the largest collection of small Earth-imaging satellites. Cocktail facilitates the combination of free and commercial satellite assets to monitor  an area of interest with a low cost system, and then switches to a high resolution asset only if a condition of concern or interest has been detected and not adequately understood in the first data set. Not unlike the tip and cue concept in which one monitors an area of interest with one sensor and then ‘tips’ another complementary sensor platform to acquire another image over the same area, Cocktail tips and cues based on economic constraints.

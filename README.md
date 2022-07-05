@@ -3,7 +3,7 @@
 <i> Mixing GDAL + OTB + QGIS in a virtual environment, with a good shot of tip and cue, for satellite asset collection and analysis </i>
 <br><br>
 
-<p align="center">
+<p align="center" width="100%">
   <src="https://github.com/realtechsupport/cocktail/blob/main/imgs/tip+cue3.png">
 </p>
 

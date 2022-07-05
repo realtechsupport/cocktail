@@ -1,6 +1,6 @@
 ## Cocktail 
 
-<i> Mixing GDAL + OTB + QGIS in a virtual environment, with a good shot of tip and cue </i>
+<i> Mixing GDAL + OTB + QGIS in a virtual environment, with a good shot of tip and cue, for satellite asset collection and analysis </i>
 <br><br>
 
 ![alt text](https://github.com/realtechsupport/cocktail/blob/main/imgs/tip+cue3.png?raw=true)
@@ -86,7 +86,7 @@ You can also move across environments to access libraries from either environmen
   	conda run -n OTB python3 /home/code/otb_code_B.py 
   	python3 /home/code/qgis_code_B.py 
 	 
-  
+	 
 Since the directory structure you setup will be identical in both the QGIS and OTB environments, intermediate filed produced will be available to processes running in either environment, allowing for data to be shared. All settings across the script modules are stored in the 'settings.txt' resource file and imported to the individual modules.
 
 <i>Details on how to perform satellite assets tip and cue, SVM, RF and NN classification with the code elements are described in the .pdf document.</i>

@@ -17,7 +17,6 @@ import gdal
 import otbApplication
 import numpy
 from PIL import Image as PILImage
-from pcloud import PyCloud
 from zipfile import ZipFile
 
 from helper import *

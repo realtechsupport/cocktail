@@ -2,7 +2,7 @@
 # otb_clip.py
 # RTS, July 2022
 #-------------------------------------------------------------------------------
-# clip a collection of raster band images based on a specified ROI file
+# Clip a collection of raster band images based on a specified ROI file.
 # ------------------------------------------------------------------------------
 # Clip shape file must be contained within the (larger) input raster band images.
 # Works on Landsat, Sentinel and Planet Labs assets.

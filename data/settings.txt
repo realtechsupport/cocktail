@@ -1,10 +1,13 @@
 {
 	"//--comment0" : "Data collection settings ---------",
 	"rawsatpath" : "/home/blc/cocktail/data/rawsat/",
-	"sent_startdate" : "2021_7_24",
-	"sent_enddate" : "2021_7_27",
+	"sent_startdate" : "2021_7_1",
+	"sent_enddate" : "2021_7_15",
 	"geojsonmap": "area2_square.geojson",
+	"roi" : "area2_clip.zip",
+	"roipath" : "/home/blc/cocktail/data/vectorfiles/roi/",
 	"maxcloudcover" : "15",
+	"goodpixelthreshold" : "50",
 	"sentinelauthfile" : "/home/blc/cocktail/data/auth/sent.txt",
 
 	"//--commentA" : "Input settings ---------",
@@ -145,7 +148,7 @@
 	"logfile" : "logfile.txt",
 
 	"//--commentI" : "User inputs -----------------",
-	"input_rasterimage" : "user_rasterimage.tif",
-	"input_classifier" : "user_classifier"
+	"input_rasterimage" : "area2_0501_2021.tif",
+	"input_classifier" : "libsvm"
 
 }

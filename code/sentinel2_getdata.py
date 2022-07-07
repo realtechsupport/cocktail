@@ -1,6 +1,6 @@
 # COCKTAIL
 # sentinel2_getdata.py 
-# RTS, April 2022
+# RTS, July 2022
 #--------------------------------------------------------------------------------------------
 # get sentinel 2 satellite assets based on area of interest, cloudcover and date interval
 #--------------------------------------------------------------------------------------------
@@ -11,11 +11,20 @@
 # 1
 # Create an account with Copernicus Open Access Hub (https://scihub.copernicus.eu/dhus)
 # You will need a login and pswd to access sentinel2 files
+# Put the Coperniculs credentials in a .txt file in the auth folder
+# line 1: user
+# line 2: pswd
+
 # 2
 # Generate a geojson file for area of interest (https://geojson.io/)
 # Save the file as somearea.geojson and place a copy on into your data directory (see below)
-# 3
-# put the ESA credential in a file in the auth folder
+
+#3
+# Create from that geojson file shapefiles to crop the resultant imagebands and  compress (zip)
+
+#4
+#Update the settings.txt file with your variables (area.geojson, roi.zip, dates)
+
 # -------------------------------------------------------------------------------------------
 # ESA quotas:
 # https://forum.step.esa.int/t/esa-copernicus-data-access-long-term-archive-and-its-drawbacks/15394/14
@@ -26,7 +35,9 @@
 # https://github.com/sentinelsat/sentinelsat/issues/540#issuecomment-920883495
 
 # Usage: -------------------------------------------------------------------------------------
-# python3 sentinel2_getdata.py
+# activate OTB, run script, follow prompts
+# > conda activate OTB
+# > python3 sentinel2_getdata.py
 #
 # enter choices at the prompt
 # inputs: bandselection, now, uuid
@@ -45,10 +56,9 @@
 # download speeds from ESA vary ... can be slow 200kB/s even ...
 # increase download speeds my placing the Cocktail server in Europe
 # https://github.com/sentinelsat/sentinelsat/issues/187
-# ...move closer to the DHuS endpoint ...using a national mirror or for instance using a server located $# which is in Frankfurt.
-# ---------------------------------------------------------------------------------------------
-# RTS, May 2022
-#----------------------------------------------------------------------------------------------
+# ...move closer to the DHuS endpoint ...using a national mirror or for instance using a server located close to ESA in Frankfurt.
+#---------------------------------------------------------------------------------------------
+
 import sys, os
 import json
 import gdal
@@ -73,9 +83,9 @@ def main():
 	enddate = 'na'
 	uuid = 'na'
 
-	print('You can use this routine to get the TCI or all bands of a Sentinel2 asset')
-	print('Edit the start and end dates in the settings.txt file')
-	print('\nTo get  the latest TCI between those dates, enter: tci')
+	print('You can use this routine to get the TCI or all bands of a Sentinel2 asset from any region specified in a geojson file.')
+	print('Edit the start and end dates in the settings.txt file.')
+	print('\nTo get the latest TCI between those preset dates, enter: tci')
 	print('To get the latest set of all bands between those dates, enter: all')
 	print('To get the latest TCI from the present, enter: tci now')
 	print('To get the lastest set of all bands from the present, enter: all now')
@@ -96,7 +106,7 @@ def main():
 			bandselection = response
 
 	if((bandselection == 'tci') or (bandselection == 'all')):
-		print('\n Getting the sentinel2 asset with choices: ', bandselection, enddate, uuid)
+		print('\nGetting the sentinel2 asset with choices: ', bandselection, enddate, uuid)
 		get_sentinel2_data(bandselection, enddate, uuid)
 	else:
 		print("\ntci, all or the uiid is required. Try again...\n")
@@ -124,10 +134,13 @@ def get_sentinel2_data(bandselection, enddate, uuid):
 		sent_startdate = jdata['sent_startdate']
 		sent_enddate = jdata['sent_enddate']
 		maxcloudcover = jdata['maxcloudcover']
+		goodpixelthreshold = jdata['goodpixelthreshold']
 		map = jdata['geojsonmap']
 		pclouddir = jdata['pdir']
 		sentinelpclouddir = jdata['pdir_sentinel']
 		logfile = jdata['logfile']
+		roi = jdata['roi']
+		roipath = jdata['roipath']
 
 	#set sentinel parameters
 	maxitems = 1
@@ -149,6 +162,7 @@ def get_sentinel2_data(bandselection, enddate, uuid):
 		end = date(ends_year, ends_month, ends_day)
 	else:
 		end = 'NOW'
+		print('Checking latest available sentinel asset in the selected geojson region with below-threshold cloud cover.')
 
 	print('GEOJSON MAP: ', map)
 	print('MAX CLOUD COVER: ', maxcloudcover)
@@ -190,7 +204,7 @@ def get_sentinel2_data(bandselection, enddate, uuid):
 		#else:
 		#	api.download_all(products_df_sorted.index, directory_path = rawsatpath)
 
-		print('\nDownload attempt complete ...  check sentinel folder')
+		print('\nDownload attempt complete ...  check sentinel (file) folder')
 
 	# catch all exceptions
 	except Exception as ex:
@@ -198,7 +212,7 @@ def get_sentinel2_data(bandselection, enddate, uuid):
 		message = template.format(type(ex).__name__, ex.args)
 		print (message)
 		print('\n... Something went wrong ... see below...')
-		print('possible error sources: gateway timeout, geojson file, start and end dates, cloud cover setting.')
+		print('Possible error sources: gateway timeout, geojson file, start and end dates, cloud cover setting.')
 		exit()
 
 	# unpack the package if it has been received
@@ -206,6 +220,7 @@ def get_sentinel2_data(bandselection, enddate, uuid):
 		unpack(rawsatpath)
 
 	tci_path = get_tci_path(rawsatpath)
+	print(tci_path)
 
 	# get only the bands requested
 	if(bandselection == 'tci'):
@@ -214,7 +229,7 @@ def get_sentinel2_data(bandselection, enddate, uuid):
 		jp2_list = [band for band in os.listdir(tci_path) if band [-4:] == '.jp2']
 
 	#convert .jp2 to .tif
-	print('\nconverting .jp2 to .tif\n')
+	print('\nConverting .jp2 to .tif\n')
 	tci_path = tci_path + '/'
 	for image in jp2_list:
 		timage = image.split('.jp2')[0] + '.tif'
@@ -224,18 +239,15 @@ def get_sentinel2_data(bandselection, enddate, uuid):
 	tif_list =[band for band in os.listdir(tci_path) if band[-4:] == '.tif']
 
 	# move and unpack the shapefile to the ROI dir in the vectorpath
-	roishapezipfile =  'area2_shape_crop.zip'
-	roishape = roishapezipfile.split('.zip')[0] + '.shp'
-	roipath = vectorpath + 'roi/'
-	roipath_area2crop = roipath + roishapezipfile.split('.zip')[0] + '/'
+	roishape = roi.split('.zip')[0] + '.shp'
 
 	# eigentlich only have to unzip the ROI file once..
-	shutil.copy(collectionpath + roishapezipfile, roipath)
-	with zipfile.ZipFile(roipath + roishapezipfile, 'r') as zip_ref:
+	shutil.copy(collectionpath + roi, roipath)
+	with zipfile.ZipFile(roipath + roi, 'r') as zip_ref:
 		zip_ref.extractall(roipath)
 
 	#clip bands
-	warp_options = gdal.WarpOptions(cutlineDSName = roipath_area2crop+roishape, cropToCutline = True)
+	warp_options = gdal.WarpOptions(cutlineDSName = roipath + roishape, cropToCutline = True)
 
 	for b in tif_list:
 		b_new = b.split('.tif')[0] + '_roi' + '.tif'
@@ -254,10 +266,10 @@ def get_sentinel2_data(bandselection, enddate, uuid):
 
 		#check stats
 		minimum = 0
-		threshold = 75
+		#threshold = 50
 		percentage_good_pixels = check_image(tci_path + tci_jpeg, minimum)
 
-		if(percentage_good_pixels > threshold):
+		if(percentage_good_pixels > int(goodpixelthreshold)):
 			#send to pcloud
 			print('\nImage passes test. Percentage of non-black pixels:', percentage_good_pixels)
 			print('Sending to pCloud..')
@@ -273,7 +285,7 @@ def get_sentinel2_data(bandselection, enddate, uuid):
 		comment = timestamp + ': TCI test: ' + str(percentage_good_pixels) + ' for uuid ' + this_uuid 
 
 	else:
-		print('zip up and move to collection for processing...')
+		print('Zip up and move to collection for processing...')
 		roi_list =[band for band in os.listdir(tci_path) if band[-7:] == 'roi.tif']
 
 		maparea = map.split('.geojson')[0]
@@ -300,7 +312,7 @@ def get_sentinel2_data(bandselection, enddate, uuid):
 	log(datapath + logfile, comment, method)
 
 	# delete content of rawsat
-	print('\nDeleting temporary files...')
+	print('\nDeleting temporary files to save storage space...')
 	shutil.rmtree(rawsatpath)
 	os.makedirs(rawsatpath)
 

@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 # Sentinel2_helper.py
-# utilities to assist with processing Sentinel2 satellige imagery
+# utilities to assist with processing Sentinel2 imagery
 # RTS, spring 2021
 #-------------------------------------------------------------------------------
 import sys, os, shutil

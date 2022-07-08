@@ -98,9 +98,10 @@ def findband (band, token, ext, path):
 
 def findband_roi(band, token, ext, path):
 	result = 'n.a'
-	area = 'roi'
+	area = 'clip'
 	skip = '.xml'
 	files = os.listdir(path)
+
 	for file in files:
 		if((token in file) and (ext in file) and (band in file) and (area in file) and not (skip in file)):
 			result = file

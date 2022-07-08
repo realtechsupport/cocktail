@@ -7,6 +7,7 @@
 	"vectorpath" : "/home/blc/cocktail/data/vectorfiles/",
 	"resultspath" : "/home/blc/cocktail/results/",
 	"sentinelrasterpath" : "/home/blc/cocktail/data/rasterimages/files/",
+	"topsentinelrasterpath" : "/home/blc/cocktail/data/rasterimages/sentinel2/",
 	"landsat8rasterpath" : "/home/blc/cocktail/data/rasterimages/landsat8/",
 	"authfile" : "/home/blc/cocktail/data/auth/pc.txt",
 	"sentinelauthfile" : "/home/blc/cocktail/data/auth/sent.txt",

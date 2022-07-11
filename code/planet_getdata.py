@@ -1,6 +1,6 @@
 # COCKTAIL
 # planet_getdata.py
-# RTS, March 2022
+# RTS, March-July 2022
 #--------------------------------------------------------------------------------------------
 # Get planet satellite asset (tip) based on area of interest, cloudcover and date interval
 # established from the sentinel sample (cue)
@@ -15,9 +15,17 @@
 # Enter choices at the prompt
 # inputs: geojson, target date, max cloudcover
 # Same set of parameters used for the seninel cue image
-# Make sure the selected geojson map is saved to the data folder
+# Make sure the selected geojson map is saved to the data/roi folder
 # assets, if found, may not be ready immediately. Script tries several times before timing out.
 # CTRL C to stop and then try again later...
+
+# Updated for SuperDove
+# https://tinyurl.com/superdoved
+# https://tinyurl.com/superdove8bands
+# https://tinyurl.com/355cz2kc
+
+# Asset requests after May 2022 will fetch SuperDove 8-band data.
+# Asset requests before that data get Dove 4-band data.
 #-------------------------------------------------------------------------------
 import sys, os
 import json, requests
@@ -96,13 +104,15 @@ def get_planet_data_v1(map_geojson, ptargetdate, maxcloud):
 	# --------------------------------------------------------------------------
 
 	start = targetdate
-	#prevent score snafu ..
+	#prevent date format snafu ..
 	try:
 		info = targetdate.split('-')
 	except:
 		info = targetdate.split('_')
 
 	day = info[2]
+	month = info[1]
+	year = info[0]
 	end_day = str(int(day) + 1).zfill(2)
 	end = info[0] + '-' + info[1] + '-' + end_day
 	#convert to percentage
@@ -125,15 +135,23 @@ def get_planet_data_v1(map_geojson, ptargetdate, maxcloud):
 	cloud_cover_filter = {"type": "RangeFilter", "field_name": "cloud_cover", "config": {"lte": max_cloud_cover}}
 	combined_filter = {"type": "AndFilter","config": [geometry_filter, date_range_filter, cloud_cover_filter]}
 
-	# API Key 
+	# API Key
 	f = open(planetauthfile, 'r')
 	lines = f.readlines()
 	PLANET_API_KEY = lines[0].strip()
 	f.close()
 
 	#asset type
-	item_type = "PSScene4Band"
-	asset_type = "analytic_xml"
+	if((int(year) >= 2022) and (int(month) >=5)):
+		superdove = True
+		item_type = "PSScene"
+		asset_type = "ortho_analytic_8b_xml"
+	else:
+		#Dove 4 band
+		superdove = False
+		item_type = "PSScene4Band"
+		asset_type = "analytic_xml"
+
 
 	# API request object including metadata
 	search_request = {"item_types": [item_type], "asset_types": [asset_type],"filter": combined_filter}
@@ -161,8 +179,15 @@ def get_planet_data_v1(map_geojson, ptargetdate, maxcloud):
 		result = requests.get(id_url, auth=HTTPBasicAuth(PLANET_API_KEY, ''))
 		# Get the asset
 		maxattempts = 11; wait = 60
+
 		#image only
-		links = result.json()[u"analytic"]["_links"]
+		if(superdove):
+			links = result.json()[u"ortho_analytic_8b"]["_links"]
+
+		else:
+			links = result.json()[u"analytic"]["_links"]
+
+
 		self_link = links["_self"]
 		activation_link = links["activate"]
 		# Request activation of the asset

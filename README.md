@@ -4,7 +4,7 @@
 <br><br>
 
 <p align="center">
-  <img src="https://github.com/realtechsupport/cocktail/blob/main/imgs/tip+cue4.png?raw=true" alt="cocktail tip and cue"/>
+  <img src="https://github.com/realtechsupport/cocktail/blob/main/imgs/tip+cue5.png?raw=true" alt="cocktail tip and cue"/>
 </p>
 
 Cocktail is designed to facilitate resource constrained collaborative inquiry on optical satellite assets. Resource constrained collaboration is supported in several different ways. Cocktail will vary parameters of a classifier in batch mode and store the classifier performances for each setting so you can collaboratively can find the best configuration. Cocktail keeps track of the large collection of parameters across the individual processing modules in a single file such that remote collaborators can reliably replicate a workflow. Moreover, Cocktail can be linked with an external cloud storage provider to move assets out of the compute environment for low-cost storage of large GIS files. 

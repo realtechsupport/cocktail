@@ -15,7 +15,7 @@
 # Enter choices at the prompt
 # inputs: geojson, target date, max cloudcover
 # Same set of parameters used for the seninel cue image
-# Make sure the selected geojson map is saved to the data/roi folder
+# Make sure the selected geojson map is saved to the data folder
 # assets, if found, may not be ready immediately. Script tries several times before timing out.
 # CTRL C to stop and then try again later...
 #-------------------------------------------------------------------------------

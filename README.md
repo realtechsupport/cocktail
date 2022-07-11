@@ -22,7 +22,7 @@ Create a virtual computer. Choose Ubuntu 18.04 LTS, with at least 16GB of RAM. I
 
 2- Get the repo files from this Github site. <br>
 
-	git clone https://github.com/realtechsupport/gdal-otb-qgis-combo.git
+	git clone https://github.com/realtechsupport/cocktail.git
 	
 You will have all the files in the correct directory structure on your computer after the download. <br>
 

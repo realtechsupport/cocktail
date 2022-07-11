@@ -14,8 +14,7 @@ Cocktail is designed as a compendium to other GIS investigation environments, co
 Private sector, high-resolution, daily-updated satellite assets have become a significant resource for remote sensing operations. A case in point is PlanetScope (PS), currently operating the largest collection of small Earth-imaging satellites. Cocktail facilitates the combination of free and commercial satellite assets to monitor  an area of interest with a low cost system, and then switches to a high resolution asset only if a condition of concern or interest has been detected and not adequately understood in the first data set. Not unlike the tip and cue concept in which one monitors an area of interest with one sensor and then ‘tips’ another complementary sensor platform to acquire another image over the same area, Cocktail tips and cues based on economic constraints.<br><br>
 
 Check the Install+Use.pdf document for details and examples.
-
-
+<br><br>
 Here is a brief description of the steps required to get started:
 
 1 - VM <br>

@@ -6,7 +6,7 @@
 # established from the sentinel sample (cue)
 #--------------------------------------------------------------------------------------------
 # You need a valid planet lab API key to use this routine
-# Place the key in the auth folder (or modify the code to you liking)
+# Place the key in the auth folder (or modify the code to your liking)
 # planet API V1
 
 # Usage: -------------------------------------------------------------------------------------

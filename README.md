@@ -18,7 +18,7 @@ Check the Install+Use.pdf document for details and examples.
 Here is a brief description of the steps required to get started:
 
 1 - VM <br>
-Create a virtual computer. Choose Ubuntu 18.04 LTS, with at least 16GB of RAM. If you intend on working with Sentinel data from ESA, it can be beneficial to select a VM close to ESA in Frankfurt. <br>
+Create a virtual computer. Choose Ubuntu 18.04 LTS, with at least 16GB of RAM. If you intend on working with Sentinel data from ESA, it can be beneficial to build a VM close to ESA in Frankfurt. <br>
 
 2- Get the repo files from this Github site. <br>
 You will have all the files in the correct directory structure on your computer after the download. <br>

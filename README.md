@@ -21,6 +21,9 @@ Here is a brief description of the steps required to get started:
 Create a virtual computer. Choose Ubuntu 18.04 LTS, with at least 16GB of RAM. If you intend on working with Sentinel data from ESA, it can be beneficial to build a VM close to ESA in Frankfurt. <br>
 
 2- Get the repo files from this Github site. <br>
+
+	git clone https://github.com/realtechsupport/gdal-otb-qgis-combo.git
+	
 You will have all the files in the correct directory structure on your computer after the download. <br>
 
 3 - Install QGIS. <br>

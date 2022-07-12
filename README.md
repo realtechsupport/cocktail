@@ -84,9 +84,9 @@ Run the otb test <br>
 
   	python3 otb_test.py
 	
-c) Update settingss
+c) Update settings
 	
-Update the settings and file parameters to refelct your directory structure
+Update the settings and file parameters to reflect your VM installation.
 
 	nano settings.txt
 	

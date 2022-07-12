@@ -67,7 +67,7 @@ Use the settings.txt file (in the data directory) to set your file names, proces
 
   
 8 - Test<br>
-a) Test QGIS
+a) Test QGIS - (test scripts are in the code directory)
 
 Run the qgis test in the base environment <br>
 
@@ -83,6 +83,17 @@ Activate the OTB environment <br>
 Run the otb test <br>
 
   	python3 otb_test.py
+	
+4) Update settingss
+	
+Update the settings and file parameters to refelct your directory structure
+
+	nano settings.txt
+	
+Then verify that all is ok
+
+	python3 settings_test.py
+  
   
 You can now use QGIS in the base installation and enable the conda environment to access OTB functionality. 
 You can also move across environments to access libraries from either environment with python scripts as outlined below (see vector_classify_top.sh): <br>

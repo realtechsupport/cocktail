@@ -84,7 +84,7 @@ Run the otb test <br>
 
   	python3 otb_test.py
 	
-4) Update settingss
+c) Update settingss
 	
 Update the settings and file parameters to refelct your directory structure
 

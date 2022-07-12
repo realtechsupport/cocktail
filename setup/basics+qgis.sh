@@ -5,7 +5,7 @@
 # RTS, may 2020
 #-------------------------------------------
 clear
-echo "WELCOME - basics for the GCP install "
+echo "WELCOME - basics for the VM install "
 
 sudo apt-get update
 sudo apt-get upgrade -y
@@ -28,7 +28,7 @@ pip3 install matplotlib
 pip3 install pandas
 pip3 install scipy
 
-echo "installed python3, python3dev, python3-venv, ffmpeg, sox, qgi, numpy, scipy, matplotlib, jupyter notebook"
+echo "installed python3, python3dev, python3-venv, ffmpeg, qgis, numpy, scipy, matplotlib, jupyter notebook"
 
 echo "hit ctrl d to close this session"
 exit 0

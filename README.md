@@ -103,7 +103,7 @@ The sandbox folder contains some experiments. For example, a script to convert f
 
 Cocktail is currently supporting the following research projects:
 
-[Who speaks for the forest? Participatory mapping and contested land cover classification in Central Bali - FOSS4G2022](https://talks.osgeo.org/foss4g-2022-academic-track/talk/33PMHD/) <br>
+[Who speaks for the forest? Participatory mapping and contested land cover classification in Central Bali - FOSS4G2022](https://talks.osgeo.org/foss4g-2022-academic-track/talk/33PMHD/) <br><br>
 [Combining Landsat, Sentinel2 and Planet Lab satellite assets for resource constrained land cover analysis in the tropics - EUROCARTO2022](https://eurocarto2022.org/accepted-submissions/)
 
 

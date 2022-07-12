@@ -86,7 +86,7 @@ Run the otb test <br>
 	
 c) Update settings
 	
-Update the settings and file parameters to reflect your VM installation.
+Update the settings and file parameters corresponding to paths on your VM.
 
 	nano settings.txt
 	

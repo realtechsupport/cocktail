@@ -1,6 +1,6 @@
 # COCKTAIL
 # otb_differenceoperations.py
-# RTS, May 2022
+# RTS, July 2022
 #-------------------------------------------------------------------------------
 # takes in two satellite assets and a bandoperation
 # calculates differences of band operations on satellite image data (either sentinel2 or landsat8)
@@ -245,6 +245,13 @@ def create_change_map (satellitesource_a, satellitesource_b, type):
 	im1 = satbandmathimage_a
 	im2 = satbandmathimage_b
 
+
+	# check for dimensions - if not same, clip ----------------------------------------
+	#now: use the clipped imags (july14 currently in results folder...
+	#im1 = 
+	#im2 =
+
+ 
 	#threshold = "-0.2"
 	#expression = "((im1b1 - im2b1) < " + threshold + ") ? 0 : 1"
 	expression = "(im1b1 - im2b1)"

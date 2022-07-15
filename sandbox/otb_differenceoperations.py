@@ -242,26 +242,32 @@ def create_change_map (satellitesource_a, satellitesource_b, type):
 
 	# difference between the two band operations
 	diff_satbandmathimage = 'diff_satbandmathimage' + ext
+
 	im1 = satbandmathimage_a
 	im2 = satbandmathimage_b
-
-
-	# check for dimensions - if not same, clip ----------------------------------------
-	#now: use the clipped imags (july14 currently in results folder...
-	#im1 = 
-	#im2 =
-
- 
+	# dimension issue here... cliped workaround  ----------------------------------------
+	#im1 ='area2_sentinel2_ndbi_20210726_roi.tif' 
+	#im2 ='area2_sentinel2_ndbi_20170717_roi.tif'
 	#threshold = "-0.2"
 	#expression = "((im1b1 - im2b1) < " + threshold + ") ? 0 : 1"
+
 	expression = "(im1b1 - im2b1)"
+	differenceoperation = True
 
-	app.SetParameterStringList("il", [resultspath + im1, resultspath + im2])
-	app.SetParameterString("out", resultspath + diff_satbandmathimage)
-	app.SetParameterString("exp", expression)
-	app.ExecuteAndWriteOutput()
+	try:
+		app.SetParameterStringList("il", [resultspath + im1, resultspath + im2])
+		app.SetParameterString("out", resultspath + diff_satbandmathimage)
+		app.SetParameterString("exp", expression)
+		app.ExecuteAndWriteOutput()
+	except:
+		differenceoperation = False
+		print('\nSomething went wrong')
 
-	#this far OK !
+	if(differenceoperation == False):
+		print('Clipping inputs to same dimensions...')
+		# otb_clip_ni(im1)
+		# otb_clip_ni(im2)
+
 
 #-------------------------------------------------------------------------------
 # step 3 - color mapping
@@ -275,40 +281,59 @@ def create_change_map (satellitesource_a, satellitesource_b, type):
 
 		cmap = "hot"
 		thres_diff_satbandmathimage = "thres_" + diff_satbandmathimage
+		color_diff_satbandmathimage = "color_diffimage.png"
 		color_thres_diff_satbandmathimage = "color_" + thres_diff_satbandmathimage.split('.tif')[0] + c_ext
 
-		print('\n\n')
-		print(color_thres_diff_satbandmathimage)
-
-		# swap color and then threshold ???  try....
-
-		#first threshold
-		apptype = "BandMathX"
-		im1 = diff_satbandmathimage
-
-		values = [float(min_val), float(max_val)]
-		threshold = str(numpy.mean(values))
-
-		print('\n\n\n')
-		print(threshold)
-		expression = "im1b1 > " + threshold + " ? 1 : 0"
-
-		app.SetParameterStringList("il", [resultspath + im1])
-		app.SetParameterString("out", resultspath + thres_diff_satbandmathimage)
-		app.SetParameterString("exp", expression)
-		app.ExecuteAndWriteOutput()
-
-
-		#then color
 		apptype = "ColorMapping"
 		app = otbApplication.Registry.CreateApplication(apptype)
-		app.SetParameterString("in", resultspath + thres_diff_satbandmathimage)
+		app.SetParameterString("in", resultspath + diff_satbandmathimage) #thres_diff_satbandmathimage
 		app.SetParameterString("method","continuous")
-		app.SetParameterString("method.continuous.min", str(0))           #min_val))
-		app.SetParameterString("method.continuous.max", str(1))           #max_val))
+		app.SetParameterString("method.continuous.min", str(0))           #min_val
+		app.SetParameterString("method.continuous.max", str(1))           #max_val
 		app.SetParameterString("method.continuous.lut", cmap)
-		app.SetParameterString("out", resultspath + color_thres_diff_satbandmathimage)
+		app.SetParameterString("out", resultspath + color_diff_satbandmathimage) #color_thres_diff_sat..
 		app.ExecuteAndWriteOutput()
+
+
+		#threshold the result with PIL
+		temp = Image.open(resultspath + color_diff_satbandmathimage)
+		threshold = 128
+		temp = temp.point(lambda p: p > threshold and 255)
+		temp.save(resultspath + color_thres_diff_satbandmathimage, "PNG")
+
+		'''
+		#create the clipped TCI imagebands - not working yet  
+		blue =  [band for band in os.listdir(sentinelrasterpath) if (("B02" in band) and ("roi" in band))]
+		red =   [band for band in os.listdir(sentinelrasterpath) if (("B04" in band) and ("roi" in band))]
+		green = [band for band in os.listdir(sentinelrasterpath) if (("B03" in band) and ("roi" in band))]
+
+		tciimage = "tci.tif"
+		apptype = "ConcatenateImages"
+		app = otbApplication.Registry.CreateApplication(apptype)
+		#app.SetParameterStringList("il", [sentinelrasterpath + blue[0], sentinelrasterpath + green[0], sentinelrasterpath + red[0]])
+		app.SetParameterStringList("il", [sentinelrasterpath + red[0], sentinelrasterpath + green[0], sentinelrasterpath + blue[0]])
+		app.SetParameterString("out", resultspath + tciimage)
+		app.ExecuteAndWriteOutput()
+		'''
+		#try just B08
+		B08 = [band for band in os.listdir(sentinelrasterpath) if(("B08" in band) and ("roi" in band))]
+
+		background = "B08.png"
+		apptype = "DynamicConvert"
+		app = otbApplication.Registry.CreateApplication(apptype)
+
+		app.SetParameterString("in", sentinelrasterpath + B08[0])
+		app.SetParameterString("type","linear")
+		#app.SetParameterString("channels","rgb")
+		app.SetParameterString("out", resultspath + background)
+		app.ExecuteAndWriteOutput()
+
+		#now overlay with PIL - error bad transparancy mask ...
+		finalimage = "difference_overlay.png"
+		red = Image.open(resultspath + color_thres_diff_satbandmathimage)
+		background = Image.open(resultspath + background)
+		background.paste(red, (0,0), red)
+		background.save(resultspath + finalimage, "PNG")
 
 		filelist = [inputsfile, resultspath + color_thres_diff_satbandmathimage]
 
@@ -327,7 +352,7 @@ def create_change_map (satellitesource_a, satellitesource_b, type):
 		conn.uploadfile(files=filelist, path=pdir)
 		print('\n\nUploaded: ' , filelist)
 		print('\n\n')
-		'''
+	'''
 #---------------------------------------------------------------------------------
 if __name__ == "__main__":
     main()

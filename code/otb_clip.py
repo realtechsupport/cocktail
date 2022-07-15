@@ -2,11 +2,13 @@
 # otb_clip.py
 # RTS, July 2022
 #-------------------------------------------------------------------------------
-# Clip a collection of raster band images with an ROI file defined in the settings.
+# Clip a a singel or a collection of raster band images with an ROI file defined in the settings.
 # ------------------------------------------------------------------------------
 # Clip shape file must be contained within the (larger) input raster band images.
 # Works on Landsat, Sentinel and Planet Labs assets.
 # Check the collection directory for the zipped band images file
+# If you want to clip a single raster image, follow to prompt to indicate name and path..
+#
 # Check the roi directory (in vectorfiles/roi) for the zipped ROI clip file
 # Check the settings.txt file for the name of the roi file.
 #-------------------------------------------------------------------------------
@@ -25,29 +27,85 @@ from helper import *
 # Local path and variables
 datapath = '/home/blc/cocktail/data/'
 inputsfile = datapath + 'settings.txt'
+
 #------------------------------------------------------------------------------
 def main():
 
 	inputs = []
 	rastershapezipfile = 'na'
+	selection = 'na'
 
 	print('\nUse this routine to clip existing satellite bands to an ROI specified in settings.txt')
-	response = input("\nEnter the name of the zipped rasterbands file (such as area2_0726_2021_sentinel2.zip): ")
+	response = input("\nEnter the name of the single (area2_sentinel_ndbi.tif) followed by space and the fully qualified path to the directory OR zipped rasterbands (such as area2_0726_2021_sentinel2.zip): ")
+
 	try:
-		rastershapezipfile = response.strip()
+		selection = response.strip()
+		inputs = selection.split(' ')
 	except:
-		if(len(elements) != 1):
+		if(len(inputs) == 0):
 			print('\nYou need the specify the input rasterfile')
 			exit()
 
-	if('.zip' in rastershapezipfile):
-		print('Selected raster input: ', rastershapezipfile)
-		clip_source(rastershapezipfile)
+	print('Selected input: ', inputs)
+
+
+
+	if('.zip' in inputs[0]):
+		rastershapezipfile = inputs[0]
+		clip_source_multiple(rastershapezipfile)
 	else:
-		print("\Something went wrong ... Try again...\n")
+		rasterfile = inputs[0]
+		path2directory = inputs[1]
+		firstchar = path2directory[0]
+		lastchar = path2directory[-1]
+		if(firstchar != '/'):
+			path2directory = '/' + path2directory
+		if(lastchar != '/'):
+			path2directory = path2directory + '/'
+
+		clip_source(rasterfile, path2directory)
 
 #------------------------------------------------------------------------------
-def clip_source(rastershapezipfile):
+def clip_source(rasterfile, path2directory):
+	#step 1 - get settings
+	try:
+        	f = open(inputsfile, 'r')
+        	data = f.read()
+        	jdata = json.loads(data)
+        	f.close()
+	except:
+        	print('\n...data access error...\n')
+	else:
+		#vectorpath = jdata['vectorpath']
+		resultspath = jdata['resultspath']
+		collectionpath = jdata['collectionpath']
+		location = jdata['location']
+		roi = jdata['roi']
+		roipath = jdata['roipath']
+
+	# step 2 - move and unpack the shapefile to the ROI dir in the vectorpath
+	roishape = roi.split('.zip')[0] + '.shp'
+
+	try:
+		shutil.copy(collectionpath + roi, roipath)
+		with zipfile.ZipFile(roipath + roi, 'r') as zip_ref:
+			zip_ref.extractall(roipath)
+	except:
+		print('\nCould not find the specified ROI reference file - check the roi directory or the settings file')
+		exit()
+
+	# step 3 - clip based on roi shapefile
+	print('\nPerforming the clip operation...\n')
+	ext = '.tif'
+	warp_options = gdal.WarpOptions(cutlineDSName = roipath + roishape, cropToCutline = True)
+	rasterfile_new = rasterfile.split('.tif')[0] + '_roi' + ext
+	ds = gdal.Warp(resultspath + rasterfile_new, path2directory + rasterfile,  options = warp_options)
+	ds = None
+	print('\nClipped raster input: ', rasterfile_new)
+	print('saved to: ', resultspath)
+
+#------------------------------------------------------------------------------
+def clip_source_multiple(rastershapezipfile):
 
 	#step 1 - get settings
 	try:
@@ -63,14 +121,6 @@ def clip_source(rastershapezipfile):
 		resultspath = jdata['resultspath']
 		collectionpath = jdata['collectionpath']
 		sentinelrasterpath = jdata['sentinelrasterpath']
-		authfile = jdata['authfile']
-
-		t2p = jdata['T2P']
-		pdir = jdata['pdir']
-		r_height = int(jdata['r_height'])
-		r_width = int(jdata['r_width'])
-		background = jdata['background']
-		location = jdata['location']
 		roi = jdata['roi']
 		roipath = jdata['roipath']
 
@@ -114,7 +164,7 @@ def clip_source(rastershapezipfile):
 			print(b, b_new)
 			ds = gdal.Warp(sentinelrasterpath + b_new, sentinelrasterpath + b, options = warp_options)
 			ds = None
-
+	print('\nClipped roi files saved to: ', sentinelrasterpath)
 #-------------------------------------------------------------------------------
 
 if __name__ == "__main__":

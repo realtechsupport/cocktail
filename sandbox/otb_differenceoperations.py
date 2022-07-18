@@ -2,6 +2,7 @@
 # otb_differenceoperations.py
 # RTS, July 2022
 #-------------------------------------------------------------------------------
+# bug on ndvi option... fix this !
 # takes in two satellite assets and a bandoperation
 # calculates differences of band operations on satellite image data (either sentinel2 or landsat8)
 # result threholded and superimposed on newer of the two satellite images
@@ -126,7 +127,8 @@ def create_change_map (satellitesource_a, satellitesource_b, type):
 		location = jdata['location']
 
 	#---------------------------------------------------------------------------
-	# step 1 - preparation - copy the selected Sentinel or Landsat data to the raster folder and uncompress
+	# step 1 - Preparation - copy the selected Sentinel or Landsat data to the raster folder and uncompress
+	# --------------------------------------------------------------------------
 
 	if(('landsat8' in satellitesource_a) and ('landsat8' in satellitesource_b)):
 		satrasterpath = landsat8rasterpath
@@ -162,6 +164,10 @@ def create_change_map (satellitesource_a, satellitesource_b, type):
 	print('\nThis is the first satellite source and date: ', satname_a, token_a)
 	print('\nThis is the second satellite source and date: ', satname_b, token_b)
 
+	# ---------------------------------------------------------------------------------
+	# step 2 - Perform selected band operation on each image
+	# --------------------------------------------------------------------------------
+
 	if(type == 'ndbi'):
 		print("\nNormalized Difference Built-up Index\n")
 		if(('landsat8' in satellitesource_a) and ('landsat8' in satellitesource_b)):
@@ -175,14 +181,12 @@ def create_change_map (satellitesource_a, satellitesource_b, type):
 
 		if(satrasterpath == topsentinelrasterpath):
 			satrasterpath = satrasterpath + "files/"
+		print('Here is the satrasterpath: ', satrasterpath)
 
-		print('here is the satrasterpath: ', satrasterpath)
 		im1a = findband_roi(swirband, token_a, ext, satrasterpath)
 		im2a = findband_roi(nirband, token_a, ext, satrasterpath)
 		im1b = findband_roi(swirband, token_b, ext, satrasterpath)
 		im2b = findband_roi(nirband, token_b, ext, satrasterpath)
-		#cmap = 'relief'
-		#cmap = 'hot'
 
 		print('This is the swir band of the first asset: ', im1a)
 		print('This is the nir band of the first asset: ', im2a)
@@ -201,55 +205,57 @@ def create_change_map (satellitesource_a, satellitesource_b, type):
 			nirband = 'B8A'
 			redband = 'B04'
 
+		if(satrasterpath == topsentinelrasterpath):
+			satrasterpath = satrasterpath + "files/"
+		print('Here is the satrasterpath: ', satrasterpath)
+
 		im1a = findband_roi(nirband, token_a, ext, satrasterpath)
 		im2a = findband_roi(redband, token_a, ext, satrasterpath)
 		im1b = findband_roi(nirband, token_b, ext, satrasterpath)
 		im2b = findband_roi(redband, token_b, ext, satrasterpath)
-		cmap = 'jet'
 
 		print('This is the nir band of the first asset: ', im1a)
 		print('This is the nir band of the first asset: ', im2a)
 		print('This is the swir band of the second asset: ', im1b)
 		print('This is the nir band of the second asset: ', im2b)
 
-	#---------------------------------------------------------------------------
 
 	expression = "(im1b1 - im2b1) / (im1b1 + im2b1)"
 	apptype = "BandMathX"
 	app = otbApplication.Registry.CreateApplication(apptype)
 
 	# operate on the first image
-	print('\noperating on first image...\n')
+	print('\nOperating on first image...\n')
 	im1 = im1a
 	im2 = im2a
 	satbandmathimage_a = satname_a + '_' + type +  '_' + token_a + ext
-	color_satbandmathimage = 'color_' + satname_a + '_' + type + '_' + token_a + ext
+	#color_satbandmathimage = 'color_' + satname_a + '_' + type + '_' + token_a + ext
 	app.SetParameterStringList("il", [satrasterpath + im1, satrasterpath + im2])
 	app.SetParameterString("out", resultspath + satbandmathimage_a)
 	app.SetParameterString("exp", expression)
 	app.ExecuteAndWriteOutput()
 
 	# operate on the second image
-	print('\noperating on second image...\n')
+	print('\nOperating on second image...\n')
 	im1 = im1b
 	im2 = im2b
 	satbandmathimage_b = satname_b + '_' + type +  '_' + token_b + ext
-	color_satbandmathimage = 'color_' + satname_b + '_' + type + '_' + token_b + ext
+	#color_satbandmathimage = 'color_' + satname_b + '_' + type + '_' + token_b + ext
 	app.SetParameterStringList("il", [satrasterpath + im1, satrasterpath + im2])
 	app.SetParameterString("out", resultspath + satbandmathimage_b)
 	app.SetParameterString("exp", expression)
 	app.ExecuteAndWriteOutput()
 
-	# difference between the two band operations
-	diff_satbandmathimage = 'diff_satbandmathimage' + ext
+	# ----------------------------------------------------------------------------------
+	# step 3 - Difference between the two operations
+	# ----------------------------------------------------------------------------------
 
+	diff_satbandmathimage = 'diff_satbandmathimage' + ext
 	im1 = satbandmathimage_a
 	im2 = satbandmathimage_b
 	# dimension issue here... cliped workaround  ----------------------------------------
 	#im1 ='area2_sentinel2_ndbi_20210726_roi.tif' 
 	#im2 ='area2_sentinel2_ndbi_20170717_roi.tif'
-	#threshold = "-0.2"
-	#expression = "((im1b1 - im2b1) < " + threshold + ") ? 0 : 1"
 
 	expression = "(im1b1 - im2b1)"
 	differenceoperation = True
@@ -261,17 +267,17 @@ def create_change_map (satellitesource_a, satellitesource_b, type):
 		app.ExecuteAndWriteOutput()
 	except:
 		differenceoperation = False
-		print('\nSomething went wrong')
+		print('\nSomething might have gone wrong ...')
 
 	if(differenceoperation == False):
 		print('Clipping inputs to same dimensions...')
 		# otb_clip_ni(im1)
 		# otb_clip_ni(im2)
 
+	#-------------------------------------------------------------------------------
+	# step 4 - Color mapping of difference image
+	#-------------------------------------------------------------------------------
 
-#-------------------------------------------------------------------------------
-# step 3 - color mapping
-#-------------------------------------------------------------------------------
 	if(do_colormap == 'true'):
 		#get min and max for colormap
 		img = gdal.Open(resultspath + diff_satbandmathimage)
@@ -286,37 +292,28 @@ def create_change_map (satellitesource_a, satellitesource_b, type):
 
 		apptype = "ColorMapping"
 		app = otbApplication.Registry.CreateApplication(apptype)
-		app.SetParameterString("in", resultspath + diff_satbandmathimage) #thres_diff_satbandmathimage
+		app.SetParameterString("in", resultspath + diff_satbandmathimage) 
 		app.SetParameterString("method","continuous")
 		app.SetParameterString("method.continuous.min", str(0))           #min_val
 		app.SetParameterString("method.continuous.max", str(1))           #max_val
 		app.SetParameterString("method.continuous.lut", cmap)
-		app.SetParameterString("out", resultspath + color_diff_satbandmathimage) #color_thres_diff_sat..
+		app.SetParameterString("out", resultspath + color_diff_satbandmathimage) 
 		app.ExecuteAndWriteOutput()
 
+	#--------------------------------------------------------------------------------
+	# step 5 - Overlay on reference
+	#--------------------------------------------------------------------------------
 
 		#threshold the result with PIL
-		temp = Image.open(resultspath + color_diff_satbandmathimage)
+		#threshold at the middle (0 - 255) ... make this an input?
 		threshold = 128
+		temp = Image.open(resultspath + color_diff_satbandmathimage)
 		temp = temp.point(lambda p: p > threshold and 255)
 		temp.save(resultspath + color_thres_diff_satbandmathimage, "PNG")
 
-		'''
-		#create the clipped TCI imagebands - not working yet  
-		blue =  [band for band in os.listdir(sentinelrasterpath) if (("B02" in band) and ("roi" in band))]
-		red =   [band for band in os.listdir(sentinelrasterpath) if (("B04" in band) and ("roi" in band))]
-		green = [band for band in os.listdir(sentinelrasterpath) if (("B03" in band) and ("roi" in band))]
-
-		tciimage = "tci.tif"
-		apptype = "ConcatenateImages"
-		app = otbApplication.Registry.CreateApplication(apptype)
-		#app.SetParameterStringList("il", [sentinelrasterpath + blue[0], sentinelrasterpath + green[0], sentinelrasterpath + red[0]])
-		app.SetParameterStringList("il", [sentinelrasterpath + red[0], sentinelrasterpath + green[0], sentinelrasterpath + blue[0]])
-		app.SetParameterString("out", resultspath + tciimage)
-		app.ExecuteAndWriteOutput()
-		'''
-		#try just B08
+		#Create overlay with B08 (NIR) of the NEWER image
 		B08 = [band for band in os.listdir(sentinelrasterpath) if(("B08" in band) and ("roi" in band))]
+		print('\nUsing this reference NIR:',  B08)
 
 		background = "B08.png"
 		apptype = "DynamicConvert"
@@ -324,23 +321,34 @@ def create_change_map (satellitesource_a, satellitesource_b, type):
 
 		app.SetParameterString("in", sentinelrasterpath + B08[0])
 		app.SetParameterString("type","linear")
-		#app.SetParameterString("channels","rgb")
 		app.SetParameterString("out", resultspath + background)
 		app.ExecuteAndWriteOutput()
 
-		#now overlay with PIL - error bad transparancy mask ...
-		finalimage = "difference_overlay.png"
+		#Adjust images and blend via PIL
+		finalimage = type + "_difference_overlay.png"
 		red = Image.open(resultspath + color_thres_diff_satbandmathimage)
+		red.convert('RGBA')
+		red.putalpha(255)
 		background = Image.open(resultspath + background)
-		background.paste(red, (0,0), red)
-		background.save(resultspath + finalimage, "PNG")
+		background.convert('RGBA')
+		background.putalpha(255)
 
-		filelist = [inputsfile, resultspath + color_thres_diff_satbandmathimage]
+		red_new = red.resize(background.size)
+		background_new = Image.new("RGBA", background.size)
+		background_new.paste(background)
+		#print(background_new.size, background_new.mode, background_new.info)
 
-#-------------------------------------------------------------------------------
-# step 4 - file transfer
-#-------------------------------------------------------------------------------
-	'''
+		blended = Image.blend(background_new, red_new, 0.75)
+		blended.save(resultspath + finalimage, "PNG")
+		print('\n\nDifference of selected band operation between first and second image in red, supperimposed on NIR of the newer image')
+		print('\n')
+
+		filelist = [inputsfile, resultspath + finalimage]
+
+	#-------------------------------------------------------------------------------
+	# step 6 - File transfer
+	#-------------------------------------------------------------------------------
+
 	if(t2p == "yes"):
 		f = open(authfile, 'r')
 		lines = f.readlines()
@@ -352,7 +360,6 @@ def create_change_map (satellitesource_a, satellitesource_b, type):
 		conn.uploadfile(files=filelist, path=pdir)
 		print('\n\nUploaded: ' , filelist)
 		print('\n\n')
-	'''
 #---------------------------------------------------------------------------------
 if __name__ == "__main__":
     main()

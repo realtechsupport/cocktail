@@ -109,7 +109,7 @@ Since the directory structure you setup will be identical in both the QGIS and O
 
 <i>Details on how to collect data from the European Space Agency's Sentinel program, how to make use of tip and cue, and how to perform various band-math operations and image classification with SVM, RF and NN classifiers is described in the Install+Use .pdf document.</i>
 
-The collection directory contains some sample Sentinel2 data. Here are links to two high resolution 4-band PlanetLab images:
+The collection directory contains some sample Sentinel2 data. Here are links to two high resolution 4-band PlanetLab images (geotif format, 300MB each):
 
 [Central Bali, May 2021](https://filedn.com/lqzjnYhpY3yQ7BdfTulG1yY/cocktail_PS_rastersamples/area2_0501_2021_4band.tif)
 <br>

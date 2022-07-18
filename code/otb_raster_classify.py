@@ -54,7 +54,7 @@ def main():
 			print('\Input error... try again..')
 			exit()
 	except:
-		print('\nInput error - enter rastername and classifier or only the classifier (rf or libsvm)')
+		print('\nSomething went wrong... try again...')
 		exit()
 
 #---------------------------------------------------------------------------------
@@ -199,6 +199,7 @@ def raster_classify (input_rasterimage, input_classifier):
 
 		#add timestamp now..
 		tstamp = create_timestamp(location)
+
 		if(classifier == 'libsvm'):
 			color_classified_rimage = b_rimage + tstamp + '_' + jdata['classified_rimage_color_svm']
 		elif(classifier == 'rf'):
@@ -206,6 +207,7 @@ def raster_classify (input_rasterimage, input_classifier):
 
 		app.SetParameterString("out", resultspath + color_classified_rimage)
 		app.ExecuteAndWriteOutput()
+
 #-------------------------------------------------------------------------------
 	#step 6 - update settings file with user inputs
 
@@ -252,6 +254,7 @@ def raster_classify (input_rasterimage, input_classifier):
 	except:
 		print('Updated settings file error...')
 		exit()
+
 #-------------------------------------------------------------------------------
 	#step 7 - transfer to storage (pCloud)
 
@@ -269,6 +272,8 @@ def raster_classify (input_rasterimage, input_classifier):
 		zipOb = ZipFile(resultspath + stats_settings_tstamp, 'w')
 		zipOb.write(resultspath + fname)
 		zipOb.write(inputsfile_updated)			#use the updated file
+
+		zipOb.write(inputsfile)
 		zipOb.close()
 
 		conn = PyCloud(username, password, endpoint='nearest')

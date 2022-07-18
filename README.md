@@ -111,7 +111,8 @@ Since the directory structure you setup will be identical in both the QGIS and O
 
 The collection directory contains some sample Sentinel2 data. Here are links to two high resolution 4-band PlanetLab images:
 
-[Central Bali, May 2021[(https://filedn.com/lqzjnYhpY3yQ7BdfTulG1yY/cocktail_PS_rastersamples/area2_0501_2021_4band.tif)
+[Central Bali, May 2021](https://filedn.com/lqzjnYhpY3yQ7BdfTulG1yY/cocktail_PS_rastersamples/area2_0501_2021_4band.tif)
+<br>
 [Central Bali, June 2017](https://filedn.com/lqzjnYhpY3yQ7BdfTulG1yY/cocktail_PS_rastersamples/area2_0617_2017_4band.tif)
 
 

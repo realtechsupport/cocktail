@@ -1,6 +1,7 @@
 # COCKTAIL
 # otb_raster_classify.py
 # RTS, March 2022
+# updated July 2022
 #---------------------------------------------------------------------------------
 # raster classifier training and image classification
 # classifiers: Support Vector Machine, Random Forest
@@ -28,11 +29,11 @@ def main():
 	elements = []
 
 	print('\nYou can use this routine to perform Support Vector Machine or Random Forest classification on PlanetLab, Sentinel2 or Landsat8 data')
-	print('The raster image must be in the rasterimages directory and the ROI vectordata in the vectorfiles directory.')
+	print('The raster image should be in the collection directory and the ROI vectordata in the vectorfiles directory.')
 	print('The corresponding vectordata file is set in the settings.txt file.')
 	print('Supported classification options are: rf or libsvm')
 	print('Enter the name of the raster image, followed by the classifier.')
-	print('Example: area2_0612_2020.tif rf')
+	print('Example: area2_0612_2020_4band.tif rf')
 	print('If you enter only the classifier choice, the raster image in the settings.txt file will be used.')
 
 	response = input("\nEnter your choices: ")
@@ -109,9 +110,21 @@ def raster_classify (input_rasterimage, input_classifier):
 	b_rimage = rasterimage.split('.tif')[0] + '_'
 
 #-----------------------------------------------------------------------------
-	# step 1 - preparation - copy the selected zipfiles to the vectordata folder and uncompress
+	# step 1 - preparation 
+	print('moving data from collection to the vectorfiles and rasterimages...')
 
-	shutil.copy(collectionpath + rastershapezipfile, vectorpath + rastershapezipfile)
+	try:
+		shutil.copy(collectionpath +  rasterimage, rasterpath + rasterimage)
+	except:
+		print('\nCant find the raster image... Try again...')
+		exit()
+
+	try:
+		shutil.copy(collectionpath + rastershapezipfile, vectorpath + rastershapezipfile)
+
+	except:
+		print('\nCant find the vector data ... Check settings...')
+		exit()
 
 	with zipfile.ZipFile(vectorpath + rastershapezipfile, 'r') as zip_ref:
   		zip_ref.extractall(vectorpath)
@@ -153,7 +166,7 @@ def raster_classify (input_rasterimage, input_classifier):
 		app.SetParameterInt("classifier.rf.var", int(jdata['rf_var']))
 		app.SetParameterInt("classifier.rf.nbtrees", int(jdata['rf_ntrees']))
 		app.SetParameterFloat("classifier.rf.acc", float(jdata['rf_acc']))
-
+		
 	#Support Vector Machine
 	elif(classifier == 'libsvm'):
 		print('\n\n Training Support Vector Machine Model\n\n')

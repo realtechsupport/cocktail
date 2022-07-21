@@ -14,6 +14,7 @@
 #	 > enter choices...
 # Updated settings file is saved.
 # RTS, March 2022
+# Updated July 2022
 # ------------------------------------------------------------------------------
 
 import sys, os
@@ -38,7 +39,7 @@ def main():
 
 	print('\nYou can use this routine to perform Support Vector Machine or Random Forest classification on PlanetLab, Sentinel2 or Landsat8 data')
 	print('This script will include texture information calculated via Haralick features.')
-	print('The raster image must be in the rasterimages directory and the corresponding ROI vectordata in the vectorfiles directory.')
+	print('The raster image should be in the collection directory and the ROI vectordata in the vectorfiles directory.')
 	print('The corresponding vectordata file is set in the settings.txt file.')
 	print('Supported classification options are: rf or libsvm')
 	print('Enter the name of the raster image, followed by the classifier.')
@@ -121,14 +122,26 @@ def raster_texture_classify (input_rasterimage, input_classifier):
 	b_rimage = rasterimage.split('.tif')[0] + '_'
 
 #-----------------------------------------------------------------------------
-	# step 1 - preparation - copy the selected zipfiles to the vectordata folder and uncompress
+	# step 1 - preparation
+	print('moving data from collection to the vectorfiles and rasterimages...')
 
-	shutil.copy(collectionpath + rastershapezipfile, vectorpath + rastershapezipfile)
+	try:
+		shutil.copy(collectionpath +  rasterimage, rasterpath + rasterimage)
+	except:
+		print('\nCant find the raster image... Try again...')
+		exit()
+
+	try:
+		shutil.copy(collectionpath + rastershapezipfile, vectorpath + rastershapezipfile)
+
+	except:
+		print('\nCant find the vector data ... Check settings...')
+		exit()
 
 	with zipfile.ZipFile(vectorpath + rastershapezipfile, 'r') as zip_ref:
   		zip_ref.extractall(vectorpath)
 
-	print("Selected zipped files moved to vector directory and unzipped..\n\n")
+	print("Selected zipped files moved to vector directory and unzipped..")
 
 #------------------------------------------------------------------------------
 	# step 2: get texture information

@@ -61,9 +61,16 @@ Add other libraries to the OTB environment as needed. Enable the OTB environment
 	
 7 – Setup the directory structure <br>
 The directories code, data, results should be ready made in your repository directory.
-Put the rasterimages and vectorfiles directories into the data directory. Place image assets (.tif) in the rasterimages directory and vector assets (.shp) into the vectorfiles directory. Add the corresponding .dbf, .prj, .shx files for each .shp file.
+Adjust the paths to reflect your current installation. From the setup folder run the adjust_datapaths script:
 
-Use the settings.txt file (in the data directory) to set your file names, process preferences and classification parameters. The content of this file is parsed and passed to the classification steps.
+	python3 adjust_datapaths.py 
+	
+Follow the prompt. All paths will be adjusted to your current installation and the settings.txt file will be updated accordingly. 
+Put analysis-ready raster and vector files (including shapefiles) into the data/collection directory. Use the settings.txt file (in the data directory) to set your file names, process preferences and classification parameters. The content of this file is parsed and passed to the classification steps.
+
+Change the fake username and passwords in the auth folder according to your needs. PC.txt is for pCloud, sent.txt for sentinel and planet.txt for Planet Labs. Put data from sentinel and planet into the collection directory. Add ,geojson references files(for sentinel and planet downloads) and colormaps as needed to the data directory. 
+
+
 
   
 8 - Test<br>

@@ -68,7 +68,7 @@ Adjust the paths to reflect your current installation. From the setup folder run
 Follow the prompt. All paths will be adjusted to your current installation and the settings.txt file will be updated accordingly. 
 Put analysis-ready raster and vector files (including shapefiles) into the data/collection directory. Use the settings.txt file (in the data directory) to set your file names, process preferences and classification parameters. The content of this file is parsed and passed to the classification steps.
 
-Change the fake username and passwords in the auth folder according to your needs. PC.txt is for pCloud, sent.txt for sentinel and planet.txt for Planet Labs. Put data from sentinel and planet into the collection directory. Add ,geojson references files(for sentinel and planet downloads) and colormaps as needed to the data directory. 
+Change the fake username and passwords in the auth folder according to your needs. PC.txt is for pCloud, sent.txt for sentinel and planet.txt for Planet Labs. Put data from sentinel and planet into the collection directory. Add .geojson references files (for sentinel and planet downloads) and colormaps as needed to the data directory. 
 
 
 

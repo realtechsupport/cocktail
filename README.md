@@ -125,7 +125,7 @@ The collection directory contains some sample Sentinel2 data. Here are links to 
 
 Cocktail is currently supporting the following research projects:
 
-[- FOSS4G2022 - Who speaks for the forest? Participatory mapping and contested land cover classification in Central Bali](https://www.researchgate.net/publication/361913433_WHO_SPEAKS_FOR_THE_FOREST_LOCAL_KNOWLEDGE_PARTICIPATORY_MAPPING_and_COLLABORATIVE_EVALUATION_for_GIS_ANALYSIS_in_the_TROPICS_of_CENTRAL_BALI_INDONESIA) <br>
-[- EUROCARTO2022 - Combining Landsat, Sentinel2 and Planet Lab satellite assets for resource constrained land cover analysis in the tropics](https://www.researchgate.net/publication/361913251_Combining_Landsat_Sentinel2_and_Planet_Lab_satellite_assets_for_resource-constrained_land_cover_analysis_in_the_tropics)
+[FOSS4G2022 - Who speaks for the forest? Participatory mapping and contested land cover classification in Central Bali](https://www.researchgate.net/publication/361913433_WHO_SPEAKS_FOR_THE_FOREST_LOCAL_KNOWLEDGE_PARTICIPATORY_MAPPING_and_COLLABORATIVE_EVALUATION_for_GIS_ANALYSIS_in_the_TROPICS_of_CENTRAL_BALI_INDONESIA) <br>
+[EUROCARTO2022 - Combining Landsat, Sentinel2 and Planet Lab satellite assets for resource constrained land cover analysis in the tropics](https://www.researchgate.net/publication/361913251_Combining_Landsat_Sentinel2_and_Planet_Lab_satellite_assets_for_resource-constrained_land_cover_analysis_in_the_tropics)
 
 

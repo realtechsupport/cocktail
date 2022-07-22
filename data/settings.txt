@@ -24,7 +24,7 @@
 	"input_rasterimage" : "area2_0501_2021.tif",
  	"input_classifier" : "libsvm",
 	"pointsfile" : "area2_0612_2020_vector_classification.shp",
- 	"rastershapezipfile" : "area2_0612_2020_raster_classification_Mar16.zip",
+ 	"rastershapezipfile" : "area2_0612_2020_raster_classification_4band_final.zip",
  	"coord_info" : "area1_4points",
  	"location" : "America/New_York",
  	"colortemplate" : "20colormap.txt",

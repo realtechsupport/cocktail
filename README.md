@@ -51,7 +51,12 @@ Run that file. <br>
 	
 
 6 - Customize <br>
-Add other libraries to the OTB environment as needed. Enable the OTB environment to install geojson and geopandas. The geopandas install may take a bit of time. <br>
+Add other libraries to the OTB environment as needed. Enable the OTB environment 
+
+	conda activate OTB
+
+
+And install geojson and geopandas. The geopandas install may take a bit of time. <br>
 
 	conda install -c conda-forge pillow
 	conda install -c conda-forge geojson

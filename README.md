@@ -81,6 +81,10 @@ Change the fake username and passwords in the auth folder according to your need
 8 - Test<br>
 a) Test QGIS - (test scripts are in the code directory)
 
+Deactivate the conda environment
+
+	conda deactivate
+	
 Run the qgis test in the base environment <br>
 
   	python3 qgis_test.py

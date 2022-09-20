@@ -125,13 +125,14 @@ Since the directory structure you setup will be identical in both the QGIS and O
 
 <i>Details on how to collect data from the European Space Agency's Sentinel program, how to make use of tip and cue, and how to perform various band-math operations and image classification with SVM, RF and NN classifiers is described in the Install+Use .pdf document.</i>
 
-The collection directory contains some sample Sentinel2 data. Here are links to two high resolution 4-band PlanetLab images (geotif format, 300MB each):
+The collection directory contains some sample Sentinel2 data. Here are links to three high resolution 4-band PlanetLab images (geotif format, 300MB each):
 
 [Central Bali, May 2021](https://filedn.com/lqzjnYhpY3yQ7BdfTulG1yY/cocktail_PS_rastersamples/area2_0501_2021_4band.tif)
 <br>
 [Central Bali, June 2017](https://filedn.com/lqzjnYhpY3yQ7BdfTulG1yY/cocktail_PS_rastersamples/area2_0617_2017_4band.tif)
-
-
+<br>
+[Central Bali, June 2017](https://filedn.com/lqzjnYhpY3yQ7BdfTulG1yY/cocktail_PS_rastersamples/area2_0617_2017_4band.tif)
+<br>
 Cocktail is currently supporting the following research projects:
 
 [FOSS4G2022 - Who speaks for the forest? Participatory mapping and contested land cover classification in Central Bali](https://www.researchgate.net/publication/361913433_WHO_SPEAKS_FOR_THE_FOREST_LOCAL_KNOWLEDGE_PARTICIPATORY_MAPPING_and_COLLABORATIVE_EVALUATION_for_GIS_ANALYSIS_in_the_TROPICS_of_CENTRAL_BALI_INDONESIA) <br>

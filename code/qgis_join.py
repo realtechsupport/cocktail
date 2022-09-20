@@ -1,11 +1,13 @@
 # COCKTAIL
 # qgis_join.py
 # join attributes by location
-# RTS, FEB 2022
+# vector points shapefile defined in the settings.txt tile
+# zipped vector points shapefile expected to end with "final.zip"
+# RTS, Feb, Sept 2022
 
 # sequence
 # OTB_vector_classify1
-# QGIS_join
+# > QGIS_join
 # OTB_vector_classify2
 # QGIS_render
 
@@ -28,7 +30,7 @@ os.environ['QT_QPA_PLATFORM'] = 'offscreen'
 qgispath = '/usr/bin/qgis'
 
 # Local path and variables
-datapath = '/home/blc/cocktail/data/'
+datapath = '/home/marcbohlen/cocktail/data/'
 inputsfile = datapath + 'settings.txt'
 
 #collect the variables
@@ -40,7 +42,7 @@ try:
 except:
 	print('\n...data access error...\n')
 else:
-	pointsfile = jdata['pointsfile']
+	pointszipfile = jdata['pointszipfile']
 	vectorpath = jdata['vectorpath']
 	segmentation_stats = jdata['segmentation_stats']
 	segmentation_points_joined = jdata['segmentation_points_joined']
@@ -77,6 +79,11 @@ processing.core.Processing.Processing.initialize()
 
 #join attributes by location
 segmentationstats =  vectorpath + segmentation_stats
+key = "final"
+s = pointszipfile.split(key)
+pointsfile = s[0] + key + ".shp"
+print(pointsfile)
+
 samplepoints = vectorpath +  pointsfile
 combined = vectorpath + segmentation_points_joined
 

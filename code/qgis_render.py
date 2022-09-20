@@ -1,13 +1,15 @@
 # COCKTAIL
 # qgis_render.py
 # select dissolve and then render vector classification with a .qml color map
-# RTS, March 2022
+# PNG image format for the final color image by default, switch to JPEG if required
+# Rendering is compute intensive; takes about 30 minutes with 8GB of RAM.
+# RTS, March, Sept 2022
 
 # sequence
 # OTB_vector_classify1
 # QGIS_join
 # OTB__vector_classify2
-# QGIS_render
+# > QGIS_render
 
 #---------------------------------------------------------------------------------------
 import os, sys, json
@@ -39,7 +41,7 @@ qgispath = '/usr/bin/qgis'
 
 #---------------------------------------------------------------------------------------
 #collect the variables
-datapath = '/home/blc/cocktail/data/'
+datapath = '/home/marcbohlen/cocktail/data/'
 inputsfile = datapath + 'settings.txt'
 
 try:
@@ -239,5 +241,4 @@ if(t2p == "yes"):
 
 else:
 	print('\nNot uploading result...\n')
-
 #----------------------------------------------------------------------------------

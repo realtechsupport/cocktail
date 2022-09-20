@@ -1,12 +1,12 @@
 # COCKTAIL 
 # otb_vector_classify_2.py
 # classifier training and image classification
-# RTS, Feb 2022
+# RTS, Feb, Sept 2022
 
 # sequence
 # OTB_vector_classify1
 # QGIS_join
-# OTB_vector_clasify2
+# > OTB_vector_clasify2
 # QGIS_render
 
 # -----------------------------------------------------------------------------
@@ -23,7 +23,7 @@ print('\nVECTOR_CLASSIFY_2: Training + Classification\n')
 #------------------------------------------------------------------------------
 
 # Local path and variables
-datapath = '/home/blc/cocktail/data/'
+datapath = '/home/marcbohlen/cocktail/data/'
 inputsfile = datapath + 'settings.txt'
 
 #collect the variables from the settings file
@@ -36,7 +36,7 @@ except:
         print('\n...data access error...\n')
 else:
 	rasterimage = jdata['rasterimage']
-	pointsfile = jdata['pointsfile']
+	#pointszipfile = jdata['pointszipfile']
 	classifier = jdata['vector_classifier_ann']
 	rasterpath = jdata['rasterpath']
 	vectorpath = jdata['vectorpath']
@@ -58,6 +58,11 @@ else:
 	NNterminationcriteria = jdata['NNterminationcriteria']
 	NNepsilon = float(jdata['NNepsilon'])
 	NNmaxiterations = int(jdata['NNmaxiterations'])
+
+
+	#key = "final"
+	#s = pointszipfile.split(key)
+	#pointsfile = s[0] + key + ".shp"
 #------------------------------------------------------------------------------
 
 if(classifier == 'ann'):

@@ -1,10 +1,13 @@
 # COCKTAIL
 # otb_vector_classify_1.py
 # segmentation and zonal statistics
+# Raster image and vector points shapefile set in the settings.txt file, not inteactive
+# zipped vector points shapefile expected to end with "final.zip"
 # RTS, Feb 2022
+# Updated Sept 2022
 
 # sequence
-# OTB_vector_classify1
+# > OTB_vector_classify1
 # QGIS_join
 # OTB__vector_classify2
 # QGIS_render
@@ -17,11 +20,13 @@ import otbApplication
 import numpy
 import geopandas
 from PIL import Image as PILImage
+
+from helper import *
 #------------------------------------------------------------------------------
 print('\nVECTOR_CLASSIFY_1: Segmentation + Zonal Statistics\n')
 #------------------------------------------------------------------------------
 # Local path and variables
-datapath = '/home/blc/cocktail/data/'
+datapath = '/home/marcbohlen/cocktail/data/'
 inputsfile = datapath + 'settings.txt'
 
 #collect the variables from the settings file
@@ -34,13 +39,40 @@ except:
 	print('\n...data access error...\n')
 else:
 	rasterimage = jdata['rasterimage']
-	pointsfile = jdata['pointsfile']
+	pointszipfile = jdata['pointszipfile']
 	classifier = jdata['vector_classifier_ann']
 	rasterpath = jdata['rasterpath']
 	vectorpath = jdata['vectorpath']
+	collectionpath = jdata['collectionpath']
 	segmentationfile = jdata['segmentationfile']
 	segmentation_stats = jdata['segmentation_stats']
 	coord_info = jdata['coord_info']
+
+	key = "final"
+	s = pointszipfile.split(key)
+	pointsfile = s[0] + key + ".shp"
+	print(pointsfile)
+
+#-----------------------------------------------------------------------------
+#step 1 - preparation 
+print('moving data from collection to the vectorfiles and rasterimages...')
+print(collectionpath + rasterimage)
+
+try:
+	shutil.copy(collectionpath +  rasterimage, rasterpath + rasterimage)
+except:
+	print('\nCant find the raster image... Try again...')
+	exit()
+try:
+	shutil.copy(collectionpath + pointszipfile, vectorpath + pointszipfile)
+except:
+	print('\nCant find the vector data ... Check settings...')
+	exit()
+
+with zipfile.ZipFile(vectorpath + pointszipfile, 'r') as zip_ref:
+	zip_ref.extractall(vectorpath)
+
+print("Selected zipped files moved to vector directory and unzipped..")
 
 #----------------------------------------------------------------------------
 #only if you are working with a geojson input...
@@ -71,6 +103,11 @@ if(classifier == 'ann'):
 	app.SetParameterString("out.vector.filename", vectorpath + segmentation_stats)
 	app.ExecuteAndWriteOutput()
 
+	#check
+	#print()
+	#print('Segstats: ', vectorpath +segmentation_stats)
+
 	print('\n\nSegmentation and ZonalStatistics complete \n')
 	#NEXT STEP: QGIS join
 #---------------------------------------------------------------------------------
+

@@ -1,7 +1,7 @@
 # COCKTAIL
 # otb_raster_classify.py
 # RTS, March 2022
-# updated July 2022
+# updated July, Sept 2022
 #---------------------------------------------------------------------------------
 # raster classifier training and image classification
 # classifiers: Support Vector Machine, Random Forest
@@ -19,7 +19,7 @@ from pcloud import PyCloud
 from helper import *
 
 # Local path and variables
-datapath = '/home/blc/cocktail/data/'
+datapath = '/home/marcbohlen/cocktail/data/'
 inputsfile = datapath + 'settings.txt'
 
 #---------------------------------------------------------------------------------
@@ -29,11 +29,11 @@ def main():
 	elements = []
 
 	print('\nYou can use this routine to perform Support Vector Machine or Random Forest classification on PlanetLab, Sentinel2 or Landsat8 data')
-	print('The raster image should be in the collection directory and the ROI vectordata in the vectorfiles directory.')
-	print('The corresponding vectordata file is set in the settings.txt file.')
+	print('The raster image shapefiles should be in the collection directory.')
+	print('The corresponding compressed shapefile is defined in the settings.txt file.')
 	print('Supported classification options are: rf or libsvm')
 	print('Enter the name of the raster image, followed by the classifier.')
-	print('Example: area2_0612_2020_4band.tif rf')
+	print('Example: area2_0612_2020_4bands.tif rf')
 	print('If you enter only the classifier choice, the raster image in the settings.txt file will be used.')
 
 	response = input("\nEnter your choices: ")

@@ -8,7 +8,8 @@ import os, sys, json
 
 #-------------------------------------------------------------------------------
 def main():
-    old_path = '/home/blc/cocktail/'
+    #old_path = '/home/blc/cocktail/'
+    old_path = '/home/marcbohlen/cocktail/'
     current_path = os.getcwd()
     new_path = current_path.split('setup')[0]
     scripts_path = new_path + 'code/'
@@ -18,8 +19,9 @@ def main():
 
     print('\nUse this script to adjust paths in the settings file and scripts to match your configuration.')
     print('Run this script only once after installing (or updating) COCKTAIL.')
+    print('Here is the default old path: ', old_path)
 
-    input_path = input('\nEnter the old path to the COCKTAIL directory or hit any key to use the default path: ')
+    input_path = input('\nEnter an alternate old path to the COCKTAIL directory or hit any key to use the default path: ')
 
     if(len(input_path) > 1):
         old_path = input_path

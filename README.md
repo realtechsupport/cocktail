@@ -129,10 +129,11 @@ The collection directory contains some sample Sentinel2 data. Here are links to 
 
 [Central Bali, May 2021](https://filedn.com/lqzjnYhpY3yQ7BdfTulG1yY/cocktail_PS_rastersamples/area2_0501_2021_4band.tif)
 <br>
-[Central Bali, June 2017](https://filedn.com/lqzjnYhpY3yQ7BdfTulG1yY/cocktail_PS_rastersamples/area2_0617_2017_4band.tif)
+[Central Bali, June 2020]([https://u.pcloud.link/publink/show?code=XZlWChVZSzr9m9mDY5Fxz8fMwEGcSB0nf1Nk])
 <br>
 [Central Bali, June 2017](https://filedn.com/lqzjnYhpY3yQ7BdfTulG1yY/cocktail_PS_rastersamples/area2_0617_2017_4band.tif)
-<br>
+
+<br><br>
 Cocktail is currently supporting the following research projects:
 
 [FOSS4G2022 - Who speaks for the forest? Participatory mapping and contested land cover classification in Central Bali](https://www.researchgate.net/publication/361913433_WHO_SPEAKS_FOR_THE_FOREST_LOCAL_KNOWLEDGE_PARTICIPATORY_MAPPING_and_COLLABORATIVE_EVALUATION_for_GIS_ANALYSIS_in_the_TROPICS_of_CENTRAL_BALI_INDONESIA) <br>

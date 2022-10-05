@@ -224,13 +224,26 @@ def create_ndbi_difference_map (satellitesource_a, satellitesource_b):
 		app.ExecuteAndWriteOutput()
 	except:
 		differenceoperation = False
-		print('\nSomething might have gone wrong ...')
+		print('\nSomething might have gone wrong with the difference operation ...')
 
 	if(differenceoperation == False):
 		print('Clipping inputs to same dimensions...')
-		# otb_clip_ni(im1)
-		# otb_clip_ni(im2)
+		command1 = "python3 otb_clip_ni.py " + im1 
+		command2 = "python3 otb_clip_ni.py " + im2
+		os.system(command1)
+		os.system(command2)
+		
+		#OK this far...-----------------------------------------------------------------
+		#Now get the difference of the clipped images...
+		#im1 ='area2_sentinel2_ndbi_20210726_roi.tif'
+        	#im2 ='area2_sentinel2_ndbi_20170717_roi.tif'
+		
 
+
+		#-------------------------------------------------------------------------------
+
+
+	'''
 	#-------------------------------------------------------------------------------
 	# step 4 - Color mapping of difference image
 	#-------------------------------------------------------------------------------
@@ -317,6 +330,7 @@ def create_ndbi_difference_map (satellitesource_a, satellitesource_b):
 		conn.uploadfile(files=filelist, path=pdir)
 		print('\n\nUploaded: ' , filelist)
 		print('\n\n')
+	'''
 #---------------------------------------------------------------------------------
 if __name__ == "__main__":
     main()

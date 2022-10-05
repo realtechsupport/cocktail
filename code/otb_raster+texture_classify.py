@@ -109,14 +109,15 @@ def raster_texture_classify (input_rasterimage, input_classifier):
 		rasterimage = input_rasterimage
 
 	rimage = rasterpath + rasterimage
-	key = "classification"
+	key = ".zip"
 	s = rastershapezipfile.split(key)
-	sf = s[0] + key + ".shp"
+	sf = s[0] + ".shp"
 	sfile = vectorpath + sf
 
 	print('\n\nHere are the inputs')
 	print('Rasterimage: ', rasterimage)
-	print('Raster shapefile: ', rastershapezipfile)
+	print('Raster shapefiles: ', rastershapezipfile)
+	print('Raster shapefile (.shp): ', sf)
 	print('Classifier: ', input_classifier)
 
 	b_rimage = rasterimage.split('.tif')[0] + '_'

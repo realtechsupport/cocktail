@@ -69,7 +69,7 @@ def main():
 			exit()
 
 	if('.zip' in satellitesource):
-		print('\n Getting the selected asset: ', satellitesource)
+		print('\nGetting the selected asset: ', satellitesource)
 		create_ndbi_map(satellitesource)
 	else:
 		print("\nSomething went wrong...Try again...\n")

@@ -47,10 +47,14 @@ else:
 	segmentationfile = jdata['segmentationfile']
 	segmentation_stats = jdata['segmentation_stats']
 	coord_info = jdata['coord_info']
-
+	'''
 	key = "final"
 	s = pointszipfile.split(key)
 	pointsfile = s[0] + key + ".shp"
+	'''
+	key = ".zip"
+	s = pointszipfile.split(key)
+	pointsfile = s[0] + ".shp"
 	print(pointsfile)
 
 #-----------------------------------------------------------------------------

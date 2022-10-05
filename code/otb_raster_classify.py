@@ -42,6 +42,8 @@ def main():
 
 	try:
 		elements = response.split(' ')
+		#print("0: ", elements[0])
+		#print("1: ", elements[1])
 		if(len(elements) == 2):
 			elements = response.split(' ')
 			input_rasterimage = elements[0]
@@ -70,6 +72,7 @@ def raster_classify (input_rasterimage, input_classifier):
         	print('\n...data access error...\n')
 	else:
 		#print(jdata)
+		print("Reading in settings ok.")
 		authfile = jdata['authfile']
 		rasterimage = jdata['rasterimage']
 		rastershapezipfile = jdata['rastershapezipfile']
@@ -89,22 +92,21 @@ def raster_classify (input_rasterimage, input_classifier):
 		location = jdata['location']
 		addcolor = jdata['raster_addcolor']
 
-
 	if(input_rasterimage == ''):
 		pass
 	else:
 		rasterimage = input_rasterimage
 
-
 	rimage = rasterpath + rasterimage
-	key = "classification"
+	key = ".zip"
 	s = rastershapezipfile.split(key)
-	sf = s[0] + key + ".shp"
+	sf = s[0] + ".shp"
 	sfile = vectorpath + sf
 
 	print('\n\nHere are the inputs')
 	print('Rasterimage: ', rasterimage)
-	print('Raster shapefile: ', rastershapezipfile)
+	print('Raster shapefiles: ', rastershapezipfile)
+	print('Raster shapefile (.shp): ', sf)
 	print('Classifier: ', input_classifier)
 
 	b_rimage = rasterimage.split('.tif')[0] + '_'
@@ -151,7 +153,7 @@ def raster_classify (input_rasterimage, input_classifier):
 	app.SetParameterString("classifier", classifier)
 
 	tstamp = create_timestamp(location)
-
+	
 	#Random Forest
 	if (classifier == 'rf'):
 		print('\n\n Training Random Forest Model\n\n')

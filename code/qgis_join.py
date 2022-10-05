@@ -79,9 +79,14 @@ processing.core.Processing.Processing.initialize()
 
 #join attributes by location
 segmentationstats =  vectorpath + segmentation_stats
+key = ".zip"
+s = pointszipfile.split(key)
+pointsfile = s[0] + ".shp"
+'''
 key = "final"
 s = pointszipfile.split(key)
 pointsfile = s[0] + key + ".shp"
+'''
 print(pointsfile)
 
 samplepoints = vectorpath +  pointsfile

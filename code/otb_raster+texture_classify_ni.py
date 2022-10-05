@@ -70,14 +70,14 @@ def raster_texture_classify (classifier):
 		addcolor = jdata['raster_addcolor']
 
 	rimage = rasterpath + rasterimage
-	key = "classification"
+	key = ".zip"
 	s = rastershapezipfile.split(key)
-	sf = s[0] + key + ".shp"
+	sf = s[0] +  ".shp"
 	sfile = vectorpath + sf
 
 	print('\nHere are the inputs')
 	print('Zipped raster shapefile: ', rastershapezipfile)
-	print('Unzipped raster shapefile: ' , sfile)
+	print('Unzipped raster shapefile: ' , sf)
 	print('Rasterimage: ', rasterimage)
 
 	b_rimage = rasterimage.split('.tif')[0] + '_'

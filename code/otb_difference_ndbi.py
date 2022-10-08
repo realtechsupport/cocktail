@@ -1,6 +1,6 @@
 # COCKTAIL
 # otb_difference_ndbi.py
-# RTS, July 2022
+# RTS, July / October 2022
 #-------------------------------------------------------------------------------
 # takes in two satellite assets
 # calculates differences of ndbi on satellite image data (either sentinel2 or landsat8)
@@ -16,8 +16,8 @@
 # https://gisgeography.com/sentinel-2-bands-combinations/
 # ------------------------------------------------------------------------------
 
-# Clip the images to the same area with otb_clip.py before you use this operation...
-
+# >> Clip the satellite images to the same area with otb_clip.py before you use this operation <<
+#    each file in the zipped folder will have '_clip.tif' as extension 
 #-------------------------------------------------------------------------------
 # Normalised Difference Built-up Index (NDBI)
 # ndbi on Sentinel2:
@@ -210,12 +210,9 @@ def create_ndbi_difference_map (satellitesource_a, satellitesource_b):
 	diff_satbandmathimage = 'diff_satbandmathimage' + ext
 	im1 = satbandmathimage_a
 	im2 = satbandmathimage_b
-	# dimension issue here... cliped workaround  ----------------------------------------
-	#im1 ='area2_sentinel2_ndbi_20210726_roi.tif'
-	#im2 ='area2_sentinel2_ndbi_20170717_roi.tif'
 
 	expression = "(im1b1 - im2b1)"
-	differenceoperation = True
+	differenceoperation1 = True
 
 	try:
 		app.SetParameterStringList("il", [resultspath + im1, resultspath + im2])
@@ -223,27 +220,33 @@ def create_ndbi_difference_map (satellitesource_a, satellitesource_b):
 		app.SetParameterString("exp", expression)
 		app.ExecuteAndWriteOutput()
 	except:
-		differenceoperation = False
+		differenceoperation1 = False
 		print('\nSomething might have gone wrong with the difference operation ...')
 
-	if(differenceoperation == False):
+	if(differenceoperation1 == False):
 		print('Clipping inputs to same dimensions...')
 		command1 = "python3 otb_clip_ni.py " + im1 
 		command2 = "python3 otb_clip_ni.py " + im2
 		os.system(command1)
 		os.system(command2)
 		
-		#OK this far...-----------------------------------------------------------------
-		#Now get the difference of the clipped images...
-		#im1 ='area2_sentinel2_ndbi_20210726_roi.tif'
-        	#im2 ='area2_sentinel2_ndbi_20170717_roi.tif'
-		
+		ext = '.tif'
+		add = '_roi'
+		im1 = satbandmathimage_a.split(ext)[0] + add + ext
+		im2 = satbandmathimage_b.split(ext)[0] + add + ext
 
+		print('new im1: ', im1)
+		print('new im2: ', im2)
+	
+		try:
+			app.SetParameterStringList("il", [resultspath + im1, resultspath + im2])
+			app.SetParameterString("out", resultspath + diff_satbandmathimage)
+			app.SetParameterString("exp", expression)
+			app.ExecuteAndWriteOutput()
+		except:
+			print('\nSomething STILL wrong ... check the files..')
+			exit()
 
-		#-------------------------------------------------------------------------------
-
-
-	'''
 	#-------------------------------------------------------------------------------
 	# step 4 - Color mapping of difference image
 	#-------------------------------------------------------------------------------
@@ -280,16 +283,22 @@ def create_ndbi_difference_map (satellitesource_a, satellitesource_b):
 		temp = Image.open(resultspath + color_diff_satbandmathimage)
 		temp = temp.point(lambda p: p > threshold and 255)
 		temp.save(resultspath + color_thres_diff_satbandmathimage, "PNG")
-
+		
 		#Create overlay with B08 (NIR) of the NEWER image
-		B08 = [band for band in os.listdir(sentinelrasterpath) if(("B08" in band) and ("roi" in band))]
-		print('\nUsing this reference NIR:',  B08)
-
+		if(differenceoperation1 == True):
+			searchpath =  sentinelrasterpath
+			B08s = [band for band in os.listdir(sentinelrasterpath) if(("B08" in band) and ("roi" in band))]
+		else:
+			searchpath = topsentinelrasterpath + 'files/'
+			B08s = [band for band in os.listdir(searchpath) if(("B08" in band) and ("roi" not in band))]
+		
+		B08 = B08s[0]
+		#print(B08)
 		background = "B08.png"
 		apptype = "DynamicConvert"
 		app = otbApplication.Registry.CreateApplication(apptype)
 
-		app.SetParameterString("in", sentinelrasterpath + B08[0])
+		app.SetParameterString("in", searchpath + B08) 
 		app.SetParameterString("type","linear")
 		app.SetParameterString("out", resultspath + background)
 		app.ExecuteAndWriteOutput()
@@ -315,10 +324,17 @@ def create_ndbi_difference_map (satellitesource_a, satellitesource_b):
 
 		filelist = [inputsfile, resultspath + finalimage]
 
-	#-------------------------------------------------------------------------------
-	# step 6 - File transfer
-	#-------------------------------------------------------------------------------
+        #-------------------------------------------------------------------------------
+        # step 6 -  Clean up the satellite data folder (sentinel2 or landsat8)
+        #-------------------------------------------------------------------------------
 
+		temp = [file for file in os.listdir(satrasterpath)]
+		for file in temp:
+			os.remove(satrasterpath + file)
+
+	#-------------------------------------------------------------------------------
+	# step 7 - File transfer
+	#-------------------------------------------------------------------------------
 	if(t2p == "yes"):
 		f = open(authfile, 'r')
 		lines = f.readlines()
@@ -330,7 +346,7 @@ def create_ndbi_difference_map (satellitesource_a, satellitesource_b):
 		conn.uploadfile(files=filelist, path=pdir)
 		print('\n\nUploaded: ' , filelist)
 		print('\n\n')
-	'''
+
 #---------------------------------------------------------------------------------
 if __name__ == "__main__":
     main()

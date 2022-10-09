@@ -4,14 +4,16 @@
 #--------------------------------------------------------------------------------------------
 
 # The script collects all the sentinel bands of the specified time and cloud conditions
-# It clips the files to the ROI specified in the settings file
+# It selects the area based on the geojson file specified in the settings file
+# and clips the files to the ROI specified in the zipped shapefile specified in the settings file
 # Files are saved without the term 'clip'"
 # T50LKR_20170717T023939_B01.tif
 # T50LKR_20170717T023939_B02.tif
 # etc
-# It zipps up the result and saves it - based on the name of the ROI file
+# It zipps up the result and saves it - based on the name of the geojson file
 # and the satellite collection date -  to the collection folder.
 # for example: area2_square_0801_2022.zip
+#
 # Prepare satellite assets with this routine and apply to otb_difference_ndbi.py to
 # find difference in built up areas across two dates
 #--------------------------------------------------------------------------------------------
@@ -296,7 +298,7 @@ def get_sentinel2_data(bandselection, enddate, uuid):
 
 		#create log message
 		timestamp = create_timestamp(location)
-		comment = timestamp + ': TCI test: ' + str(percentage_good_pixels) + ' for uuid ' + this_uuid 
+		comment = timestamp + ': TCI test: ' + str(percentage_good_pixels) + ' for uuid ' + this_uuid
 
 	else:
 		print('Zip up and move to collection for processing...')
@@ -306,14 +308,14 @@ def get_sentinel2_data(bandselection, enddate, uuid):
 		monthday = roi_list[0].split('_')[1][4:8]
 		year = roi_list[0].split('_')[1][0:4]
 		sentinelasset = maparea + '_' + monthday + '_' + year + '_sentinel2'
-		
+
 		#print(sentinelasset)
-		
+
 		if(os.path.exists(tci_path +'/temp')):
 			pass
 		else:
 			os.mkdir(tci_path + '/temp')
-		
+
 		for roi in roi_list:
 			shutil.copy(tci_path + roi, tci_path + '/temp/' + roi)
 
@@ -329,7 +331,7 @@ def get_sentinel2_data(bandselection, enddate, uuid):
 	print('\nAdding log entry...')
 	method = 'a'
 	log(datapath + logfile, comment, method)
-	
+
 	# delete content of rawsat
 	print('\nDeleting temporary files to save storage space...')
 	shutil.rmtree(rawsatpath)

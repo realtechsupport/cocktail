@@ -1,24 +1,24 @@
 # COCKTAIL
 # otb_difference_ndbi.py
-# RTS, July / October 2022
+# RTS, October 2022
 #-------------------------------------------------------------------------------
-# takes in two satellite assets
-# calculates differences of ndbi on satellite image data (either sentinel2 or landsat8)
+# This script takes in two satellite assets
+# It calculates differences of ndbi on satellite image data (either sentinel2 or landsat8)
 # result threholded and superimposed on newer of the two satellite images
 # ------------------------------------------------------------------------------
-# get sentinel data via planet lab
-# or directly from sentinel and convert .jp2 to geotif (.tif)
-
+# The script assumes the input data is a zipped file of the image bands in one folder only
+# The script sentinel2_getdata.py collects the data directly from ESA and produces that format
+# If you collect the satellite data from a different source, you must clip the images to your ROI
+# and create the zipped folder manually
+# Zipped .tif band files must be in the collection directory
+# 'area2_0726_2021_sentinel2.zip', 'area2_0727_2021_landsat8.zip'
+#-------------------------------------------------------------------------------
 # Landsat bands
 # https://www.usgs.gov/faqs/what-are-band-designations-landsat-satellites
 # https://earthexplorer.usgs.gov/
 # Sentinel bands
 # https://gisgeography.com/sentinel-2-bands-combinations/
 # ------------------------------------------------------------------------------
-
-# >> Clip the satellite images to the same area with otb_clip.py before you use this operation <<
-#    each file in the zipped folder will have '_clip.tif' as extension 
-#-------------------------------------------------------------------------------
 # Normalised Difference Built-up Index (NDBI)
 # ndbi on Sentinel2:
 # swir: B11
@@ -30,14 +30,8 @@
 # operation: (B06 - B05) / (B06 + B05)
 # useful: https://github.com/CNES/ALCD/blob/master/L1C_band_composition.py
 # ------------------------------------------------------------------------------
-# General comments
-# Input images must share same origin, resolution, size, projection.
-# Clip the inputs with the same ROI file !
-# Select / set the settings in the settings.txt file.
 # Activate the OTB conda environment before you run this code
 # conda activate OTB
-# # Zipped .tif band files should be in the collection directory
-# 'area2_0726_2021_sentinel2.zip', 'area2_0727_2021_landsat8.zip'
 # ------------------------------------------------------------------------
 
 import sys, os
@@ -62,11 +56,11 @@ def main():
 	enddate = 'na'
 	uuid = 'na'
 
-	print('\nYou can use this routine to create difference images of NDVI on satellite imagery of two different dates.')
+	print('\nYou can use this routine to create difference images of NDBI on satellite imagery of two different dates.')
 	print('Supported satellite assets are: Sentinel2 or Landsat8 data - do not mix sources...')
 	print('All inputs should have the same footprint - use otb_clip.py to clip to a selected ROI')
-	print('\nThe compressed datasets, cliped to the same area, must reside in the collection directory.')
-	print('Enter the name of the datasets.')
+	print('\nThe datasets must reside in the collection directory.')
+	print('At the prompt, enter the names of the datasets.')
 	print('Example: area2_0726_2021_sentinel2.zip area2_0717_2017_sentinel2.zip')
 
 	response = input("\nEnter your choices: ")
@@ -100,7 +94,6 @@ def create_ndbi_difference_map (satellitesource_a, satellitesource_b):
 		resultspath = jdata['resultspath']
 		collectionpath = jdata['collectionpath']
 		sentinelrasterpath = jdata['sentinelrasterpath']
-		topsentinelrasterpath = jdata['topsentinelrasterpath']
 		landsat8rasterpath = jdata['landsat8rasterpath']
 		authfile = jdata['authfile']
 
@@ -118,7 +111,7 @@ def create_ndbi_difference_map (satellitesource_a, satellitesource_b):
 	if(('landsat8' in satellitesource_a) and ('landsat8' in satellitesource_b)):
 		satrasterpath = landsat8rasterpath
 	else:
-		satrasterpath = topsentinelrasterpath
+		satrasterpath = sentinelrasterpath
 
 	#copy first dataset
 	shutil.copy(collectionpath + satellitesource_a, satrasterpath)
@@ -134,13 +127,34 @@ def create_ndbi_difference_map (satellitesource_a, satellitesource_b):
 
 	#_a and _b for the different timestamped images
 	#_1 and _2 for the different band images
+	#this depends on the naming convention of the zipped satelllite files
+	#see sentinel2_getdata.py
 	parts_a = satellitesource_a.split('_')
+	if(len(parts_a) > 4):
+		date = 2
+		year = 3
+	else:
+		date = 1
+		year = 2
+
 	satname_a = parts_a[0] + '_' + parts_a[-1].split('.zip')[0]
-	token_a = parts_a[2] + parts_a[1]
+	token_a = parts_a[year] + parts_a[date]
 
 	parts_b = satellitesource_b.split('_')
+	if(len(parts_b) > 4):
+		date = 2
+		year = 3
+	else:
+		date = 1
+		year = 2
+
 	satname_b = parts_b[0] + '_' + parts_b[-1].split('.zip')[0]
-	token_b = parts_b[2] + parts_b[1]
+	token_b = parts_b[year] + parts_b[date]
+	
+	'''
+	print('Partsa: ', parts_a) print('Partsb: ', parts_b)
+	print('tokena: ', token_a) print('tokenb: ', token_b)
+	'''
 
 	ext = '.tif'
 	c_ext = '.png'
@@ -163,14 +177,21 @@ def create_ndbi_difference_map (satellitesource_a, satellitesource_b):
 		nirband = 'B8A'
 		swirband = 'B11'
 
-	if(satrasterpath == topsentinelrasterpath):
-		satrasterpath = satrasterpath + "files/"
-	print('Here is the satrasterpath: ', satrasterpath)
-
 	im1a = findband_roi(swirband, token_a, ext, satrasterpath)
+	if(im1a == 'na'):
+		im1a = findband(swirband, token_a, ext, satrasterpath)
+
 	im2a = findband_roi(nirband, token_a, ext, satrasterpath)
+	if(im2a == 'na'):
+		im2a = findband(nirband, token_a, ext, satrasterpath)
+
 	im1b = findband_roi(swirband, token_b, ext, satrasterpath)
+	if(im1b == 'na'):
+		im1b = findband(swirband, token_b, ext, satrasterpath)
+
 	im2b = findband_roi(nirband, token_b, ext, satrasterpath)
+	if(im2b == 'na'):
+		im2b = findband(nirband, token_b, ext, satrasterpath)
 
 	print('This is the swir band of the first asset: ', im1a)
 	print('This is the nir band of the first asset: ', im2a)
@@ -283,17 +304,26 @@ def create_ndbi_difference_map (satellitesource_a, satellitesource_b):
 		temp = Image.open(resultspath + color_diff_satbandmathimage)
 		temp = temp.point(lambda p: p > threshold and 255)
 		temp.save(resultspath + color_thres_diff_satbandmathimage, "PNG")
-		
+
 		#Create overlay with B08 (NIR) of the NEWER image
-		if(differenceoperation1 == True):
-			searchpath =  sentinelrasterpath
-			B08s = [band for band in os.listdir(sentinelrasterpath) if(("B08" in band) and ("roi" in band))]
-		else:
-			searchpath = topsentinelrasterpath + 'files/'
-			B08s = [band for band in os.listdir(searchpath) if(("B08" in band) and ("roi" not in band))]
+		searchpath =  sentinelrasterpath
 		
+		#not necessary any more...
+		'''
+		if(differenceoperation1 == True):
+			B08s = [band for band in os.listdir(searchpath) if(("B08" in band) and ("roi" in band))]
+			if(len(B08s) == 0):
+				B08s = [band for band in os.listdir(searchpath) if("B08" in band)]
+		#not sure we still need this case..
+		else:
+			B08s = [band for band in os.listdir(searchpath) if(("B08" in band) and ("roi" not in band))]
+			if(len(B08s) == 0):
+				B08s = [band for band in os.listdir(searchpath) if("B08" in band)]
+		'''
+		
+		B08s = [band for band in os.listdir(searchpath) if("B08" in band)]
 		B08 = B08s[0]
-		#print(B08)
+
 		background = "B08.png"
 		apptype = "DynamicConvert"
 		app = otbApplication.Registry.CreateApplication(apptype)

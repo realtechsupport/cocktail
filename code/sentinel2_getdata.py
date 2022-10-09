@@ -1,8 +1,19 @@
 # COCKTAIL
-# sentinel2_getdata.py 
-# RTS, July 2022
+# sentinel2_getdata.py
+# RTS, July, October 2022
 #--------------------------------------------------------------------------------------------
-# get sentinel 2 satellite assets based on area of interest, cloudcover and date interval
+
+# The script collects all the sentinel bands of the specified time and cloud conditions
+# It clips the files to the ROI specified in the settings file
+# Files are saved without the term 'clip'"
+# T50LKR_20170717T023939_B01.tif
+# T50LKR_20170717T023939_B02.tif
+# etc
+# It zipps up the result and saves it - based on the name of the ROI file
+# and the satellite collection date -  to the collection folder.
+# for example: area2_square_0801_2022.zip
+# Prepare satellite assets with this routine and apply to otb_difference_ndbi.py to
+# find difference in built up areas across two dates
 #--------------------------------------------------------------------------------------------
 # sentinelsat version 1.1.1
 # https://sentinelsat.readthedocs.io/en/v1.1.1/api_reference.html
@@ -20,10 +31,10 @@
 # Save the file as somearea.geojson and place a copy on into your data directory (see below)
 
 #3
-# Create from that geojson file shapefiles to crop the resultant imagebands and  compress (zip)
+# Create from that geojson file shapefiles to crop the resultant imagebands and compress (zip)
 
 #4
-#Update the settings.txt file with your variables (area.geojson, roi.zip, dates)
+# Update the settings.txt file with your variables (area.geojson, roi.zip, dates)
 
 # -------------------------------------------------------------------------------------------
 # ESA quotas:
@@ -42,7 +53,7 @@
 # enter choices at the prompt
 # inputs: bandselection, now, uuid
 # if the second input is empty, end date in settings.txt will be used
-# do   1. tci now ... to see if htere is a useable image
+# do   1. tci now ... to see if there is a useable image
 # then 2. all now ... to fetch the bands and save them in the collection
 # or
 #	  tci ... to get the latest tci between dates in the settings.txt
@@ -51,6 +62,8 @@
 #
 # if the script does not fetch an asset within 30 seconds, something might be amiss with the connection
 # CTRL C to stop and then try again later...
+#
+# Start and End dates should not be too far appart (not sure on upper bound, but typically a month or so).
 #
 # Note on downloading -------------------------------------------------------------------------
 # download speeds from ESA vary ... can be slow 200kB/s even ...
@@ -204,7 +217,7 @@ def get_sentinel2_data(bandselection, enddate, uuid):
 		#else:
 		#	api.download_all(products_df_sorted.index, directory_path = rawsatpath)
 
-		print('\nDownload attempt complete ...  check sentinel (file) folder')
+		print('\nDownload attempt complete ...  check sentinels folder within rasterimages')
 
 	# catch all exceptions
 	except Exception as ex:
@@ -247,10 +260,11 @@ def get_sentinel2_data(bandselection, enddate, uuid):
 		zip_ref.extractall(roipath)
 
 	#clip bands
+	print('\nPerforming the clipping operation to the ROI')
 	warp_options = gdal.WarpOptions(cutlineDSName = roipath + roishape, cropToCutline = True)
-
 	for b in tif_list:
-		b_new = b.split('.tif')[0] + '_roi' + '.tif'
+		#b_new = b.split('.tif')[0] + '_roi' + '.tif'
+		b_new = b
 		print(b, b_new)
 		if('TCI' in b):
 			tci_tif = b_new
@@ -286,15 +300,20 @@ def get_sentinel2_data(bandselection, enddate, uuid):
 
 	else:
 		print('Zip up and move to collection for processing...')
-		roi_list =[band for band in os.listdir(tci_path) if band[-7:] == 'roi.tif']
+		roi_list =[band for band in os.listdir(tci_path) if band[-4:] == '.tif']
 
 		maparea = map.split('.geojson')[0]
 		monthday = roi_list[0].split('_')[1][4:8]
 		year = roi_list[0].split('_')[1][0:4]
 		sentinelasset = maparea + '_' + monthday + '_' + year + '_sentinel2'
-		print(sentinelasset)
-
-		os.mkdir(tci_path + '/temp')
+		
+		#print(sentinelasset)
+		
+		if(os.path.exists(tci_path +'/temp')):
+			pass
+		else:
+			os.mkdir(tci_path + '/temp')
+		
 		for roi in roi_list:
 			shutil.copy(tci_path + roi, tci_path + '/temp/' + roi)
 
@@ -310,7 +329,7 @@ def get_sentinel2_data(bandselection, enddate, uuid):
 	print('\nAdding log entry...')
 	method = 'a'
 	log(datapath + logfile, comment, method)
-
+	
 	# delete content of rawsat
 	print('\nDeleting temporary files to save storage space...')
 	shutil.rmtree(rawsatpath)

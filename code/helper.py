@@ -84,11 +84,12 @@ def get_classifier_statistics(location, datapath, confusion_matrix, save):
 
 # get the .tif sentinel2 file with the correct band 
 def findband (band, token, ext, path):
-	result = 'n.a.'
+	result = 'na'
 	files = os.listdir(path)
 	for file in files:
 		if((token in file) and (ext in file) and (band in file)):
 			result = file
+			#print('\n\nFound: ', result)
 			break
 		else:
 			pass
@@ -97,7 +98,7 @@ def findband (band, token, ext, path):
 #-------------------------------------------------------------------------------
 
 def findband_roi(band, token, ext, path):
-	result = 'n.a'
+	result = 'na'
 	area = 'clip'
 	skip = '.xml'
 	files = os.listdir(path)
@@ -105,6 +106,7 @@ def findband_roi(band, token, ext, path):
 	for file in files:
 		if((token in file) and (ext in file) and (band in file) and (area in file) and not (skip in file)):
 			result = file
+			#print('\n\nFound: ', result)
 			break
 		else:
 			pass

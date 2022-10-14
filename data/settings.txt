@@ -83,7 +83,7 @@
 	"classified_rimage+texture_color_svm" : "raster+texture_classified_color_svm.png",
 	"classified_rimage+texture_color_ann" : "raster+texture_classified_color_ann.png",
 
-
+	"confidencemap" : "confidence_map.png",
 
 	"//3" : "Expressions and classification parameters --------------------------",
 	"bandmathexpression" : "im1b4>1.0 ? 255:0",

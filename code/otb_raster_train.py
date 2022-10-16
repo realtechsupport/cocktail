@@ -101,39 +101,47 @@ def raster_train (input_rasterimages, input_shapefiles, input_classifier):
 	rasterimages = []
 	shapefiles = []
 	key = ".zip"
+	nr = 0; ns = 0;
 	for entry in input_rasterimages:
 		rasterimages.append(rasterpath + entry)
-
+		nr = nr + 1 ;
 	for entry in input_shapefiles:
 		s = entry.split(key)
 		sf = s[0] + ".shp"
 		shapefiles.append(vectorpath + sf)
-
+		ns = ns + 1;
 	print('Rasterimages: ', rasterimages)
 	print('Shapefiles: ', shapefiles)
 	print('Classifier: ', input_classifier)
+	print('Number of rasters and number of shapefiles: ', nr, ns)
 
 #-----------------------------------------------------------------------------
 	# step 1 - preparation
-	print('moving data from collection to the vectorfiles and rasterimages...')
+	print('Moving data from collection to the vectorfiles and rasterimages...')
 
-	try:
-		shutil.copy(collectionpath +  rasterimage, rasterpath + rasterimage)
-	except:
-		print('\nCant find the raster image... Try again...')
+	#check number of raster images and shapefiles
+	if((ns == nr) and (nr > 0)):
+		for i in range(nr):
+			print('Working on raster - shapefile pair: ', i)
+			try:
+				shutil.copy(collectionpath +  input_rasterimages[i], rasterpath + input_rasterimages[i])
+			except:
+				print('\nCant find the raster image... Try again...')
+				exit()
+
+			try:
+				shutil.copy(collectionpath + input_shapefiles[i], vectorpath + input_shapefiles[i])
+			except:
+				print('\nCant find the vector data ... Check settings...')
+				exit()
+
+			with zipfile.ZipFile(vectorpath + input_shapefiles[i], 'r') as zip_ref:
+  				zip_ref.extractall(vectorpath)
+			
+			print('Raster and shapefile pair prepared.')
+	else:
+		print('Raster images not paired with shapefiles.. check inputs.')
 		exit()
-
-	try:
-		shutil.copy(collectionpath + rastershapezipfile, vectorpath + rastershapezipfile)
-
-	except:
-		print('\nCant find the vector data ... Check settings...')
-		exit()
-
-	with zipfile.ZipFile(vectorpath + rastershapezipfile, 'r') as zip_ref:
-  		zip_ref.extractall(vectorpath)
-
-	print("Selected zipped files moved to vector directory and unzipped..")
 
 #------------------------------------------------------------------------------
 	#step 2 - train a classifiers with the raster input image and the shapefile with ROIs
@@ -279,7 +287,6 @@ def raster_train (input_rasterimages, input_shapefiles, input_classifier):
 		conn.uploadfile(files=filelist, path=pdir)
 		print('\n\nUploaded: ' , filelist)
 		print('\n\n')
-
 #---------------------------------------------------------------------------------
 
 if __name__ == "__main__":

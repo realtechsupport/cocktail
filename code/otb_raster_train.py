@@ -277,7 +277,8 @@ def raster_train (input_rasterimages, input_shapefiles, input_classifier):
 		zipOb = ZipFile(resultspath + stats_settings_tstamp, 'w')
 		zipOb.write(resultspath + fname)
 		zipOb.write(inputsfile_updated)			#use the updated file
-
+		#add confusion matrix
+		zipOb.write(resultspath + con_matrix)
 		zipOb.write(inputsfile)
 		zipOb.close()
 

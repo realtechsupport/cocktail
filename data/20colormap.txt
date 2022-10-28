@@ -9,15 +9,15 @@
 #9-clove plantation
 #10-mixed forest1
 #11-mixed forest2
-#12-mixed forest3
 #13-rice field1
 #14-rice field2
 #15-rice field3
 #16-mixed garden
 #17-grass land2
 #18-grass land3
-#19-grass land4
 #20-mixed garden2
+#21-agroforestry
+#22-cloud
 
 
 1 5 5 230
@@ -31,12 +31,12 @@
 9 120 216 47
 10 84 142 128
 11 84 142 128
-12 84 142 128
 13 50 255 215
 14 50 255 215
 15 50 255 215
 16 193 255 0
 17 105 200 95
 18 105 200 95
-19 105 200 95
 20 193 255 0
+21 255 50 185
+22 255 255 255

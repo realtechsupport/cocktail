@@ -40,10 +40,10 @@ inputsfile = datapath + 'settings.txt'
 def main():
 
 	elements = []
-
 	print('Use this routine to get a planet lab satellite asset if you have a vali API key.')
 	print('\nEnter the name of the geojson file, target date and max cloud cover.')
 	print('Enter the date in year-month-day (2021-05-12) format and cloud cover as a percentage (25).')
+	print('Example: area2_square.geojson 2022-08-01 25 {space separated}')
 	print('if you do not enter any choices, default values from the settings.txt file will be used.')
 
 	response = input("\nEnter your choices: ")
@@ -74,6 +74,7 @@ def get_planet_data_v1(map_geojson, ptargetdate, maxcloud):
 	else:
 		collectionpath = jdata['collectionpath']
 		rasterpath = jdata['rasterpath']
+		planetrasterpath = jdata['planetrasterpath']
 		rawsatpath = jdata['rawsatpath']
 		authfile = jdata['authfile']
 		planetauthfile = jdata['planetauthfile']
@@ -143,11 +144,13 @@ def get_planet_data_v1(map_geojson, ptargetdate, maxcloud):
 
 	#asset type
 	if((int(year) >= 2022) and (int(month) >=5)):
+		print('\n8-band SUPERDOVE\n')
 		superdove = True
 		item_type = "PSScene"
 		asset_type = "ortho_analytic_8b_xml"
 	else:
 		#Dove 4 band
+		print('\n4-band dove\n')
 		superdove = False
 		item_type = "PSScene4Band"
 		asset_type = "analytic_xml"
@@ -170,10 +173,17 @@ def get_planet_data_v1(map_geojson, ptargetdate, maxcloud):
 	else:
 		print('found a number of images meeting the search criteria: ', n_images)
 		print(image_ids)
+		print()
 		#  First or last image ID
 		id_first = image_ids[0]
 		id_last = image_ids[-1]
-		id = id_last
+		#first or last...
+		id = id_first
+
+		print('\nGetting this asset: ', id)
+		print()
+		#Order V1 - no clipping
+		'''
 		id_url = 'https://api.planet.com/data/v1/item-types/{}/items/{}/assets'.format(item_type, id)
 		# Returns JSON metadata for assets in this ID.
 		result = requests.get(id_url, auth=HTTPBasicAuth(PLANET_API_KEY, ''))
@@ -194,6 +204,37 @@ def get_planet_data_v1(map_geojson, ptargetdate, maxcloud):
 		activate_result = requests.get(activation_link,auth=HTTPBasicAuth(PLANET_API_KEY, ''))
 		#download
 		getasset(self_link, rasterpath, maxattempts, wait, PLANET_API_KEY)
+		'''
+
+		#Order V2 - with clipping ----------------------------------------------
+		orders_url = 'https://api.planet.com/compute/ops/orders/v2'
+
+		# set up requests to work with api
+		auth = HTTPBasicAuth(PLANET_API_KEY, '')
+		headers = {'content-type': 'application/json'}
+
+		if(superdove):
+			single_product_8b = [{"item_ids" : [id], "item_type" : "PSScene","product_bundle" : "analytic_8b_sr_udm2"}]
+			single_product = single_product_8b
+			end_tag = '8b_clip.tif'
+
+		else:
+			single_product_4b = [{"item_ids" : [id], "item_type" : "PSScene4Band","product_bundle" : "analytic"}]
+			single_product = single_product_4b
+			end_tag = '4b_clip.tif'
+
+		# define the clip tool
+		clip = {"clip": {"aoi": ngeodata}}
+
+		# create an order request with the clipping tool
+		request_clip = {"name": "just clip","products": single_product,"tools": [clip]}
+
+		#download and poll
+		clip_order_url = place_order(request_clip, auth, orders_url, headers)
+		num_loops = 100
+		poll_for_success(clip_order_url, auth, num_loops)
+		savepath = planetrasterpath
+		downloaded_clip_files = download_order(savepath, clip_order_url, auth)
 
 #----------------------------------------------------------------------------------------------
 if __name__ == "__main__":

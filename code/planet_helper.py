@@ -6,6 +6,7 @@
 import os, sys, json, requests
 import time
 import json
+import pathlib
 from requests.auth import HTTPBasicAuth
 
 #-------------------------------------------------------------------------------
@@ -52,4 +53,55 @@ def getasset(self_link, datapath, maxattempts, wait, PLANET_API_KEY):
     else:
       print('unknown asset request error occurred...')
       break
+#-------------------------------------------------------------------------------
+def place_order(request, auth, orders_url, headers):
+    response = requests.post(orders_url, data=json.dumps(request), auth=auth, headers=headers)
+    print(response)
+
+    if not response.ok:
+        raise Exception(response.content)
+
+    order_id = response.json()['id']
+    print(order_id)
+    order_url = orders_url + '/' + order_id
+    return (order_url)
+#-------------------------------------------------------------------------------
+
+def poll_for_success(order_url, auth, num_loops):
+    count = 0
+    while(count < num_loops):
+        count += 1
+        r = requests.get(order_url, auth=auth)
+        response = r.json()
+        state = response['state']
+        print(state, count)
+        success_states = ['success', 'partial']
+        if state == 'failed':
+            raise Exception(response)
+        elif state in success_states:
+            break
+
+        time.sleep(10)
+#-------------------------------------------------------------------------------
+
+def download_order(savepath, order_url, auth, overwrite=False):
+    r = requests.get(order_url, auth=auth)
+    print(r)
+
+    response = r.json()
+    results = response['_links']['results']
+    results_urls = [r['location'] for r in results]
+    results_names = [r['name'] for r in results]
+    results_paths = [pathlib.Path(os.path.join(savepath, n)) for n in results_names]
+    print('{} items to download'.format(len(results_urls)))
+
+    for url, name, path in zip(results_urls, results_names, results_paths):
+        if overwrite or not path.exists():
+            print('downloading {} to {}'.format(name, path))
+            r = requests.get(url, allow_redirects=True)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            open(path, 'wb').write(r.content)
+        else:
+            print('{} already exists, skipping {}'.format(path, name))
+    return (dict(zip(results_names, results_paths)))
 #-------------------------------------------------------------------------------

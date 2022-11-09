@@ -4,6 +4,7 @@
 # RTS, spring 2021 / 2022
 #-------------------------------------------------------------------------------
 import os, sys, json, requests
+import shutil
 import time
 import json
 import pathlib
@@ -31,6 +32,7 @@ def pl_download(url, datapath, PLANET_API_KEY, filename=None):
                 f.flush()
     print('download complete...')
     return (filename)
+
 
 #-------------------------------------------------------------------------------
 def getasset(self_link, datapath, maxattempts, wait, PLANET_API_KEY):
@@ -85,23 +87,24 @@ def poll_for_success(order_url, auth, num_loops):
 #-------------------------------------------------------------------------------
 
 def download_order(savepath, order_url, auth, overwrite=False):
-    r = requests.get(order_url, auth=auth)
-    print(r)
+	r = requests.get(order_url, auth=auth)
+	print(r)
+	
+	response = r.json()
+	results = response['_links']['results']
+	results_urls = [r['location'] for r in results]
+	results_names = [r['name'] for r in results]
+	results_paths = [pathlib.Path(os.path.join(savepath, n)) for n in results_names]
+	print('{} items to download'.format(len(results_urls)))
 
-    response = r.json()
-    results = response['_links']['results']
-    results_urls = [r['location'] for r in results]
-    results_names = [r['name'] for r in results]
-    results_paths = [pathlib.Path(os.path.join(savepath, n)) for n in results_names]
-    print('{} items to download'.format(len(results_urls)))
+	for url, name, path in zip(results_urls, results_names, results_paths):
+		if overwrite or not path.exists():
+			print('downloading {} to {}'.format(name, path))
+			r = requests.get(url, allow_redirects=True)
+			path.parent.mkdir(parents=True, exist_ok=True)
+			open(path, 'wb').write(r.content)
+		else:
+			print('{} already exists, skipping {}'.format(path, name))
 
-    for url, name, path in zip(results_urls, results_names, results_paths):
-        if overwrite or not path.exists():
-            print('downloading {} to {}'.format(name, path))
-            r = requests.get(url, allow_redirects=True)
-            path.parent.mkdir(parents=True, exist_ok=True)
-            open(path, 'wb').write(r.content)
-        else:
-            print('{} already exists, skipping {}'.format(path, name))
-    return (dict(zip(results_names, results_paths)))
+	return (dict(zip(results_names, results_paths)))
 #-------------------------------------------------------------------------------

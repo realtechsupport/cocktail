@@ -7,14 +7,14 @@
 
 #--------------------------------------------------------------------------------------------
 # You need a valid planet lab API key to use this routine
-# Place the key in the auth folder (or modify the code to your liking)
-# planet API V1
+# Place the key in the auth folder (or modify the access method)
+# planet API V2
 
 # Usage: -------------------------------------------------------------------------------------
 # > python3 planet_place_order.py
 #
 # Enter choice at the prompt:
-# image id, copied from the preview (on pCloud or on the VM), AOI and constellation (superdove)
+# image id, copied from the preview (on pCloud or on the VM), AOI 
 # assets, if found, may not be ready immediately. Script tries several times before timing out.
 # CTRL C to stop and then try again later...
 
@@ -34,25 +34,23 @@ def main():
 
 	elements = []
 	print('\nUse this routine to get a planet lab satellite asset, clipped to an AOI.')
-	print('\nEnter the image ID, the name of the AOI, and the satellite constellation (superdove or dove).')
-	print('Example: 20220806_021247_74_248b area2_square.geojson superdove')
+	print('\nEnter the image ID and the name of the AOI.')
+	print('Example: 20220806_021247_74_248b area2_square.geojson')
 	response = input("\nEnter your choices: ")
 	try:
 		elements = response.split(' ')
 		id  = elements[0]
 		map = elements[1]
-		constellation = elements[2]
 	except:
 		id = 'na'
 		map = 'na'
-		constellation = 'superdove'	#default
 		print('\nInput is empty - exiting')
 		exit()
 
-	get_planet_data_v2(id, map, constellation)
+	get_planet_data_v2(id, map)
 
 #----------------------------------------------------------------------------------------------
-def get_planet_data_v2(id, map, constellation):
+def get_planet_data_v2(id, map):
 
 	try:
         	f = open(inputsfile, 'r')
@@ -73,7 +71,7 @@ def get_planet_data_v2(id, map, constellation):
 		pcloudplanet = jdata['pcloudplanet']
 		t2p = jdata['T2P']
 
-	print('\nYour inputs: ' , id, map, constellation)
+	print('\nYour inputs: ' , id, map)
 	print()
 	# --------------------------------------------------------------------------
 
@@ -97,22 +95,33 @@ def get_planet_data_v2(id, map, constellation):
   			ngeodata['type'] = feature['geometry']['type']
   			ngeodata['coordinates'] = feature['geometry']['coordinates']
 
+
+	# Superdove? Use the input id to assess
+	id_date = id.split('_')[0]
+	id_year = id_date[0:4]
+	id_month = id_date[4:6]
+	constellation = 'na'
+	if((int(id_year) >= 2022) and (int(id_month) >= 4)):
+		constellation = 'superdove'
+		print('Requesting SUPERdove asset.')
+	else:
+		print('Requesting dove asset.')
+
+	if(constellation == 'superdove'):
+		single_product_8b = [{"item_ids" : [id], "item_type" : "PSScene","product_bundle" : "analytic_8b_sr_udm2"}]
+		single_product = single_product_8b
+		end_tag = '8b_clip.tif'
+	else:
+		single_product_4b = [{"item_ids" : [id], "item_type" : "PSScene4Band","product_bundle" : "analytic"}]
+		single_product = single_product_4b
+		end_tag = '4b_clip.tif'
+
 	# Order V2 - with clipping
 	orders_url = 'https://api.planet.com/compute/ops/orders/v2'
 
 	# Requests to work with api
 	auth = HTTPBasicAuth(PLANET_API_KEY, '')
 	headers = {'content-type': 'application/json'}
-
-	if(constellation == 'superdove'):
-		single_product_8b = [{"item_ids" : [id], "item_type" : "PSScene","product_bundle" : "analytic_8b_sr_udm2"}]
-		single_product = single_product_8b
-		end_tag = '8b_clip.tif'
-
-	else:
-		single_product_4b = [{"item_ids" : [id], "item_type" : "PSScene4Band","product_bundle" : "analytic"}]
-		single_product = single_product_4b
-		end_tag = '4b_clip.tif'
 
         # Clip tool
 	clip = {"clip": {"aoi": ngeodata}}
@@ -139,20 +148,19 @@ def get_planet_data_v2(id, map, constellation):
 		if(end_tag in item):
 			target_file = item
 
-
+	#Rename the file based on the actual download
+	date_parts = target_file.split('_')[0]
+	year = date_parts[0:4]
+	month = date_parts[4:6]
+	day = date_parts[6:8]
+	date = month + day + '_' + year
+	place = map.split('.')[0]
+	
 	# Copy to the collection directory
 	try:
 		shutil.copy(ssdir + target_file, collectionpath +  target_file)
 		print('Copied asset to the collection')
 
-		#Rename the file
-		date_parts = target_file.split('_')[0]
-		year = date_parts[0:4]
-		month = date_parts[4:6]
-		day = date_parts[6:8]
-		date = month + day + '_' + year
-		place = map.split('.')[0]
-		
 		if(constellation == 'superdove'):
 			newname = place + '_' + date + '_' + '8bands.tif'
 		else:
@@ -161,9 +169,8 @@ def get_planet_data_v2(id, map, constellation):
 		os.rename(collectionpath + target_file, collectionpath + newname)
 
 	except:
-		print('Could not copy the asset into the collection..')
-		pass
-
+		print('\nSomething went wrong..Could not copy the asset into the collection..')
+		exit()
 
 	# Copy over to PCloud, if enabled
 	if(t2p == "yes"):

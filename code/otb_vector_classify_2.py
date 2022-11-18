@@ -66,6 +66,13 @@ else:
 #------------------------------------------------------------------------------
 
 if(classifier == 'ann'):
+	#4band or 8band data?
+
+	source = gdal.Open(rasterpath + rasterimage)
+	if(source is not None):
+		num_bands = source.RasterCount
+		print('Number of bands in this raster image: ', num_bands)
+
 	#TrainVectorClassifiers
 	sfile = vectorpath + segmentation_points_joined
 	app = otbApplication.Registry.CreateApplication("TrainVectorClassifier")
@@ -73,7 +80,16 @@ if(classifier == 'ann'):
 	confusion_matrix = jdata['confusion_matrix_vector_ann']
 	ann_vector_classification = jdata['ann_vector_classification']
 
-	mean_std_list = ["mean_0", "stdev_0", "mean_1", "stdev_1", "mean_2", "stdev_2", "mean_3", "stdev_3"]
+	#4band images
+	if(num_bands < 8):
+		print('4Band raster image input')
+		mean_std_list = ["mean_0", "stdev_0", "mean_1", "stdev_1", "mean_2", "stdev_2", "mean_3", "stdev_3"]
+	#8band images
+	else:
+		print('8Band raster image input')
+		mean_std_list = ["mean_0", "stdev_0", "mean_1", "stdev_1", "mean_2", "stdev_2", "mean_3", "stdev_3", "mean_4", "stdev_4", "mean_5", "stdev_5", "mean_6", "stdev_6", "mean_7", "stdev_7"]
+
+	
 	app.SetParameterStringList("io.vd", [sfile])
 	app.SetParameterString("io.out", resultspath + modelname)
 

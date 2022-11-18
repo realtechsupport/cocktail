@@ -3,7 +3,7 @@
 # top level script to perform neural network based object classification
 # on a rasterimage together with a vector based point file
 # script access functionality across Orfeo and Qgis libraries sequentially
-# RTS, February, September 2022
+# RTS, February, September, November 2022
 #---------------------------------------------------------------------------
 # uncomment commands to run tests
 # OTB
@@ -22,7 +22,8 @@
 #---------------------------------------------------------------------------
 echo "\nStarting the object based Neural Net Classifier."
 echo "Check the settings.txt file for all inputs and hyperparameters."
-echo "Press any key when you are ready... or Ctrl c to exit..."
+python3 /home/marcbohlen/cocktail/code/settings_check.py
+echo "Press any key to continue ... or ctrl c to exit ..."
 read var
 
 echo "\nThis process will take several minutes (32GB RAM) or about half an hour (8GB RAM)"

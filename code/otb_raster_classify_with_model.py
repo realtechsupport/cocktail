@@ -98,12 +98,19 @@ def raster_classify (input_rasterimage, input_modelname):
 	#step 2 - classify with pretrained model
 
 	tstamp = create_timestamp(location)
-	classifier_model = input_modelname.split('_')[1]
-	classifier = classifier_model.split('.model')[0]
+	cparts = input_modelname.split('_')
 	
+	if(len(cparts) == 2):
+		classifier_model = input_modelname.split('_')[1]
+		classifier = classifier_model.split('.model')[0]
+	elif(len(cparts) == 3):
+		classifier_model = cparts[2]
+		classifier = cparts[2].split('.model')[0]
+	
+	#print('Classifier model: ', classifier_model)
 	confidencemap = jdata['confidencemap']	
-
 	print('Confidence map: ', confidencemap)
+	
 	#Random Forest
 	if ('rf' in classifier_model):
 		classified_rimage = b_rimage + tstamp + '_' + jdata['classified_rimage_rf']
@@ -136,10 +143,15 @@ def raster_classify (input_rasterimage, input_modelname):
 		#add timestamp now
 		tstamp = create_timestamp(location)
 
+		if(len(cparts) == 3):
+			t = cparts[0]
+		else:
+			t = ''
+
 		if(classifier == 'libsvm'):
-			color_classified_rimage = b_rimage + tstamp + '_' + jdata['classified_rimage_color_svm']
+			color_classified_rimage = b_rimage + tstamp + '_' + t + '_'  + jdata['classified_rimage_color_svm']
 		elif(classifier == 'rf'):
-			color_classified_rimage = b_rimage + tstamp + '_' + jdata['classified_rimage_color_rf']
+			color_classified_rimage = b_rimage + tstamp + '_' + t + '_' + jdata['classified_rimage_color_rf']
 
 		app.SetParameterString("out", resultspath + color_classified_rimage)
 		app.ExecuteAndWriteOutput()

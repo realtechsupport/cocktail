@@ -182,6 +182,9 @@ def get_planet_data_v1(map_geojson, ptargetdate, ndays, maxcloud):
 		password = lines[1].strip()
 		f.close()
 
+	# Define the AOI with shapely
+	aoi = geometry.shape(ngeodata)
+
 	# Launch the search for each date set
 	for date_set in dates_range_filter:
 		combined_filter = {"type": "AndFilter","config": [geometry_filter, date_set, cloud_cover_filter]}
@@ -194,13 +197,14 @@ def get_planet_data_v1(map_geojson, ptargetdate, ndays, maxcloud):
 		# extract image IDs only
 		image_ids = [feature['id'] for feature in search_result.json()['features']]
 		thumb_ids = [feature['_links']['thumbnail'] for feature in search_result.json()['features']]
+		geo_infos = [feature['geometry'] for feature in search_result.json()['features']]
 		n_images = len(image_ids)
 
 		if(n_images == 0):
-			print('\nNo matchig results found for that date\n')
+			print('\nNo matching results found for that date\n')
 			print('Trying next date ...')
 		else:
-			print('Found a number of images meeting the search criteria: ', n_images)
+			print('Found a number of candidates meeting the search criteria: ', n_images)
 			print(image_ids)
 			print()
 			#  First ID
@@ -215,23 +219,31 @@ def get_planet_data_v1(map_geojson, ptargetdate, ndays, maxcloud):
 			if(result !=0):
 				i = 0
 				for item in image_ids:
-					result = requests.get(thumb_ids[i], auth=HTTPBasicAuth(PLANET_API_KEY, ''))
-					thumb_image = planetpreviewpath + str(item) +'.png'
-					filelist.append(thumb_image)
-					with open(thumb_image, 'wb') as file:
-						file.write(result.content)
-						print('Got this thumb image: ' ,thumb_image)
+					res = requests.get(thumb_ids[i], auth=HTTPBasicAuth(PLANET_API_KEY, ''))
+					g = geometry.shape(geo_infos[i])
+					#Check if aoi is inside candidate geometry
+					if(g.contains(aoi)):
+						print('\nCandidate contains the AOI')
+						thumb_image = planetpreviewpath + str(item) +'.png'
+						filelist.append(thumb_image)
+						with open(thumb_image, 'wb') as file:
+							file.write(res.content)
+							print('Got the corresponding thumb image: ' , thumb_image)
+
+						if(t2p == "yes"):
+							conn = PyCloud(username, password, endpoint='nearest')
+							conn.uploadfile(files=filelist, path=pcloudpreviewdir)
+							print('Uploaded to pCloud: ' , filelist)
+							print('\n')
+
+
+					else:
+						print('Candidate does not fully cover the aoi..')
+
 					i = i+1
 
-				#copy over to Pcloud, if enabled
-				if(t2p == "yes"):
-					conn = PyCloud(username, password, endpoint='nearest')
-					conn.uploadfile(files=filelist, path=pcloudpreviewdir)
-					print('Uploaded to pCloud: ' , filelist)
-					print('\n\n')
-
 			else:
-				print('Not able to retrieve previews for that  choice ...') 
+				print('Not able to retrieve previews for that choice ...') 
 
 #----------------------------------------------------------------------------------------------
 if __name__ == "__main__":

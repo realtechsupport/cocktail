@@ -27,8 +27,10 @@ pip3 install numpy
 pip3 install matplotlib
 pip3 install pandas
 pip3 install scipy
+pip3 install shapely
 
-echo "installed python3, python3dev, python3-venv, ffmpeg, qgis, numpy, scipy, matplotlib, jupyter notebook"
+
+echo "installed python3, python3dev, python3-venv, ffmpeg, qgis, numpy, scipy, matplotlib, shapely, jupyter notebook"
 
 echo "hit ctrl d to close this session"
 exit 0

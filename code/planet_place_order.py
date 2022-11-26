@@ -111,10 +111,12 @@ def get_planet_data_v2(id, map):
 		single_product_8b = [{"item_ids" : [id], "item_type" : "PSScene","product_bundle" : "analytic_8b_sr_udm2"}]
 		single_product = single_product_8b
 		end_tag = '8b_clip.tif'
+		dir_tag = '/PSScene/'
 	else:
 		single_product_4b = [{"item_ids" : [id], "item_type" : "PSScene4Band","product_bundle" : "analytic"}]
 		single_product = single_product_4b
-		end_tag = '4b_clip.tif'
+		end_tag = '_clip.tif'
+		dir_tag = '/PSScene4Band/'
 
 	# Order V2 - with clipping
 	orders_url = 'https://api.planet.com/compute/ops/orders/v2'
@@ -140,7 +142,7 @@ def get_planet_data_v2(id, map):
 	#Find the clipped file in the downloaded package
 	sdir = planetrasterpath
 	newest_dir = max([os.path.join(sdir,d) for d in os.listdir(sdir)], key=os.path.getmtime)
-	ssdir = newest_dir + '/PSScene/'
+	ssdir = newest_dir + dir_tag
 	dirlist = os.listdir(ssdir)
 
 	target_file = 'na'

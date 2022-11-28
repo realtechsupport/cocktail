@@ -58,7 +58,7 @@ def main():
 		maxcloud = 'na'
 		ndays = 1
 		print('\nInput is incomplete ... try again')
-		
+
 
 	get_planet_data_v1(map_geojson, ptargetdate, ndays, maxcloud)
 
@@ -132,7 +132,7 @@ def get_planet_data_v1(map_geojson, ptargetdate, ndays, maxcloud):
 	except:
 		info = targetdate.split('_')
 
-	dates_range_filter = []	
+	dates_range_filter = []
 	day = info[2]
 	intday = int(day)
 
@@ -169,6 +169,12 @@ def get_planet_data_v1(map_geojson, ptargetdate, ndays, maxcloud):
 		superdove = False
 		item_type = "PSScene4Band"
 		asset_type = "analytic_xml"
+		'''
+		#update after 1/2023
+		# https://developers.planet.com/docs/apis/data/psscene3-4band-deprecation/
+		item_type = "PSScene"
+		asset_type = "ortho_analytic_4b_xml"
+		'''
 
 	# Set geometry and cloud filters
 	geometry_filter = {"type": "GeometryFilter","field_name": "geometry", "config": ngeodata}
@@ -243,7 +249,7 @@ def get_planet_data_v1(map_geojson, ptargetdate, ndays, maxcloud):
 					i = i+1
 
 			else:
-				print('Not able to retrieve previews for that choice ...') 
+				print('Not able to retrieve previews for that choice ...')
 
 #----------------------------------------------------------------------------------------------
 if __name__ == "__main__":

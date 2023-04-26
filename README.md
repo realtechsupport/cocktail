@@ -125,7 +125,7 @@ Since the directory structure you setup will be identical in both the QGIS and O
 
 <i>Details on how to collect data from the European Space Agency's Sentinel program, how to make use of tip and cue, and how to perform various band-math operations and image classification with SVM, RF and NN classifiers is described in the Install+Use .pdf document.</i>
 
-The collection directory contains some sample Sentinel2 data. Here are links to three high resolution 4-band PlanetLab images (geotif format, 300MB each):
+The collection directory contains some sample Sentinel2 data. Here are links to three high resolution 8-band (2022) and 4-band PlanetLab images (geotif format, 500MB / 300MB each):
 
 [Central Bali, May 2022](https://filedn.com/lqzjnYhpY3yQ7BdfTulG1yY/FOSS4G_2023/area2_0803_2022_8bands.tif)
 <br>
@@ -136,9 +136,11 @@ The collection directory contains some sample Sentinel2 data. Here are links to 
 
 <br>
 Cocktail has been used to create the following research artifacts:
-
-[FOSS4G2022 - Who speaks for the forest? Participatory mapping and contested land cover classification in Central Bali](https://isprs-archives.copernicus.org/articles/XLVIII-4-W1-2022/73/2022/isprs-archives-XLVIII-4-W1-2022-73-2022.pdf) <br>
-[EUROCARTO2022 - Combining Landsat, Sentinel2 and Planet Lab satellite assets for resource constrained land cover analysis in the tropics](https://ica-abs.copernicus.org/articles/5/44/2022/) <br>
-[FOSS4G2023 - Agroforestry in the Alas Mertajati of Bali, Indonesia. A case study in sustainable small-scale farming practices and GeoAI}(https://filedn.com/lqzjnYhpY3yQ7BdfTulG1yY/temp/FOSS4G_2023_final_Liu_Iryadi_Bohlen.pdf)
+<br>
+[FOSS4G2022 - Who speaks for the forest? Participatory mapping and contested land cover classification in Central Bali]
+(https://isprs-archives.copernicus.org/articles/XLVIII-4-W1-2022/73/2022/isprs-archives-XLVIII-4-W1-2022-73-2022.pdf) <br>
+[EUROCARTO2022 - Combining Landsat, Sentinel2 and Planet Lab satellite assets for resource constrained land cover analysis in the tropics]
+(https://ica-abs.copernicus.org/articles/5/44/2022/) <br>
+[FOSS4G2023 - Agroforestry in the Alas Mertajati of Bali, Indonesia. A case study in sustainable small-scale farming practices and GeoAI](https://filedn.com/lqzjnYhpY3yQ7BdfTulG1yY/temp/FOSS4G_2023_final_Liu_Iryadi_Bohlen.pdf)
 
 

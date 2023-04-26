@@ -138,9 +138,9 @@ The collection directory contains some sample Sentinel2 data. Here are links to 
 Cocktail has been used to create the following research artifacts:
 <br>
 [FOSS4G2022 - Who speaks for the forest? Participatory mapping and contested land cover classification in Central Bali]
-(https://isprs-archives.copernicus.org/articles/XLVIII-4-W1-2022/73/2022/isprs-archives-XLVIII-4-W1-2022-73-2022.pdf) <br>
+(https://isprs-archives.copernicus.org/articles/XLVIII-4-W1-2022/73/2022/isprs-archives-XLVIII-4-W1-2022-73-2022.pdf)  <br>
 [EUROCARTO2022 - Combining Landsat, Sentinel2 and Planet Lab satellite assets for resource constrained land cover analysis in the tropics]
-(https://ica-abs.copernicus.org/articles/5/44/2022/) <br>
+(https://ica-abs.copernicus.org/articles/5/44/2022/)  <br>
 [FOSS4G2023 - Agroforestry in the Alas Mertajati of Bali, Indonesia. A case study in sustainable small-scale farming practices and GeoAI](https://filedn.com/lqzjnYhpY3yQ7BdfTulG1yY/temp/FOSS4G_2023_final_Liu_Iryadi_Bohlen.pdf)
 
 

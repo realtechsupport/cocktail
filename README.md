@@ -142,6 +142,7 @@ Cocktail has been used to create the following research artifacts:
 [EUROCARTO2022 - Combining Landsat, Sentinel2 and Planet Lab satellite assets for resource constrained land cover analysis in the tropics]
 (https://ica-abs.copernicus.org/articles/5/44/2022/)  
 <br>
-[FOSS4G2023 - Agroforestry in the Alas Mertajati of Bali, Indonesia. A case study in sustainable small-scale farming practices and GeoAI](https://filedn.com/lqzjnYhpY3yQ7BdfTulG1yY/temp/FOSS4G_2023_final_Liu_Iryadi_Bohlen.pdf)
+[FOSS4G2023 - Agroforestry in the Alas Mertajati of Bali, Indonesia. A case study in sustainable small-scale farming practices and GeoAI]
+(https://filedn.com/lqzjnYhpY3yQ7BdfTulG1yY/temp/FOSS4G_2023_final_Liu_Iryadi_Bohlen.pdf)
 
 

@@ -127,12 +127,12 @@ Since the directory structure you setup will be identical in both the QGIS and O
 
 The collection directory contains some sample Sentinel2 data. Here are links to three high resolution 8-band (2022) and 4-band PlanetLab images (geoTIFF format, 500MB / 300MB each):
 
-[Central Bali, May 2022](https://filedn.com/lqzjnYhpY3yQ7BdfTulG1yY/FOSS4G_2023/area2_0803_2022_8bands.tif)
+[Central Bali, June 2020](https://u.pcloud.link/publink/show?code=XZlWChVZSzr9m9mDY5Fxz8fMwEGcSB0nf1Nk)
 <br>
 [Central Bali, May 2021](https://filedn.com/lqzjnYhpY3yQ7BdfTulG1yY/cocktail_PS_rastersamples/area2_0501_2021_4band.tif)
 <br>
-[Central Bali, June 2020](https://u.pcloud.link/publink/show?code=XZlWChVZSzr9m9mDY5Fxz8fMwEGcSB0nf1Nk)
-<br>
+[Central Bali, May 2022](https://filedn.com/lqzjnYhpY3yQ7BdfTulG1yY/FOSS4G_2023/area2_0803_2022_8bands.tif)
+
 
 Cocktail has been used to create research artifacts presented at the following venues:<br>
 

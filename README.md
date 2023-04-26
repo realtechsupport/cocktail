@@ -136,7 +136,7 @@ The collection directory contains some sample Sentinel2 data. Here are links to 
 <br>
 Cocktail has been used to create the following research artifacts:
 
-
+<br>
 [FOSS4G-2022](https://isprs-archives.copernicus.org/articles/XLVIII-4-W1-2022/73/2022/isprs-archives-XLVIII-4-W1-2022-73-2022.pdf) 
 <br>
 [EUROCARTO-2022](https://ica-abs.copernicus.org/articles/5/44/2022/)

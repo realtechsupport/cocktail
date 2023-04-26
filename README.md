@@ -142,7 +142,9 @@ Cocktail has been used to create the following research artifacts:
 <br>
 [FOSS4G2023](https://filedn.com/lqzjnYhpY3yQ7BdfTulG1yY/temp/FOSS4G_2023_final_Liu_Iryadi_Bohlen.pdf)
 
-[FOSS4G2022](https://isprs-archives.copernicus.org/articles/XLVIII-4-W1-2022/73/2022/isprs-archives-XLVIII-4-W1-2022-73-2022.pdf))
-[EUROCARTO2022](https://ica-abs.copernicus.org/articles/5/44/2022/))
-[FOSS4G2023](https://filedn.com/lqzjnYhpY3yQ7BdfTulG1yY/temp/FOSS4G_2023_final_Liu_Iryadi_Bohlen.pdf)
+[FOSS4G-2022](https://isprs-archives.copernicus.org/articles/XLVIII-4-W1-2022/73/2022/isprs-archives-XLVIII-4-W1-2022-73-2022.pdf) 
+<br>
+[EUROCARTO-2022](https://ica-abs.copernicus.org/articles/5/44/2022/)
+<br>
+[FOSS4G-2023](https://filedn.com/lqzjnYhpY3yQ7BdfTulG1yY/temp/FOSS4G_2023_final_Liu_Iryadi_Bohlen.pdf)
 

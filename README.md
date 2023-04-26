@@ -134,7 +134,7 @@ The collection directory contains some sample Sentinel2 data. Here are links to 
 [Central Bali, June 2020](https://u.pcloud.link/publink/show?code=XZlWChVZSzr9m9mDY5Fxz8fMwEGcSB0nf1Nk)
 
 <br>
-Cocktail has been used to create the following research artifacts:
+Cocktail has been used to create research artifacts presented at the following venues:<br>
 
 
 [FOSS4G-2022](https://isprs-archives.copernicus.org/articles/XLVIII-4-W1-2022/73/2022/isprs-archives-XLVIII-4-W1-2022-73-2022.pdf) 

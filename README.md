@@ -127,16 +127,18 @@ Since the directory structure you setup will be identical in both the QGIS and O
 
 The collection directory contains some sample Sentinel2 data. Here are links to three high resolution 4-band PlanetLab images (geotif format, 300MB each):
 
+[Central Bali, May 2022](https://filedn.com/lqzjnYhpY3yQ7BdfTulG1yY/FOSS4G_2023/area2_0803_2022_8bands.tif)
+<br>
 [Central Bali, May 2021](https://filedn.com/lqzjnYhpY3yQ7BdfTulG1yY/cocktail_PS_rastersamples/area2_0501_2021_4band.tif)
 <br>
 [Central Bali, June 2020](https://u.pcloud.link/publink/show?code=XZlWChVZSzr9m9mDY5Fxz8fMwEGcSB0nf1Nk)
-<br>
-[Central Bali, June 2017](https://filedn.com/lqzjnYhpY3yQ7BdfTulG1yY/cocktail_PS_rastersamples/area2_0617_2017_4band.tif)
+
 
 <br>
-Cocktail is currently supporting the following research projects:
+Cocktail has been used to create the following research artifacts:
 
-[FOSS4G2022 - Who speaks for the forest? Participatory mapping and contested land cover classification in Central Bali](https://www.researchgate.net/publication/361913433_WHO_SPEAKS_FOR_THE_FOREST_LOCAL_KNOWLEDGE_PARTICIPATORY_MAPPING_and_COLLABORATIVE_EVALUATION_for_GIS_ANALYSIS_in_the_TROPICS_of_CENTRAL_BALI_INDONESIA) <br>
-[EUROCARTO2022 - Combining Landsat, Sentinel2 and Planet Lab satellite assets for resource constrained land cover analysis in the tropics](https://www.researchgate.net/publication/361913251_Combining_Landsat_Sentinel2_and_Planet_Lab_satellite_assets_for_resource-constrained_land_cover_analysis_in_the_tropics)
+[FOSS4G2022 - Who speaks for the forest? Participatory mapping and contested land cover classification in Central Bali](https://isprs-archives.copernicus.org/articles/XLVIII-4-W1-2022/73/2022/isprs-archives-XLVIII-4-W1-2022-73-2022.pdf) <br>
+[EUROCARTO2022 - Combining Landsat, Sentinel2 and Planet Lab satellite assets for resource constrained land cover analysis in the tropics](https://ica-abs.copernicus.org/articles/5/44/2022/) <br>
+[FOSS4G2023 - Agroforestry in the Alas Mertajati of Bali, Indonesia. A case study in sustainable small-scale farming practices and GeoAI}(https://filedn.com/lqzjnYhpY3yQ7BdfTulG1yY/temp/FOSS4G_2023_final_Liu_Iryadi_Bohlen.pdf)
 
 

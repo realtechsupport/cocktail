@@ -1,6 +1,8 @@
 # COCKTAIL
 # sentinel2_getdata.py
 # RTS, July, October 2022
+# Update May 2023 - option to get only 10m resolution bands
+# Output file saved to collections folder
 #--------------------------------------------------------------------------------------------
 
 # The script collects all the sentinel bands of the specified time and cloud conditions
@@ -102,8 +104,10 @@ def main():
 	print('Edit the start and end dates in the settings.txt file.')
 	print('\nTo get the latest TCI between those preset dates, enter: tci')
 	print('To get the latest set of all bands between those dates, enter: all')
+	print('To get only the 10m resolution bands between those dates, enter: 10m')
 	print('To get the latest TCI from the present, enter: tci now')
 	print('To get the lastest set of all bands from the present, enter: all now')
+	print('To get the lates set of 10m resolution bands from the preent, enter: 10m now')
 	print('To get all bands from a known UUID, enter that long UUID: a-b-c-d-e')
 
 
@@ -120,7 +124,7 @@ def main():
 		else:
 			bandselection = response
 
-	if((bandselection == 'tci') or (bandselection == 'all')):
+	if((bandselection == 'tci') or (bandselection == 'all') or (bandselection == '10m')):
 		print('\nGetting the sentinel2 asset with choices: ', bandselection, enddate, uuid)
 		get_sentinel2_data(bandselection, enddate, uuid)
 	else:
@@ -192,7 +196,7 @@ def get_sentinel2_data(bandselection, enddate, uuid):
 	f.close()
 
 	api = SentinelAPI(username, password, 'https://scihub.copernicus.eu/dhus')
-
+	
 	#fetch the data
 	try:
 		this_uuid = 'na'
@@ -240,8 +244,14 @@ def get_sentinel2_data(bandselection, enddate, uuid):
 	# get only the bands requested
 	if(bandselection == 'tci'):
 		jp2_list = [band for band in os.listdir(tci_path) if band [-7:] == 'TCI.jp2']
+	
+	elif(bandselection == '10m'):
+		jp2_list =  [band for band in os.listdir(tci_path) if ((band [-7:] == 'B02.jp2') or (band [-7:] == 'B03.jp2') or (band [-7:] == 'B04.jp2') or (band [-7:] == 'B08.jp2'))]
 	else:
 		jp2_list = [band for band in os.listdir(tci_path) if band [-4:] == '.jp2']
+
+
+	print(jp2_list)
 
 	#convert .jp2 to .tif
 	print('\nConverting .jp2 to .tif\n')
@@ -331,6 +341,9 @@ def get_sentinel2_data(bandselection, enddate, uuid):
 	print('\nAdding log entry...')
 	method = 'a'
 	log(datapath + logfile, comment, method)
+
+	# show saved loction
+	print('\nFinal .tif file saved to collections folder.')
 
 	# delete content of rawsat
 	print('\nDeleting temporary files to save storage space...')

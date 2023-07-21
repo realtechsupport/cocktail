@@ -2,26 +2,26 @@
 
 #### We are creating a custom u-net and a data pipeline suited for our situation. Refer to [Digitalsreeni youtube channel's playlist on U-net](https://www.youtube.com/playlist?list=PLZsOBAyNTZwbR08R959iCvYT3qzhxvGOE) - particularly videos [228](https://www.youtube.com/watch?v=jvZm8REF2KY&list=PLZsOBAyNTZwbR08R959iCvYT3qzhxvGOE&index=29) and [230](https://www.youtube.com/watch?v=0W6MKZqSke8&list=PLZsOBAyNTZwbR08R959iCvYT3qzhxvGOE&index=31) and the corresponding code in his [github](https://github.com/bnsreenu/python_for_microscopists/tree/master/230_landcover_dataset_segmentation) to understand everything you need to know about U-nets and geo-spatial segmentation. While the data processing, U-net modelling, and training framework is inspired from him, we are using Rasterio instead of cv2, patchify, etc. during the pre-processing steps. 
 
-#### follow the below steps until step 4 to create your mask file. From step 5, although I have included code from my notebook, we need to create proper functions and a script to do those tasks. Refer to the [colab notebook](https://github.com/srikarreddy1729/pipeline-for-geospatial/blob/main/landcover.ipynb) if needed. 
+#### follow the below steps until step 4 to create your mask file. From step 5, although I have included code from my notebook, we need to create proper functions and a script to do those tasks. Refer to the [colab notebook](https://github.com/realtechsupport/cocktail/blob/main/sandbox/landcover.ipynb) if needed. 
 
 ## 1. Understand our data: 
 We have our input image (8 band tif file) but we don't have a mask/labelled image which corresponds to that input. The label information is currently stored in .gpkg file. We can open that file in qgis and align it with our input 8-band image and visually see that polygons on .gpkg file corresponds to different terrain-classes. These polygons belongs to different classes of terrain. These polygons belong to 22 such classes, we could color these polygons into different colors based on their class, to see how they represent different terrain classes. To color the polygons based on the class, select the .gpkg file, go to properties, go to symbology, select categorized, select value - class, select random colors option in color ramp, and click classify.
 
-![gpkg with colors](https://github.com/srikarreddy1729/pipeline-for-geospatial/blob/main/images/1.png "gpkg")
-![gpkg with map](https://github.com/srikarreddy1729/pipeline-for-geospatial/blob/main/images/1.1.png "gpkg")
+![gpkg with colors](https://github.com/realtechsupport/cocktail/blob/main/sandbox/images/1.png "gpkg")
+![gpkg with map](https://github.com/realtechsupport/cocktail/blob/main/sandbox/images/1.1.png "gpkg")
 
 
 ## 2.
 There's a way in qgis to convert this .gpkg file into a mask/label tif file which only contains the information as to which class does each pixel belongs to. This mask/label file should exactly correspond to the input 8 band tif file. Each pixel value in mask/label file should give us information as to which class the corresponding pixel value in the input 8-band tif file belongs to. So, we need to generate a mask tif file that should have the exact same size of the input 8 band tif file and should also contain class-label information embedded into pixels based on .gpkg file. 
 
 >a. select the .gpkg file and go to raster, and select conversion, and then vector to raster
-![convert to raster](https://github.com/srikarreddy1729/pipeline-for-geospatial/blob/main/images/2.a.png "raster")
+![convert to raster](https://github.com/realtechsupport/cocktail/blob/main/sandbox/images/2.a.png "raster")
 >b. In the pop up window, make sure the input layer is just .gpkg file
-![window](https://github.com/srikarreddy1729/pipeline-for-geospatial/blob/main/images/2.b.png "select")
+![window](https://github.com/realtechsupport/cocktail/blob/main/sandbox/images/2.b.png "select")
 >c. In the "field to "use for a burn-in value" select the option - class
 >d. select the output rasterize units to pixels
 >e. change the width to (4618) and height to 4019. These the width and height of the input image. 
-![width and height](https://github.com/srikarreddy1729/pipeline-for-geospatial/blob/main/images/2.e.png "w&h")
+![width and height](https://github.com/realtechsupport/cocktail/blob/main/sandbox/images/2.e.png "w&h")
 >f. In the output extent, click on the down-arrow beside the map, click on calculate from layer, and select the input 8-band file. 
 >g. In the "rasterized", select save to a temporary file. Make sure the "open the file after running the algorithm" is checked
 >h. hit run. A file name rasterized should open in qgis. Click on the properties and click on its path to see where it is stored. It gets stored in some oscure location. Save it whereever you feel is accessible. 
@@ -38,8 +38,8 @@ In future, one could automate this mask creation process for a batch of images u
 ## 3. 
 We have now succesfully created the mask file which of same dimension as that of input file. The pixels in this file have the information as to which class the corresponding pixels in the input file belongs to. You can see that min value of the pixel is 1, max is 22, and no-data(background) value is 0. So, we bascially have 23 classes (22 labelled classes and 1 background dummy class) which correspond to our input file. 
 
-![rasterized](https://github.com/srikarreddy1729/pipeline-for-geospatial/blob/main/images/3.a.png "rasterized")
-![properties](https://github.com/srikarreddy1729/pipeline-for-geospatial/blob/main/images/3.b.png "info")
+![rasterized](https://github.com/realtechsupport/cocktail/blob/main/sandbox/images/3.a.png "rasterized")
+![properties](https://github.com/realtechsupport/cocktail/blob/main/sandbox/images/3.b.png "info")
 
 ## 4. 
 It's time to check programmatically if we generated a mask file that is of proper dimensions and contain the desired values or not. Rasterio is a python geospatial library which does the job. (Rasterio was primarily built because people wanted a geo-spatial library that is truly pythonic and intuitive. I ♡ Rasterio. Its documentation is very good. We are gonna use Rasterio for pretty much everything. We are using it for creating patches, converting tif files to numpy arrays, and repackaging numpy arrays to tif, and imaging tif files, etc.)

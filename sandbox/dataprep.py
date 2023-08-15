@@ -14,6 +14,8 @@ import random
 import rasterio 
 from rasterio.windows import Window
 from tensorflow.keras.utils import to_categorical
+import shutil
+from pathlib import Path
 
 
 #-----------------------------------5a-----------------------------------------------------
@@ -131,6 +133,36 @@ def reshape_images(normalized_images, p_size1, p_size2, num_bands):
 
     print('5e. Reshaping normalized images completed!')
     return reshaped_images 
+
+def sampling(patch_path,output_folder):
+       # Iterate through the TIFF files in the folder
+    
+    for filename in os.listdir(patch_path):
+        if filename.endswith(".tif"):
+            file_path = os.path.join(patch_path, filename)
+
+            # Open the TIFF file
+            with rasterio.open(file_path) as src:
+                # Read all bands of the TIFF file as a NumPy array
+                array = src.read()
+
+                val, counts = np.unique(array, return_counts=True)
+    
+                if (1 - (counts[0]/counts.sum())) > 0.05:  #At least 5% useful area with labels that are not 0
+                    Path(output_folder).mkdir(parents=True, exist_ok=True)
+                    # Construct the output image file path
+                    output_image_path = Path(output_folder) / Path(file_path).name
+    
+                    # Copy the input image to the output folder
+                    shutil.copyfile(file_path, output_image_path)
+
+                    print(f"Image copied to: {output_image_path}")
+                else:
+                    print("Condition not met: Image not copied.")
+
+
+
+    
 
 #-----------------------------------Main---------------------------------------------------
 # def main():

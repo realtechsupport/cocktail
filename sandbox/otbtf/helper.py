@@ -5,6 +5,7 @@
 import numpy as np
 from osgeo import gdal
 #---------------------------------------------------------------------
+print("This has been succesfully run")
 
 def scale_and_normalize(datapath, input, output, scale_min, scale_max):
     input_dataset = gdal.Open(datapath + input)

@@ -1,10 +1,11 @@
 import otbApplication
 
+print("hello")
 # Create the OTBTF application
 app = otbApplication.Registry.CreateApplication("TensorflowModelServe")
 
 # Set the input parameters
-app.SetParameterString("source1.il", "Sentinel-2_B4328_10m.tif")
+app.SetParameterString("source1", "/root/cocktail/data/collection/area2_square_0709_2022_sentinel2/T50LKR_20220709T022601_B02.tif")
 app.SetParameterInt("source1.rfieldx", 16)
 app.SetParameterInt("source1.rfieldy", 16)
 app.SetParameterString("source1.placeholder", "x")

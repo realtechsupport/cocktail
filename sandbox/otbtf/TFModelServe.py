@@ -1,6 +1,7 @@
 import otbApplication
 
 print("hello")
+print("inside docker")
 # Create the OTBTF application
 app = otbApplication.Registry.CreateApplication("TensorflowModelServe")
 

@@ -3,10 +3,12 @@ from otbtf import TFRecords
 import tensorflow as tf
 from otbtf import ModelBase
 
+print("working")
+
 dataset = DatasetFromPatchesImages(
     filenames_dict={
         "input_xs_patches": ['/home/otbuser/all/data/area2_0530_2022_8bands_patches_A.tif'],
-        "labels_patches": ['/home/otbuser/all/data/area2_0530_2022_8bands_labels_A.tif']   #write the actual file name
+        "labels_patches": "D:\OneDrive - University at Buffalo\Projects\GeoAI\cocktail\data\new_data\area2_0530_2022_8bands.tif"']   #write the actual file name
     }
 )
 

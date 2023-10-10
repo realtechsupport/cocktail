@@ -4,6 +4,7 @@ import tensorflow as tf
 import os
 from otbtf.model import ModelBase
 from otbtf import DatasetFromPatchesImages, TFRecords
+from tensorflow.keras.utils import plot_model
 
 #---Model-------------------------------------------------------------------------------
 """
@@ -104,6 +105,7 @@ class FCNNModel(ModelBase):
         gap = tf.expand_dims(gap, axis=1)
         gap = tf.expand_dims(gap, axis=1)
 
+
         # Generally it is a good thing to name the final layers of the network
         # (i.e. the layers of which outputs are returned from
         # `MyModel.get_output()`). Indeed this enables to retrieve them for
@@ -189,6 +191,11 @@ def train(model_dir, batch_size, learning_rate, nb_epochs, ds_train, ds_valid, d
         # Summarize the model (in CLI)
         model.summary()
 
+        # tf.keras.utils.plot_model(
+        #     model,
+        #     show_shapes=True,
+        #     to_file='model.png')
+
         # Train
         model.fit(ds_train, epochs=nb_epochs, validation_data=ds_valid)
 
@@ -198,6 +205,25 @@ def train(model_dir, batch_size, learning_rate, nb_epochs, ds_train, ds_valid, d
 
         # Save trained model as SavedModel
         model.save(model_dir)
+
+
+# since we don't have testing file, or idk yet about how to measure this, let's try to visulaize what each
+# convolution layer is trying to visualize, it may provide us with great insight or not, worth a try.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

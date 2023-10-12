@@ -43,7 +43,7 @@ input = 'area2_0530_2022_8bands.tif'
 normalized_input = 'area2_0530_2022_8bands_norm.tif'
 scale_min = 0
 scale_max = 65535
-print(input.shape, normalized_input.shape)
+# print(input.shape, normalized_input.shape)
 
 scale_and_normalize(datapath, input, normalized_input, scale_min, scale_max)
 print("\nImage normalized")

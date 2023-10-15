@@ -38,5 +38,6 @@
 
    For training the model:
       - python3 training.py
-   For Predicting
+
+   For prediction:
       - python3 prediction.py

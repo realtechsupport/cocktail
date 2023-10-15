@@ -128,6 +128,7 @@ cbar.set_label('Classes')
 
 # Show the plot
 plt.title('Segmentation Mask')
+plt.savefig('/home/otbuser/all/data/'+'Segmentation-Mask-prediction.png')
 plt.show()
 
 

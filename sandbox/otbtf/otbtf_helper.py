@@ -54,14 +54,26 @@ def SampleSelection(apptype, datapath, input, vec, instats, output):
 def PatchesExtraction(apptype, datapath, input, vec, out_patches, out_labels, patchsize):
 	app = otbApplication.Registry.CreateApplication(apptype)
 	app.SetParameterStringList("source1.il", [datapath + input])
-	app.SetParameterString("source1.out", datapath + out_patches) 
+	app.SetParameterString("source1.out", datapath + out_labels) 
 	app.SetParameterInt("source1.patchsizex", patchsize)
 	app.SetParameterInt("source1.patchsizey", patchsize)
 	app.SetParameterString("vec", datapath + vec)
 	app.SetParameterString("field", "class")
-	app.SetParameterString("outlabels", datapath + out_labels)
+	# app.SetParameterString("outlabels", datapath + out_labels)
 	app.ExecuteAndWriteOutput()
 	
+
+
+# def PatchesExtraction(apptype, datapath, input, vec, out_patches, out_labels, patchsize):
+# 	app = otbApplication.Registry.CreateApplication(apptype)
+# 	app.SetParameterStringList("source1.il", [datapath + input]) 
+# 	app.SetParameterString("source1.out", datapath + out_labels) # -source1.out samp_labels.tif
+# 	app.SetParameterInt("source1.patchsizex", patchsize)
+# 	app.SetParameterInt("source1.patchsizey", patchsize)
+# 	app.SetParameterString("vec", datapath + vec)
+# 	app.SetParameterString("field", "class")
+# 	app.SetParameterString("outpatches", datapath + out_patches) # -outpatches samp_patches.tif
+# 	app.ExecuteAndWriteOutput()    
 #----------------------------------------------------------------------------
 class Model2(tf.keras.Model):
     def __init__(self, nclasses):
@@ -83,31 +95,4 @@ class Model2(tf.keras.Model):
         x = self.pool2(x)
         x = self.conv3(x)
         features = self.flatten(x)
-        estimated = self.estimated(features)
-        estimated2 = self.estimated2(estimated)
-        estimated_label = tf.argmax(estimated2, axis=1, name="prediction")
-        return (estimated2, estimated_label)
-
-#----------------------------------------------------------------------------------
-'''
-# Train the deep learning model
-otbcli_TensorflowModelTrain \
--training.source1.il Sentinel-2_B4328_10m_patches_A.tif \
--training.source1.patchsizex 16 \
--training.source1.patchsizey 16 \
--training.source1.placeholder "x" \
--training.source2.il Sentinel-2_B4328_10m_labels_A.tif \
--training.source2.patchsizex 1 \
--training.source2.patchsizey 1 \
--training.source2.placeholder "y" \
--model.dir model1 \
--training.targetnodes "optimizer" \
--validation.mode "class" \
--validation.source1.il Sentinel-2_B4328_10m_patches_B.tif \
--validation.source1.name "x" \
--validation.source2.il Sentinel-2_B4328_10m_labels_B.tif \
--validation.source2.name "prediction" \
--model.saveto model1/variables/variables
-
-'''
-#----------------------------------------------------------------------------
+        est

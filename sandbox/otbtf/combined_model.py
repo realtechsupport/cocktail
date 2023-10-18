@@ -53,7 +53,7 @@ scale_max = 65535
 scale_and_normalize(datapath, input, normalized_input, scale_min, scale_max)
 print("\nImage normalized")
 # ------------------------------------------------------------------------------
-# input = normalized_input                # use the normalized input !! 
+input = normalized_input                # use the normalized input !! 
 
 out_patches_A = input.split('.')[0] + "_patches_A.tif"
 out_labels_A = input.split('.')[0] + "_labels_A.tif"
@@ -62,6 +62,7 @@ out_patches_B = input.split('.')[0] + "_patches_B.tif"
 out_labels_B = input.split('.')[0] + "_labels_B.tif"
 
 #--------------------------------------------------------------------------------
+# input = normalized_input
 apptype = "PolygonClassStatistics"
 vec = "area2_0123_2023_raster_classification_13.shp"
 output = "area2_0123_2023_raster_classification_13_vecstats.xml"
@@ -86,7 +87,7 @@ out_patches_B = input.split('.')[0] + "_patches_B.tif"
 out_labels_B = input.split('.')[0] + "_labels_B.tif"
 #------------------------------------------------------------------------------
 apptype = "PatchesExtraction"
-patchsize = 8 		#16?
+patchsize = 22		#16?
 vec_A = output_A
 vec_B = output_B
 
@@ -112,7 +113,7 @@ print("\nPatches B created")
 # """
 
 # Number of classes estimated by the model
-N_CLASSES = 20
+N_CLASSES = 22
 
 # Name of the input in the `FCNNModel` instance, also name of the input node
 # in the SavedModel
@@ -202,7 +203,7 @@ class FCNNModel(ModelBase):
         gap = out_tconv4
         # Replace the transposed convolutions with global average pooling
         # gap = tf.keras.layers.GlobalAveragePooling2D(name="global_avg_pool")(out_tconv4)
-        # gap = tf.expand_dims(gap, axis=1)
+        gap = tf.expand_dims(gap, axis=1)
         # gap = tf.expand_dims(gap, axis=1)
 
         print("Batch size:", gap.shape[0])

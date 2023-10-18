@@ -54,11 +54,11 @@ def SampleSelection(apptype, datapath, input, vec, instats, output):
 def PatchesExtraction(apptype, datapath, input, vec, out_patches, out_labels, patchsize):
 	app = otbApplication.Registry.CreateApplication(apptype)
 	app.SetParameterStringList("source1.il", [datapath + input])
-	app.SetParameterString("source1.out", datapath + out_labels) 
 	app.SetParameterInt("source1.patchsizex", patchsize)
 	app.SetParameterInt("source1.patchsizey", patchsize)
 	app.SetParameterString("vec", datapath + vec)
 	app.SetParameterString("field", "class")
+	# app.SetParameterString("source1.out", datapath + out_patches) 
 	# app.SetParameterString("outlabels", datapath + out_labels)
 	app.ExecuteAndWriteOutput()
 	

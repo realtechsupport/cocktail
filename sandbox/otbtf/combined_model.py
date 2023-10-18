@@ -86,7 +86,7 @@ out_patches_B = input.split('.')[0] + "_patches_B.tif"
 out_labels_B = input.split('.')[0] + "_labels_B.tif"
 #------------------------------------------------------------------------------
 apptype = "PatchesExtraction"
-patchsize = 64 		#16?
+patchsize = 8 		#16?
 vec_A = output_A
 vec_B = output_B
 
@@ -199,11 +199,11 @@ class FCNNModel(ModelBase):
         out_tconv3 = _tconv(out_tconv2, 16, "tconv3") + out_conv1
         out_tconv5 = _tconv(out_tconv3, 8, "tconv5") + out_conv5
         out_tconv4 = _tconv(out_tconv5, N_CLASSES, "classifier", None)
-        # gap = out_tconv4
+        gap = out_tconv4
         # Replace the transposed convolutions with global average pooling
-        gap = tf.keras.layers.GlobalAveragePooling2D(name="global_avg_pool")(out_tconv4)
-        gap = tf.expand_dims(gap, axis=1)
-        gap = tf.expand_dims(gap, axis=1)
+        # gap = tf.keras.layers.GlobalAveragePooling2D(name="global_avg_pool")(out_tconv4)
+        # gap = tf.expand_dims(gap, axis=1)
+        # gap = tf.expand_dims(gap, axis=1)
 
         print("Batch size:", gap.shape[0])
         print("Height:", gap.shape[1])

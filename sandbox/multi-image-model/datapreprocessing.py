@@ -96,7 +96,7 @@ def target_preprocessing(folder_path, patch_size):
     useful_masks_onehot = to_categorical(useful_masks_array)
 
 
-    return useful_masks, useful_masks_onehot, indexes
+    return useful_masks, useful_masks_onehot, indexes, new_mask
 
 def newclipping(datapath,roipath,ps, roishape):
   rasterfile = gdal.Open(datapath + ps)
@@ -128,7 +128,7 @@ def newclipping(datapath,roipath,ps, roishape):
 
   return roipath + rasterfile_new
 
-def preprocessing(filelocation,patch_size):
+def preprocessing(filelocation,patch_size, target = None):
     # Load the GeoTIFF file
     with rasterio.open(filelocation) as src:
         # Read the TIFF data
@@ -137,6 +137,11 @@ def preprocessing(filelocation,patch_size):
 
         # Get the shape of the TIFF data
         num_bands, height, width = tiff_data.shape
+
+        if target: 
+            target_array = target[3]
+            if height < target_array.shape[0] or width < target_array.shape[1]:
+               return False
 
         print("Original image dimensions:", num_bands, height, width)
         unique_elements, counts_elements = np.unique(tiff_data, return_counts=True)
@@ -159,8 +164,12 @@ def preprocessing(filelocation,patch_size):
             normalized_image[band, :, :] = normalized_band
 
         # Calculate the new width and height that are multiples of the patch size
-        new_width = int(np.floor(width / patch_size)) * patch_size
-        new_height = int(np.floor(height / patch_size)) * patch_size
+        if target: 
+            new_height = target_array.shape[0]
+            new_width = target_array.shape[1]
+        else:
+            new_width = int(np.floor(width / patch_size)) * patch_size
+            new_height = int(np.floor(height / patch_size)) * patch_size
 
         print("cropped dimensions:", new_height, new_width)
 
@@ -209,8 +218,11 @@ def process_images_in_folder(datapath, patch_size, roipath,target, roishape = 'a
         clipped_image_path = newclipping(datapath,roipath,ps, roishape)
 
         # Preprocess(normalize,resize,create patches) the clipped image
-        patches, CA = preprocessing(clipped_image_path, patch_size)
-        print(len(patches))
+        if preprocessing(clipped_image_path, patch_size): 
+            patches, CA = preprocessing(clipped_image_path, patch_size)
+            print(len(patches))
+        else: 
+            continue 
 
         # Sample patches from the processed image patches and create corresponding target patches
         #print(target[2])

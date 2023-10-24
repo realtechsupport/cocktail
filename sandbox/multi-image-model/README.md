@@ -27,6 +27,7 @@
   - `prediction.py`
   - `model.py`
   - `datapreprocessing.py`
+  - `downloadImages.py`
 
 ## Running the Code
 

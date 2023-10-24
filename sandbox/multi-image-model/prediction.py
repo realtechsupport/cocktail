@@ -5,6 +5,8 @@ import rasterio
 import matplotlib.pyplot as plt
 from matplotlib.colors import ListedColormap
 from datapreprocessing import *
+import sys, os
+from google.cloud import storage
 
 
 def predict_segmentation(patches):

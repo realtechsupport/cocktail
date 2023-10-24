@@ -33,7 +33,7 @@ target = target_preprocessing(new_roi_file, patch_size)
 dataset = process_images_in_folder(datapath, patch_size, roipath, target)
 
 # training
-img_size = (256, 256)
+img_size = (patch_size, patch_size)
 num_classes = 21
 model = get_model(img_size=img_size, num_classes=num_classes)
 print(model.summary())

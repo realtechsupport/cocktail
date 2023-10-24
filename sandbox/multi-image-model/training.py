@@ -3,8 +3,16 @@ from model import *
 import numpy as np
 import random
 import matplotlib.pyplot as plt
+import sys, os
+from google.cloud import storage
+from downloadImages import *
 
+# download the images to local folder
+bucket_name = 'gislogics-bucket'
+source_folder = 'area2_planetlabs_superdove/'
+destination_folder = '/home/otbuser/all/data/images/'
 
+download_files_from_gcs(bucket_name, source_folder, destination_folder)
 
 # perform the clipping on one image
 datapath1 = '/home/otbuser/all/data/'
@@ -14,6 +22,7 @@ roipath = '/home/otbuser/all/data/roi_folder/'
 roishape = 'area2_square.geojson'
 clipping(datapath1, ps, roipath, roishape)
 datapath = '/home/otbuser/all/data/images/'
+
 
 # get the preprocessed target
 new_roi_file = '/home/otbuser/all/data/roi_folder/crop_mask_roi.tif'

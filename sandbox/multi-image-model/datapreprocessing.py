@@ -8,7 +8,7 @@ import tensorflow as tf
 from keras.utils import to_categorical
 
 # Hardcode value
-patch_size = 256
+# patch_size = 256
 
 def clipping(datapath, ps, roipath, roishape):
     rasterfile = gdal.Open(datapath + ps)

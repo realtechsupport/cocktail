@@ -48,7 +48,7 @@ scale_max = 65535
 scale_and_normalize(datapath, input, normalized_input, scale_min, scale_max)
 print("\nImage normalized")
 # ------------------------------------------------------------------------------
-# input = normalized_input                # use the normalized input !! 
+input = normalized_input                # use the normalized input !! 
 
 out_patches_A = input.split('.')[0] + "_patches_A.tif"
 out_labels_A = input.split('.')[0] + "_labels_A.tif"

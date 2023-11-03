@@ -51,29 +51,35 @@ def SampleSelection(apptype, datapath, input, vec, instats, output):
 	app.ExecuteAndWriteOutput()
 
 #------------------------------------------------------------------------------
+
 def PatchesExtraction(apptype, datapath, input, vec, out_patches, out_labels, patchsize):
+	os.environ["OTB_TF_NSOURCES"] = "2"
 	app = otbApplication.Registry.CreateApplication(apptype)
 	app.SetParameterStringList("source1.il", [datapath + input])
 	app.SetParameterInt("source1.patchsizex", patchsize)
 	app.SetParameterInt("source1.patchsizey", patchsize)
+	# app.SetParameterInt("source1.nodata", 0)
+	# app.SetParameterStringList("source2.il", [datapath + input])
+	# app.SetParameterInt("source2.patchsizex", patchsize)
+	# app.SetParameterInt("source2.patchsizey", patchsize)
+	# app.SetParameterInt("source2.nodata", 0)
+	app.SetParameterStringList("source2.il", [datapath + input])
+	app.SetParameterInt("source2.patchsizex", patchsize)
+	app.SetParameterInt("source2.patchsizey", patchsize)
+	# app.placeholder
+	# app.SetParameterInt("source3.patchsizez", 1)
+	# app.SetParameterInt("source2.nodata", 0)
+	# app.SetParameterString("source1.out", datapath + "discard" + out_patches)
+	app.SetParameterString("source1.out", datapath + out_patches)
+	app.SetParameterString("source2.out", datapath + out_labels)
+	# app.SetParameterString("source2.out", "uint8")
+	# app.SetParameterString("outlabels", datapath + out_labels)	# if making it source2.out then it's creating (patchsize x patchsize x 8)
+	# app.SetParameter
+
 	app.SetParameterString("vec", datapath + vec)
 	app.SetParameterString("field", "class")
-	app.SetParameterString("source1.out", datapath + out_patches) 
-	app.SetParameterString("outlabels", datapath + out_labels)
 	app.ExecuteAndWriteOutput()
-	
 
-
-# def PatchesExtraction(apptype, datapath, input, vec, out_patches, out_labels, patchsize):
-# 	app = otbApplication.Registry.CreateApplication(apptype)
-# 	app.SetParameterStringList("source1.il", [datapath + input]) 
-# 	app.SetParameterString("source1.out", datapath + out_labels) # -source1.out samp_labels.tif
-# 	app.SetParameterInt("source1.patchsizex", patchsize)
-# 	app.SetParameterInt("source1.patchsizey", patchsize)
-# 	app.SetParameterString("vec", datapath + vec)
-# 	app.SetParameterString("field", "class")
-# 	app.SetParameterString("outpatches", datapath + out_patches) # -outpatches samp_patches.tif
-# 	app.ExecuteAndWriteOutput()    
 #----------------------------------------------------------------------------
 class Model2(tf.keras.Model):
     def __init__(self, nclasses):

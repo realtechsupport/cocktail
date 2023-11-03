@@ -45,6 +45,7 @@ print("datapath: ", datapath)
 # ------------------------------------------------------------------------------
 # Ensure that the input image is normalized before proceeding with the next steps
 input = 'area2_0530_2022_8bands.tif'
+# input = 'crop_mask.tif'
 normalized_input = 'area2_0530_2022_8bands_norm.tif'
 scale_min = 0
 scale_max = 65535
@@ -62,7 +63,7 @@ out_patches_B = input.split('.')[0] + "_patches_B.tif"
 out_labels_B = input.split('.')[0] + "_labels_B.tif"
 
 #--------------------------------------------------------------------------------
-# input = normalized_input
+input = normalized_input
 apptype = "PolygonClassStatistics"
 vec = "area2_0123_2023_raster_classification_13.shp"
 output = "area2_0123_2023_raster_classification_13_vecstats.xml"
@@ -87,7 +88,7 @@ out_patches_B = input.split('.')[0] + "_patches_B.tif"
 out_labels_B = input.split('.')[0] + "_labels_B.tif"
 #------------------------------------------------------------------------------
 apptype = "PatchesExtraction"
-patchsize = 22		#16?
+patchsize = 16		#16?
 vec_A = output_A
 vec_B = output_B
 
@@ -113,7 +114,7 @@ print("\nPatches B created")
 # """
 
 # Number of classes estimated by the model
-N_CLASSES = 22
+N_CLASSES = 2
 
 # Name of the input in the `FCNNModel` instance, also name of the input node
 # in the SavedModel
@@ -172,7 +173,7 @@ class FCNNModel(ModelBase):
         def _conv(inp, depth, name):
             conv_op = tf.keras.layers.Conv2D(
                 filters=depth,
-                kernel_size=3,
+                kernel_size=[3,3],# made kernel size [3,3] instead of 3
                 strides=2,
                 activation="relu",
                 padding="same",
@@ -183,29 +184,50 @@ class FCNNModel(ModelBase):
         def _tconv(inp, depth, name, activation="relu"):
             tconv_op = tf.keras.layers.Conv2DTranspose(
                 filters=depth,
-                kernel_size=3,
+                kernel_size= [3,3],
                 strides=2,
                 activation=activation,
                 padding="same",
                 name=name
             )
             return tconv_op(inp)
-        out_conv5 = _conv(norm_inp, 8, "conv5")
-        out_conv1 = _conv(out_conv5, 16, "conv1")
+
+
+
+        out_conv1 = _conv(norm_inp, 16, "conv1")
         out_conv2 = _conv(out_conv1, 32, "conv2")
         out_conv3 = _conv(out_conv2, 64, "conv3")
         out_conv4 = _conv(out_conv3, 64, "conv4")
         out_tconv1 = _tconv(out_conv4, 64, "tconv1") + out_conv3
         out_tconv2 = _tconv(out_tconv1, 32, "tconv2") + out_conv2
         out_tconv3 = _tconv(out_tconv2, 16, "tconv3") + out_conv1
-        out_tconv5 = _tconv(out_tconv3, 8, "tconv5") + out_conv5
-        out_tconv4 = _tconv(out_tconv5, N_CLASSES, "classifier", None)
+        out_tconv4 = _tconv(out_tconv3, N_CLASSES, "classifier", None)
+        ## ---------------------------------------------------------------------------------------
+        # print("Shape of norm_inp", norm_inp.shape)
+        # out_conv5 = _conv(norm_inp, 8, "conv5")
+        # # tf.print(out_conv5.shape, output_stream=sys.stderr)
+        # out_conv1 = _conv(out_conv5, 16, "conv1")
+        # # tf.print(out_conv1.shape, output_stream=sys.stderr)
+        # out_conv2 = _conv(out_conv1, 32, "conv2")
+        # # tf.print(out_conv2.shape, output_stream=sys.stderr)
+        # out_conv3 = _conv(out_conv2, 64, "conv3")
+        # # tf.print(out_conv3.shape, output_stream=sys.stderr)
+        # out_conv4 = _conv(out_conv3, 64, "conv4")
+        # # tf.print(out_conv4.shape, output_stream=sys.stderr)
+        # out_tconv1 = _tconv(out_conv3, 64, "tconv1") + out_conv3
+        # # tf.print(out_tconv1.shape, output_stream=sys.stderr)
+        # out_tconv2 = _tconv(out_tconv1, 32, "tconv2") + out_conv2
+        # # tf.print(out_tconv2.shape, output_stream=sys.stderr)
+        # out_tconv3 = _tconv(out_tconv2, 16, "tconv3") + out_conv1
+        # # tf.print(out_tconv3.shape, output_stream=sys.stderr)
+        # out_tconv5 = _tconv(out_tconv3, 8, "tconv5") + out_conv5
+        # # tf.print(out_tconv5.shape, output_stream=sys.stderr)
+        # out_tconv4 = _tconv(out_tconv5, N_CLASSES, "classifier", None)
+        # tf.print(out_tconv4.shape, output_stream=sys.stderr)
+        ## -------------------------------------------------------------------------------------------------
         gap = out_tconv4
-        # Replace the transposed convolutions with global average pooling
-        # gap = tf.keras.layers.GlobalAveragePooling2D(name="global_avg_pool")(out_tconv4)
-        gap = tf.expand_dims(gap, axis=1)
-        # gap = tf.expand_dims(gap, axis=1)
-
+        # gap = tf.keras.layers.Flatten(gap)
+        # gap = tf.expand_dims(gap, axis=-1)
         print("Batch size:", gap.shape[0])
         print("Height:", gap.shape[1])
         print("Width:", gap.shape[2])
@@ -231,14 +253,15 @@ class FCNNModel(ModelBase):
         #    fit the targets to model outputs during training process, but it
         #    can also be used to access the tensors as tf/keras objects, for
         #    instance to display previews images in TensorBoard.
+
         softmax_op = tf.keras.layers.Softmax(name=OUTPUT_SOFTMAX_NAME)
         predictions = softmax_op(gap)
         
         # *****************************************************************************
-        # i'm changing it to tf.argmax rather than np.argmax, because it was giving error
-        predictions = tf.argmax(predictions)
+        # changing it to tf.argmax rather than np.argmax, because it was giving error
+        # predictions = tf.argmax(predictions)
+        predictions = tf.expand_dims(predictions, axis=-2)
         # *****************************************************************************
-        # print(predictions.shape)
 
         return {TARGET_NAME: predictions}
 
@@ -261,14 +284,14 @@ def dataset_preprocessing_fn(examples: dict):
         preprocessed examples
 
     """
-
+    # expanding the last dimension beacuse it wants the last dimension as 1.
     return {
         INPUT_NAME: examples["input_xs_patches"],
         TARGET_NAME: tf.one_hot(
-            tf.squeeze(tf.cast(examples["labels_patches"], tf.int32), axis=-1),
+            # tf.squeeze(tf.cast(examples["labels_patches"], tf.int32), axis=-1),
+            tf.squeeze(tf.cast(tf.expand_dims(examples["labels_patches"], axis = -1), tf.int32), axis=-1),
             depth=N_CLASSES
-        )
-    }
+        )}
 
 
 def train(model_dir, batch_size, learning_rate, nb_epochs, ds_train, ds_valid, ds_test):
@@ -318,153 +341,6 @@ def train(model_dir, batch_size, learning_rate, nb_epochs, ds_train, ds_valid, d
         model.save(model_dir)
 
 
-
-
-# ________________________________________________________________________________________
-# ****************************************************************************************
-# ****************************************************************************************
-# ________________________________________________________________________________________
-
-# Let's try to copy otbtf code and change it so it would run maybe.
-# from this line onwards everything has been copied from remicres
-
-# class Dataset:
-#     """
-#     Handles the "mining" of patches.
-#     This class has a thread that extract tuples from the readers, while
-#     ensuring the access of already gathered tuples.
-
-#     See `PatchesReaderBase` and `Buffer`
-
-#     """
-
-#     def __init__(
-#             self,
-#             patches_reader: PatchesReaderBase = None,
-#             buffer_length: int = 128,
-#             iterator_cls: Type[IteratorBase] = RandomIterator,
-#             max_nb_of_samples: int = None
-#     ):
-#         """
-#         Params:
-#             patches_reader: The patches reader instance
-#             buffer_length: The number of samples that are stored in the
-#                 buffer
-#             iterator_cls: The iterator class used to generate the sequence of
-#                 patches indices.
-#             max_nb_of_samples: Optional, max number of samples to consider
-
-#         """
-#         # patches reader
-#         self.patches_reader = patches_reader
-
-#         # If necessary, limit the nb of samples
-#         logging.info('Number of samples: %s', self.patches_reader.get_size())
-#         if max_nb_of_samples and \
-#                 self.patches_reader.get_size() > max_nb_of_samples:
-#             logging.info('Reducing number of samples to %s', max_nb_of_samples)
-#             self.size = max_nb_of_samples
-#         else:
-#             self.size = self.patches_reader.get_size()
-
-#         # iterator
-#         self.iterator = iterator_cls(patches_reader=self.patches_reader)
-
-#         # Get patches sizes and type, of the first sample of the first tile
-#         self.output_types = {}
-#         self.output_shapes = {}
-#         one_sample = self.patches_reader.get_sample(index=0)
-#         for src_key, np_arr in one_sample.items():
-#             self.output_shapes[src_key] = np_arr.shape
-#             self.output_types[src_key] = tf.dtypes.as_dtype(np_arr.dtype)
-
-#         logging.info("output_types: %s", self.output_types)
-#         logging.info("output_shapes: %s", self.output_shapes)
-
-#         # buffers
-#         if self.size <= buffer_length:
-#             buffer_length = self.size
-#         self.miner_buffer = Buffer(buffer_length)
-#         self.mining_lock = multiprocessing.Lock()
-#         self.consumer_buffer = Buffer(buffer_length)
-#         self.consumer_buffer_pos = 0
-#         self.tot_wait = 0
-#         self.miner_thread = self._summon_miner_thread()
-#         self.read_lock = multiprocessing.Lock()
-#         self._dump()
-
-#         # Prepare tf dataset for one epoch
-#         self.tf_dataset = tf.data.Dataset.from_generator(
-#             self._generator,
-#             output_types=self.output_types,
-#             output_shapes=self.output_shapes
-#         ).repeat(1)
-
-#     def to_tfrecords(
-#             self,
-#             output_dir: str,
-#             n_samples_per_shard: int = 100,
-#             drop_remainder: bool = True
-#     ):
-#         """
-#         Save the dataset into TFRecord files
-
-#         Params:
-#             output_dir: output directory
-#             n_samples_per_shard: number of samples per TFRecord file
-#             drop_remainder: drop remaining samples
-
-#         """
-#         tfrecord = otbtf.tfrecords.TFRecords(output_dir)
-#         tfrecord.ds2tfrecord(
-#             self,
-#             n_samples_per_shard=n_samples_per_shard,
-#             drop_remainder=drop_remainder
-#         )
-
-# class TFRecords:
-#     """
-#     This class allows to convert Dataset objects to TFRecords and to load them
-#     in dataset tensorflow format.
-#     """
-
-#     def __init__(self, path: str):
-#         """
-#         Params:
-#             path: Can be a directory where TFRecords must be saved/loaded
-#         """
-#         self.dirpath = path
-#         os.makedirs(self.dirpath, exist_ok=True)
-#         self.output_types_file = os.path.join(
-#             self.dirpath, "output_types.json"
-#         )
-#         self.output_shapes_file = os.path.join(
-#             self.dirpath, "output_shapes.json"
-#         )
-#         self.output_shapes = self.load(self.output_shapes_file) \
-#             if os.path.exists(self.output_shapes_file) else None
-#         self.output_types = self.load(self.output_types_file) \
-#             if os.path.exists(self.output_types_file) else None
-
-#     @staticmethod
-#     def _bytes_feature(value):
-#         """
-#         Convert a value to a type compatible with tf.train.Example.
-
-#         Params:
-#             value: value
-
-#         Returns:
-#             a bytes_list from a string / byte.
-#         """
-#         if isinstance(value, type(tf.constant(0))):
-#             value = value.numpy()  # BytesList won't unpack a string from
-#             # an EagerTensor.
-#         return tf.train.Feature(bytes_list=tf.train.BytesList(value=[value]))
-
-
-
-
 #---Create TFRecords--------------------------------------------------------------------
 
 def create_tfrecords(patches, labels, outdir):
@@ -474,18 +350,6 @@ def create_tfrecords(patches, labels, outdir):
     outdir = Path(outdir)
     if not outdir.exists():
         outdir.mkdir(exist_ok=True)
-
-    # print(patches[0].type)
-    # # we are sending the string, it is sorting and doing everything in the backend
-
-    # # Convert patches and labels to NumPy arrays or byte strings
-    # patches = [p.numpy() if isinstance(p, tf.Tensor) else p for p in patches]
-    # labels = [l.numpy() if isinstance(l, tf.Tensor) else l for l in labels]
-
-
-    # Create placeholders for patches and labels
-    # patches_placeholder = tf.placeholder(tf.float32, shape=(None,))  # Modify the data type as needed
-    # labels_placeholder = tf.placeholder(tf.float32, shape=(None,))   # Modify the data type as needed
 
     #create a dataset
     dataset = DatasetFromPatchesImages(
@@ -497,26 +361,12 @@ def create_tfrecords(patches, labels, outdir):
 
     is_eager_execution = tf.executing_eagerly()
     print('Is eager execution:', is_eager_execution)
-
-    # with tf.compat.v1.enable_eager_execution() as sess:
-    #     # Initialize variables if needed
-    #     sess.run(tf.global_variables_initializer())
-
-        # Feed the data into the placeholders
-        # feed_dict = {
-        #     patches_placeholder: np.array(patches),  # Convert patches to NumPy array
-        #     labels_placeholder: np.array(labels)    # Convert labels to NumPy array
-        # }
-
-        # Convert dataset into TFRecords
-        # dataset.to_tfrecords(output_dir=outdir, drop_remainder=False)
-    # #convert dataset into TFRecords
     dataset.to_tfrecords(output_dir=outdir, drop_remainder=False)
 
 #----Main------------------------------------------------------------
 if __name__=="__main__":
     datapath = "/home/otbuser/all/data/"
-    batch_size = 8
+    batch_size = 5
     learning_rate = 0.0001
     nb_epochs = 5
 
@@ -524,12 +374,44 @@ if __name__=="__main__":
     tf.compat.v1.enable_eager_execution()
     patches = ['/home/otbuser/all/data/area2_0530_2022_8bands_patches_A.tif', '/home/otbuser/all/data/area2_0530_2022_8bands_patches_B.tif']
     labels = ['/home/otbuser/all/data/area2_0530_2022_8bands_labels_A.tif', '/home/otbuser/all/data/area2_0530_2022_8bands_labels_B.tif']
+    # patches = ['/home/otbuser/all/data/output/train_p_patches.tif', '/home/otbuser/all/data/output/valid_p_patches.tif']
+    # labels = ['/home/otbuser/all/data/output/train_labels_patches.tif', '/home/otbuser/all/data/output/valid_labels_patches.tif']
+
+    ## ------------------------------------------------------------------------------------------------------------------------------------
+    # patches = ['/home/otbuser/all/data/output/train_p_patches.tif', '/home/otbuser/all/data/output/valid_p_patches.tif']
+    # labels = ['/home/otbuser/all/data/output/train_labels_patches.tif', '/home/otbuser/all/data/output/valid_labels_patches.tif']
+    # output_shapes: {'input_xs_patches': (64, 64, 1), 'labels_patches': (64, 64, 1)}
+    # Dimensions must be equal, but are 8 and 4 for '{{node FCNNModel/tf.__operators__.add/AddV2}} = AddV2[T=DT_FLOAT](FCNNModel/tconv1/Relu, FCNNModel/conv3/Relu)' with input shapes: [5,8,8,64], [5,4,4,64].
+    #   • x=tf.Tensor(shape=(5, 8, 8, 64), dtype=float32)
+    #   • y=tf.Tensor(shape=(5, 4, 4, 64), dtype=float32)
+    #   • name=None
+    ## ------------------------------------------------------------------------------------------------------------------------------------
+    
+    ## ------------------------------------------------------------------------------------------------------------------------------------
+    # patches = ['/home/otbuser/all/data/output/train_xs_patches.tif', '/home/otbuser/all/data/output/valid_xs_patches.tif']
+    # labels = ['/home/otbuser/all/data/output/train_labels_patches.tif', '/home/otbuser/all/data/output/valid_labels_patches.tif']
+    # output_shapes: {'input_xs_patches': (16, 16, 4), 'labels_patches': (64, 64, 1)}
+    # Dimensions must be equal, but are 4 and 2 for '{{node FCNNModel/tf.__operators__.add_1/AddV2}} = AddV2[T=DT_FLOAT](FCNNModel/tconv2/Relu, FCNNModel/conv2/Relu)' with input shapes: [5,4,4,32], [5,2,2,32].
+    #   • x=tf.Tensor(shape=(5, 4, 4, 32), dtype=float32)
+    #   • y=tf.Tensor(shape=(5, 2, 2, 32), dtype=float32)
+    #   • name=None
+    ## ------------------------------------------------------------------------------------------------------------------------------------
+
+    ## ------------------------------------------------------------------------------------------------------------------------------------
+    # patches = ['/home/otbuser/all/data/output/train_xs_patches.tif', '/home/otbuser/all/data/output/valid_xs_patches.tif']
+    # labels = ['/home/otbuser/all/data/output/train_labels_patches.tif', '/home/otbuser/all/data/output/valid_labels_patches.tif']
+    # output_shapes: {'input_xs_patches': (16, 16, 4), 'labels_patches': (16, 16, 1)}
+    # Dimensions must be equal, but are 4 and 2 for '{{node FCNNModel/tf.__operators__.add_1/AddV2}} = AddV2[T=DT_FLOAT](FCNNModel/tconv2/Relu, FCNNModel/conv2/Relu)' with input shapes: [5,4,4,32], [5,2,2,32].
+    #   • x=tf.Tensor(shape=(5, 4, 4, 32), dtype=float32)
+    #   • y=tf.Tensor(shape=(5, 2, 2, 32), dtype=float32)
+    #   • name=None
+    ## ------------------------------------------------------------------------------------------------------------------------------------
+
     create_tfrecords(patches=patches[0:1], labels=labels[0:1], outdir=datapath+"train")
     create_tfrecords(patches=patches[1:], labels=labels[1:], outdir=datapath+"valid")
-    # tf.compat.v1.disable_eager_execution()
 
     # Train the model and save the model
-    train_dir = os.path.join(datapath, "train")
+    train_dir = os.path.join(datapath, "train") 
     valid_dir = os.path.join(datapath, "valid")
     test_dir = None # define the training directory if test dataset is available
     kwargs = {
@@ -541,8 +423,6 @@ if __name__=="__main__":
     ds_train = TFRecords(train_dir).read(**kwargs)
     ds_valid = TFRecords(valid_dir).read(**kwargs)
 
-    
-    # tf.compat.v1.enable_eager_execution()
     train(datapath+"sandbox_model", batch_size, learning_rate, nb_epochs, ds_train, ds_valid, ds_test=None)
     tf.compat.v1.disable_eager_execution()
 

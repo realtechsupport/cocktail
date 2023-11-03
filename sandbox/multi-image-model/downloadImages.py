@@ -23,8 +23,8 @@ def download_files_from_gcs(bucket_name, source_folder, destination_folder):
                 print(f"Skipped (already exists): {blob.name}")
 
 # Replace these with your specific details
-# bucket_name = 'gislogics-bucket'
-# source_folder = 'area2_planetlabs_superdove/'
-# destination_folder = '/home/otbuser/all/data/images/'
+bucket_name = 'gislogics-bucket'
+source_folder = 'area2_planetlabs_superdove/'
+destination_folder = '/home/otbuser/all/data/images/'
 
-# download_files_from_gcs(bucket_name, source_folder, destination_folder)
+download_files_from_gcs(bucket_name, source_folder, destination_folder)

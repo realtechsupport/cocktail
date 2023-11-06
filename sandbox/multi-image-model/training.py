@@ -17,7 +17,7 @@ download_files_from_gcs(bucket_name, source_folder, destination_folder)
 # perform the clipping on one image
 datapath1 = '/home/otbuser/all/data/'
 ps = 'crop_mask.tif'
-patch_size = 256
+patch_size = 16
 roipath = '/home/otbuser/all/data/roi_folder/'
 roishape = 'area2_square.geojson'
 clipping(datapath1, ps, roipath, roishape)
@@ -33,8 +33,8 @@ target = target_preprocessing(new_roi_file, patch_size)
 dataset = process_images_in_folder(datapath, patch_size, roipath, target)
 
 # training
-img_size = (256, 256)
-num_classes = 21
+img_size = (patch_size, patch_size)
+num_classes = 23
 model = get_model(img_size=img_size, num_classes=num_classes)
 print(model.summary())
 num_imgs = len(dataset[1])
@@ -50,7 +50,7 @@ random.Random(1337).shuffle(target_paths)
 
 
 input_imgs = np.zeros((num_imgs,) + img_size + (8,), dtype="float32")
-targets = np.zeros((num_imgs,) + img_size + (21,), dtype="uint8")
+targets = np.zeros((num_imgs,) + img_size + (23,), dtype="uint8")
 
 for i in range(num_imgs):
 

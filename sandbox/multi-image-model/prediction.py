@@ -45,12 +45,12 @@ def prediction_visual(segmentation_masks_arrays):
         18: (105, 200, 95),
         19: ( 105, 200, 95),
         20: (193, 255, 0),
-        #21: ( 255, 50, 185),
-        #22: (255, 255, 255),
+        21: ( 255, 50, 185),
+        22: (255, 255, 255),
     }
 
     # Create a colormap using the class-color mapping
-    colors = [class_colors[i] for i in range(1, 21)]
+    colors = [class_colors[i] for i in range(1, 23)]
     cmap = ListedColormap(colors)
 
     # Create a figure and axis for the plot
@@ -104,12 +104,12 @@ def predict_images_in_folder(datapath, patch_size, roipath,roishape = 'area2_squ
 
 datapath = '/home/otbuser/all/data/images/'
 roipath = '/home/otbuser/all/data/roi_folder/'
-patch_size = 256
+patch_size = 16
 model_path = '/home/otbuser/all/code/multi_image_model.hdf5'
 
 model = keras.models.load_model(model_path, compile=False)
 
-num_classes = 21  # Total number of classes including class 0
+num_classes = 23  # Total number of classes including class 0
 
 # Define the class weights (0 for class 0, equal weight for other classes)
 class_weights = np.ones(num_classes)

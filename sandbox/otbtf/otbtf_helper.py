@@ -50,6 +50,16 @@ def SampleSelection(apptype, datapath, input, vec, instats, output):
 	app.SetParameterString("out", datapath + output)
 	app.ExecuteAndWriteOutput()
 
+
+
+def LabelImageSampleSelection():
+	app = otbApplication.Registry.CreateApplication(LabelImageSampleSelection)
+	app.SetParameterString("in", datapath + input)
+	app.SetParameterString("instats", datapath + instats)
+	app.SetParameterString("vec", datapath + vec)
+	app.SetParameterString("field", "class")
+	app.SetParameterString("out", datapath + output)
+	app.ExecuteAndWriteOutput()
 #------------------------------------------------------------------------------
 
 def PatchesExtraction(apptype, datapath, input, vec, out_patches, out_labels, patchsize):

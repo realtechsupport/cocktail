@@ -37,6 +37,7 @@ for vec in [vec_train, vec_valid, vec_test]:
         "source2.patchsizex": 16,
         "source2.patchsizey": 16,
         "source2.nodata": 0,
+        # "outlabels" : "/home/otbuser/all/data/output/_labels_patches.tif",
         "source3.il": labels_img,
         "source3.patchsizex": 64,
         "source3.patchsizey": 64,

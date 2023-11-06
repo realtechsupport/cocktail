@@ -44,58 +44,58 @@ print("datapath: ", datapath)
 
 # ------------------------------------------------------------------------------
 # Ensure that the input image is normalized before proceeding with the next steps
-input = 'area2_0530_2022_8bands.tif'
-# input = 'crop_mask.tif'
-normalized_input = 'area2_0530_2022_8bands_norm.tif'
-scale_min = 0
-scale_max = 65535
-# print(input.shape, normalized_input.shape)
+# input = 'area2_0530_2022_8bands.tif'
+# # input = 'crop_mask.tif'
+# normalized_input = 'area2_0530_2022_8bands_norm.tif'
+# scale_min = 0
+# scale_max = 65535
+# # print(input.shape, normalized_input.shape)
 
-scale_and_normalize(datapath, input, normalized_input, scale_min, scale_max)
-print("\nImage normalized")
-# ------------------------------------------------------------------------------
-input = normalized_input                # use the normalized input !! 
+# scale_and_normalize(datapath, input, normalized_input, scale_min, scale_max)
+# print("\nImage normalized")
+# # ------------------------------------------------------------------------------
+# input = normalized_input                # use the normalized input !! 
 
-out_patches_A = input.split('.')[0] + "_patches_A.tif"
-out_labels_A = input.split('.')[0] + "_labels_A.tif"
+# out_patches_A = input.split('.')[0] + "_patches_A.tif"
+# out_labels_A = input.split('.')[0] + "_labels_A.tif"
 
-out_patches_B = input.split('.')[0] + "_patches_B.tif"
-out_labels_B = input.split('.')[0] + "_labels_B.tif"
+# out_patches_B = input.split('.')[0] + "_patches_B.tif"
+# out_labels_B = input.split('.')[0] + "_labels_B.tif"
 
-#--------------------------------------------------------------------------------
-input = normalized_input
-apptype = "PolygonClassStatistics"
-vec = "area2_0123_2023_raster_classification_13.shp"
-output = "area2_0123_2023_raster_classification_13_vecstats.xml"
+# #--------------------------------------------------------------------------------
+# input = normalized_input
+# apptype = "PolygonClassStatistics"
+# vec = "area2_0123_2023_raster_classification_13.shp"
+# output = "area2_0123_2023_raster_classification_13_vecstats.xml"
 
-PolygonClassStatistics(apptype, datapath, input, vec, output)
-print("\Stats created")
-#------------------------------------------------------------------------------
-apptype = "SampleSelection"
-instats = "area2_0123_2023_raster_classification_13_vecstats.xml"
-output_A = "area2_0123_2023_raster_classification_13_points_A.shp"
-output_B = "area2_0123_2023_raster_classification_13_points_B.shp"
+# PolygonClassStatistics(apptype, datapath, input, vec, output)
+# print("\Stats created")
+# #------------------------------------------------------------------------------
+# apptype = "SampleSelection"
+# instats = "area2_0123_2023_raster_classification_13_vecstats.xml"
+# output_A = "area2_0123_2023_raster_classification_13_points_A.shp"
+# output_B = "area2_0123_2023_raster_classification_13_points_B.shp"
 
-SampleSelection(apptype, datapath, input, vec, instats, output_A)
-print("\nSamples A created")
-SampleSelection(apptype, datapath, input, vec, instats, output_B)
-print("\nSamples B created")
-#------------------------------------------------------------------------------
-out_patches_A = input.split('.')[0] + "_patches_A.tif"
-out_labels_A = input.split('.')[0] + "_labels_A.tif"
+# SampleSelection(apptype, datapath, input, vec, instats, output_A)
+# print("\nSamples A created")
+# SampleSelection(apptype, datapath, input, vec, instats, output_B)
+# print("\nSamples B created")
+# #------------------------------------------------------------------------------
+# out_patches_A = input.split('.')[0] + "_patches_A.tif"
+# out_labels_A = input.split('.')[0] + "_labels_A.tif"
 
-out_patches_B = input.split('.')[0] + "_patches_B.tif"
-out_labels_B = input.split('.')[0] + "_labels_B.tif"
-#------------------------------------------------------------------------------
-apptype = "PatchesExtraction"
-patchsize = 16		#16?
-vec_A = output_A
-vec_B = output_B
+# out_patches_B = input.split('.')[0] + "_patches_B.tif"
+# out_labels_B = input.split('.')[0] + "_labels_B.tif"
+# #------------------------------------------------------------------------------
+# apptype = "PatchesExtraction"
+# patchsize = 16		#16?
+# vec_A = output_A
+# vec_B = output_B
 
-PatchesExtraction(apptype, datapath, input, vec_A, out_patches_A, out_labels_A, patchsize)
-print("\nPatches A created")
-PatchesExtraction(apptype, datapath, input, vec_B, out_patches_B, out_labels_B, patchsize)
-print("\nPatches B created")
+# PatchesExtraction(apptype, datapath, input, vec_A, out_patches_A, out_labels_A, patchsize)
+# print("\nPatches A created")
+# PatchesExtraction(apptype, datapath, input, vec_B, out_patches_B, out_labels_B, patchsize)
+# print("\nPatches B created")
 #----------------------------------------------------------------------------
 
 # call create model
@@ -114,7 +114,7 @@ print("\nPatches B created")
 # """
 
 # Number of classes estimated by the model
-N_CLASSES = 2
+N_CLASSES = 22
 
 # Name of the input in the `FCNNModel` instance, also name of the input node
 # in the SavedModel
@@ -372,8 +372,12 @@ if __name__=="__main__":
 
     # create TFRecords
     tf.compat.v1.enable_eager_execution()
-    patches = ['/home/otbuser/all/data/area2_0530_2022_8bands_patches_A.tif', '/home/otbuser/all/data/area2_0530_2022_8bands_patches_B.tif']
-    labels = ['/home/otbuser/all/data/area2_0530_2022_8bands_labels_A.tif', '/home/otbuser/all/data/area2_0530_2022_8bands_labels_B.tif']
+    
+    labels = ['/home/otbuser/all/data/area2_0123_2023__A_p_patches.tif', '/home/otbuser/all/data/area2_0123_2023__B_p_patches.tif']
+    patches = ['/home/otbuser/all/data/area2_0123_2023__A_labels_patches_source2.tif', '/home/otbuser/all/data/area2_0123_2023__B_labels_patches_source2.tif']
+    # patches = ['/home/otbuser/all/data/output/area2_0123_2023__A_p_patches.tif', '/home/otbuser/all/data/output/test_p_patches.tif']
+    # labels = ["/home/otbuser/all/data/output/_labels_patches.tif", "/home/otbuser/all/data/output/_labels_patches.tif"]
+    
     # patches = ['/home/otbuser/all/data/output/train_p_patches.tif', '/home/otbuser/all/data/output/valid_p_patches.tif']
     # labels = ['/home/otbuser/all/data/output/train_labels_patches.tif', '/home/otbuser/all/data/output/valid_labels_patches.tif']
 

@@ -46,6 +46,7 @@ scale_max = 65535
 # print(input.shape, normalized_input.shape)
 
 scale_and_normalize(datapath, input, normalized_input, scale_min, scale_max)
+scale_and_normalize_and_flatten(datapath, input, normalized_input, scale_min, scale_max)
 print("\nImage normalized")
 # ------------------------------------------------------------------------------
 input = normalized_input                # use the normalized input !! 
@@ -74,21 +75,7 @@ print("\nSamples A created")
 SampleSelection(apptype, datapath, input, vec, instats, output_B)
 print("\nSamples B created")
 #------------------------------------------------------------------------------
-out_patches_A = input.split('.')[0] + "_patches_A.tif"
-out_labels_A = input.split('.')[0] + "_labels_A.tif"
 
-out_patches_B = input.split('.')[0] + "_patches_B.tif"
-out_labels_B = input.split('.')[0] + "_labels_B.tif"
-#------------------------------------------------------------------------------
-apptype = "PatchesExtraction"
-patchsize = 64 		#16?
-vec_A = output_A
-vec_B = output_B
-
-PatchesExtraction(apptype, datapath, input, vec_A, out_patches_A, out_labels_A, patchsize)
-print("\nPatches A created")
-PatchesExtraction(apptype, datapath, input, vec_B, out_patches_B, out_labels_B, patchsize)
-print("\nPatches B created")
 #----------------------------------------------------------------------------
 
 # call create model

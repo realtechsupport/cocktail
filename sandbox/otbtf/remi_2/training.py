@@ -1,15 +1,15 @@
-nb_cls = 2               # number of classes
-inp_key_p = "input_p"    # model input p
+nb_cls = 10              # number of classes
+# inp_key_p = "input_p"    # model input p
 inp_key_xs = "input_xs"  # model input xs
 tgt_key = "estimated"    # model target
 
 
 import otbtf
 
-def create_otbtf_dataset(p, xs, labels):
+def create_otbtf_dataset(xs, labels):
     return otbtf.DatasetFromPatchesImages(
         filenames_dict={
-            "p": p,
+            # "p": p,
             "xs": xs,
             "labels": labels
         }
@@ -20,7 +20,7 @@ import tensorflow as tf
 
 def dataset_preprocessing_fn(sample):
     return {
-        inp_key_p: sample["p"],
+        # inp_key_p: sample["p"],
         inp_key_xs: sample["xs"],
         tgt_key: tf.one_hot(
             tf.squeeze(tf.cast(sample["labels"], tf.int32), axis=-1),
@@ -28,8 +28,8 @@ def dataset_preprocessing_fn(sample):
         )
     }
 
-def create_dataset(p, xs, labels, batch_size=8):
-    otbtf_dataset = create_otbtf_dataset(p, xs, labels)
+def create_dataset(xs, labels, batch_size=8):
+    otbtf_dataset = create_otbtf_dataset(xs, labels)
     return otbtf_dataset.get_tf_dataset(
         batch_size=batch_size,
         preprocessing_fn=dataset_preprocessing_fn,
@@ -65,17 +65,17 @@ class FCNNModel(otbtf.ModelBase):
 
     def normalize_inputs(self, inputs):
         return {
-            inp_key_p: tf.cast(inputs[inp_key_p], tf.float32) * 0.01,
+            # inp_key_p: tf.cast(inputs[inp_key_p], tf.float32) * 0.01,
             inp_key_xs: tf.cast(inputs[inp_key_xs], tf.float32) * 0.01
         }
 
     def get_outputs(self, normalized_inputs):
-        norm_inp_p = normalized_inputs[inp_key_p]
+        # norm_inp_p = normalized_inputs[inp_key_p]
         norm_inp_xs = normalized_inputs[inp_key_xs]
 
-        cv_xs = conv(norm_inp_xs, 32, "convxs", 1)
-        cv1 = conv(norm_inp_p, 16, "conv1")
-        cv2 = conv(cv1, 32, "conv2") + cv_xs
+        # cv_xs = conv(norm_inp_xs, 32, "convxs", 1)
+        cv1 = conv(norm_inp_xs, 16, "conv1")
+        cv2 = conv(cv1, 32, "conv2") 
         cv3 = conv(cv2, 64, "conv3")
         cv4 = conv(cv3, 64, "conv4")
         cv1t = tconv(cv4, 64, "conv1t") + cv3
@@ -127,21 +127,21 @@ params = parser.parse_args()
 tf.get_logger().setLevel('ERROR')
 
 ds_train = create_dataset(
-    ["/home/otbuser/all/data/area2_0123_2023__A_p_patches.tif"],
-    ["/home/otbuser/all/data/area2_0123_2023__A_labels_patches_source2.tif"],
-    ["/home/otbuser/all/data/crop_mask_/home/otbuser/all/data/area2_0123_2023_raster_classification_13_points_A.shp.tif"],
+    ["/home/otbuser/all/data/patches_selection/new/output/vec_train_xs_patches_label_new.tif"],
+    ["/home/otbuser/all/data/patches_selection/new/output/vec_train_labels_patches.tif"],
 )
+
 
 ds_valid = create_dataset(
-    ["/home/otbuser/all/data/area2_0123_2023__B_p_patches.tif"],
-    ["/home/otbuser/all/data/area2_0123_2023__B_labels_patches_source2.tif"],
-    ["/home/otbuser/all/data/crop_mask_/home/otbuser/all/data/area2_0123_2023_raster_classification_13_points_B.shp.tif"],
+    ["/home/otbuser/all/data/patches_selection/new/output/vec_valid_xs_patches_label_new.tif"],
+    ["/home/otbuser/all/data/patches_selection/new/output/vec_valid_labels_patches.tif"],
 )
 
+
+
 ds_test = create_dataset(
-    ["/home/otbuser/all/data/area2_0123_2023__B_p_patches.tif"],
-    ["/home/otbuser/all/data/area2_0123_2023__B_labels_patches_source2.tif"],
-    ["/home/otbuser/all/data/crop_mask_/home/otbuser/all/data/area2_0123_2023_raster_classification_13_points_B.shp.tif"],
+    ["/home/otbuser/all/data/patches_selection/new/output/vec_test_xs_patches_label_new.tif"],
+    ["/home/otbuser/all/data/patches_selection/new/output/vec_test_labels_patches.tif"],
 )
 
 train(params, ds_train, ds_valid, ds_test)

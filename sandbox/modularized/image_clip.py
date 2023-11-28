@@ -23,3 +23,8 @@ def image_clipping(datapath, tiff_file, shape_file):
     print ("Number of columns: " + str(cols))
     print ("Number of rows: " + str(rows))
     print ("Number of bands: " + str(bands))
+
+
+
+
+image_clipping("/home/otbuser/all/data/", "all/data/area2_0530_2022_8bands.tif", "area2_0123_2023_raster_classification_13_points_A.shp")

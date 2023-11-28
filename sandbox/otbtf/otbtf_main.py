@@ -41,13 +41,13 @@ print("datapath: ", datapath)
 # Ensure that the input image is normalized before proceeding with the next steps
 input = 'area2_0530_2022_8bands.tif'
 normalized_input = 'area2_0530_2022_8bands_norm.tif'
-flattened_input = 'area2_0530_2022_8bands_flattened.tif'
+# flattened_input = 'area2_0530_2022_8bands_flattened.tif'
 scale_min = 0
 scale_max = 65535
 # print(input.shape, normalized_input.shape)
 
 scale_and_normalize(datapath, input, normalized_input, scale_min, scale_max)
-scale_and_normalize_and_flatten(datapath, input, flattened_input, scale_min, scale_max)
+# scale_and_normalize_and_flatten(datapath, input, flattened_input, scale_min, scale_max)
 print("\nImage normalized and flattened")
 # ------------------------------------------------------------------------------
 input = normalized_input                # use the normalized input !! 
@@ -73,8 +73,7 @@ output_B = "area2_0123_2023_raster_classification_13_points_B.shp"
 
 SampleSelection(apptype, datapath, input, vec, instats, output_A)
 print("\nSamples A created")
-SampleSelection(apptype, datapath, input, vec, instats, output_B)
-print("\nSamples B created")
+
 #------------------------------------------------------------------------------
 
 #----------------------------------------------------------------------------

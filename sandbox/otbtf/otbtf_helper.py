@@ -43,14 +43,25 @@ def PolygonClassStatistics(apptype, datapath, input, vec, output):
 #-------------------------------------------------------------------------------
 def SampleSelection(apptype, datapath, input, vec, instats, output):
 	app = otbApplication.Registry.CreateApplication(apptype)
+	print(app.GetParametersKeys())
 	app.SetParameterString("in", datapath + input)
 	app.SetParameterString("instats", datapath + instats)
 	app.SetParameterString("vec", datapath + vec)
 	app.SetParameterString("field", "class")
+	app.SetParameterString('strategy', 'all')
 	app.SetParameterString("out", datapath + output)
+	app.SetParameterInt("rand", 123)
+	# app.SetParameterString("out", datapath + output)
+	# app.SetParameterString("outtrain", "all/data/patches_selection/training_samples.shp")
+	# app.SetParameterString("outtest", "all/data/patches_selection/testing_samples.shp")
+	# app.SetParameterString("outvalid", "all/data/patches_selection/validation_samples.shp")
+
+	# app.SetParameterInt("sample.mt", 70)
+	# app.SetParameterInt("sample.mv", 15)
+	# app.SetParameterInt("sample.mb", 15)
 	app.ExecuteAndWriteOutput()
-
-
+	# # Set the sampling strategy to use all samples from all classes
+	# sample_selection.SetParameterString("sample.all", "true")
 
 def LabelImageSampleSelection():
 	app = otbApplication.Registry.CreateApplication(LabelImageSampleSelection)

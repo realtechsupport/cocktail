@@ -23,4 +23,6 @@ infer = pyotb.TensorflowModelServe({
     "output.efieldy": 32
 })
 ext_fname = "gdal:co:COMPRESS=DEFLATE"
-infer.write("/home/otbuser/all/data/output/map.tif", pixel_type="uint8", ext_fname=ext_fname)
+infer.write("/home/otbuser/all/data/output/amsterdam_map.tif", pixel_type="uint8", ext_fname=ext_fname)
+
+# python training.py --model_dir /home/otbuser/all/data/output/savedmodel

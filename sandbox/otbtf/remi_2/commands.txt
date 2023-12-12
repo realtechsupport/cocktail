@@ -1,0 +1,31 @@
+otbcli_BandMathX \
+-il "/home/otbuser/all/data/training/area2_0123_2023_8bands.tif" \
+-exp "{im1b1/im1b1Maxi;im1b2/im1b2Maxi; \
+im1b3/im1b3Maxi;im1b4/im1b4Maxi; \
+im1b5/im1b5Maxi;im1b6/im1b6Maxi; \
+im1b7/im1b7Maxi;im1b8/im1b8Maxi}" \
+-out "/home/otbuser/all/data/training/area2_0123_2023_8bands_norm.tif"
+
+
+
+
+otbcli_Rasterization \
+-in "/home/otbuser/all/data/training/area2_0123_2023_raster_classification_13.gpkg" \
+-im "/home/otbuser/all/data/training/area2_0123_2023_8bands_norm.tif" \
+-out "/home/otbuser/all/data/training/area2_0123_2023_8bands_norm_labelimage.tif" uint8 \
+-mode attribute 
+
+
+
+export OTB_TF_NSOURCES=2
+otbcli_PatchesExtraction \
+-source1.il "/home/otbuser/all/data/training/area2_0123_2023_8bands_norm.tif" \
+-source1.patchsizex 64 \
+-source1.patchsizey 64 \
+-source1.out "/home/otbuser/all/data/training/area2_0123_2023_8bands_norm_patches_A.tif" \
+-source2.il "/home/otbuser/all/data/training/area2_0123_2023_8bands_norm_labelimage.tif" \
+-source2.patchsizex 64 \
+-source2.patchsizey 64 \
+-source2.out "/home/otbuser/all/data/training/area2_0123_2023_8bands_norm_labelimage_patches_A.tif" \
+-vec "/home/otbuser/all/data/training/area2_0123_2023_training_centroids.gpkg" \
+-field "id"

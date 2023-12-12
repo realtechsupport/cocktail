@@ -1,7 +1,7 @@
 import pyotb
 import os
 
-xs_img = ("/home/otbuser/all/data/patches_selection/new/area2_0530_2022_8bands.tif")
+xs_img = ("/home/otbuser/all/data/training/area2_0123_2023_8bands_norm.tif")
 labels_img =  "/home/otbuser/all/data/patches_selection/new/new_terrain_truth_rasterized.tif"
 
 vec_train = "/home/otbuser/all/data/patches_selection/new/output/vec_train_new.geojson"

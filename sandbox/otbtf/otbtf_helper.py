@@ -43,25 +43,64 @@ def PolygonClassStatistics(apptype, datapath, input, vec, output):
 #-------------------------------------------------------------------------------
 def SampleSelection(apptype, datapath, input, vec, instats, output):
 	app = otbApplication.Registry.CreateApplication(apptype)
+	print(app.GetParametersKeys())
+	app.SetParameterString("in", datapath + input)
+	app.SetParameterString("instats", datapath + instats)
+	app.SetParameterString("vec", datapath + vec)
+	app.SetParameterString("field", "class")
+	app.SetParameterString('strategy', 'all')
+	app.SetParameterString("out", datapath + output)
+	app.SetParameterInt("rand", 123)
+	# app.SetParameterString("out", datapath + output)
+	# app.SetParameterString("outtrain", "all/data/patches_selection/training_samples.shp")
+	# app.SetParameterString("outtest", "all/data/patches_selection/testing_samples.shp")
+	# app.SetParameterString("outvalid", "all/data/patches_selection/validation_samples.shp")
+
+	# app.SetParameterInt("sample.mt", 70)
+	# app.SetParameterInt("sample.mv", 15)
+	# app.SetParameterInt("sample.mb", 15)
+	app.ExecuteAndWriteOutput()
+	# # Set the sampling strategy to use all samples from all classes
+	# sample_selection.SetParameterString("sample.all", "true")
+
+def LabelImageSampleSelection():
+	app = otbApplication.Registry.CreateApplication(LabelImageSampleSelection)
 	app.SetParameterString("in", datapath + input)
 	app.SetParameterString("instats", datapath + instats)
 	app.SetParameterString("vec", datapath + vec)
 	app.SetParameterString("field", "class")
 	app.SetParameterString("out", datapath + output)
 	app.ExecuteAndWriteOutput()
-
 #------------------------------------------------------------------------------
+
 def PatchesExtraction(apptype, datapath, input, vec, out_patches, out_labels, patchsize):
+	os.environ["OTB_TF_NSOURCES"] = "2"
 	app = otbApplication.Registry.CreateApplication(apptype)
 	app.SetParameterStringList("source1.il", [datapath + input])
-	app.SetParameterString("source1.out", datapath + out_patches) 
 	app.SetParameterInt("source1.patchsizex", patchsize)
 	app.SetParameterInt("source1.patchsizey", patchsize)
+	# app.SetParameterInt("source1.nodata", 0)
+	# app.SetParameterStringList("source2.il", [datapath + input])
+	# app.SetParameterInt("source2.patchsizex", patchsize)
+	# app.SetParameterInt("source2.patchsizey", patchsize)
+	# app.SetParameterInt("source2.nodata", 0)
+	app.SetParameterStringList("source2.il", [datapath + input])
+	app.SetParameterInt("source2.patchsizex", patchsize)
+	app.SetParameterInt("source2.patchsizey", patchsize)
+	# app.placeholder
+	# app.SetParameterInt("source3.patchsizez", 1)
+	# app.SetParameterInt("source2.nodata", 0)
+	# app.SetParameterString("source1.out", datapath + "discard" + out_patches)
+	app.SetParameterString("source1.out", datapath + out_patches)
+	app.SetParameterString("source2.out", datapath + out_labels)
+	# app.SetParameterString("source2.out", "uint8")
+	# app.SetParameterString("outlabels", datapath + out_labels)	# if making it source2.out then it's creating (patchsize x patchsize x 8)
+	# app.SetParameter
+
 	app.SetParameterString("vec", datapath + vec)
 	app.SetParameterString("field", "class")
-	app.SetParameterString("outlabels", datapath + out_labels)
 	app.ExecuteAndWriteOutput()
-	
+
 #----------------------------------------------------------------------------
 class Model2(tf.keras.Model):
     def __init__(self, nclasses):
@@ -83,31 +122,4 @@ class Model2(tf.keras.Model):
         x = self.pool2(x)
         x = self.conv3(x)
         features = self.flatten(x)
-        estimated = self.estimated(features)
-        estimated2 = self.estimated2(estimated)
-        estimated_label = tf.argmax(estimated2, axis=1, name="prediction")
-        return (estimated2, estimated_label)
-
-#----------------------------------------------------------------------------------
-'''
-# Train the deep learning model
-otbcli_TensorflowModelTrain \
--training.source1.il Sentinel-2_B4328_10m_patches_A.tif \
--training.source1.patchsizex 16 \
--training.source1.patchsizey 16 \
--training.source1.placeholder "x" \
--training.source2.il Sentinel-2_B4328_10m_labels_A.tif \
--training.source2.patchsizex 1 \
--training.source2.patchsizey 1 \
--training.source2.placeholder "y" \
--model.dir model1 \
--training.targetnodes "optimizer" \
--validation.mode "class" \
--validation.source1.il Sentinel-2_B4328_10m_patches_B.tif \
--validation.source1.name "x" \
--validation.source2.il Sentinel-2_B4328_10m_labels_B.tif \
--validation.source2.name "prediction" \
--model.saveto model1/variables/variables
-
-'''
-#----------------------------------------------------------------------------
+        est

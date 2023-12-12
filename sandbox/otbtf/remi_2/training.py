@@ -1,9 +1,9 @@
-nb_cls = 10              # number of classes
+nb_cls = 15              # number of classes
 # inp_key_p = "input_p"    # model input p
 inp_key_xs = "input_xs"  # model input xs
 tgt_key = "estimated"    # model target
 
-
+import os
 import otbtf
 
 def create_otbtf_dataset(xs, labels):
@@ -126,24 +126,22 @@ parser.add_argument("--nb_epochs", type=int, default=40)
 params = parser.parse_args()
 tf.get_logger().setLevel('ERROR')
 
+
+datapath = '/home/otbuser/all/data/'
 ds_train = create_dataset(
-    ["/home/otbuser/all/data/patches_selection/new/output/vec_train_xs_patches_label_new.tif"],
-    ["/home/otbuser/all/data/patches_selection/new/output/vec_train_labels_patches.tif"],
+    [os.path.join(datapath, "area2_0123_2023_training_xs_patches.tif")],
+    [os.path.join(datapath, "area2_0123_2023_training_labels_patches.tif")],
 )
-
-
-ds_valid = create_dataset(
-    ["/home/otbuser/all/data/patches_selection/new/output/vec_valid_xs_patches_label_new.tif"],
-    ["/home/otbuser/all/data/patches_selection/new/output/vec_valid_labels_patches.tif"],
-)
-
 
 
 ds_test = create_dataset(
-    ["/home/otbuser/all/data/patches_selection/new/output/vec_test_xs_patches_label_new.tif"],
-    ["/home/otbuser/all/data/patches_selection/new/output/vec_test_labels_patches.tif"],
+    [os.path.join(datapath, "area2_0123_2023_testing_xs_patches.tif")],
+    [os.path.join(datapath, "area2_0123_2023_testing_labels_patches.tif")],
 )
 
-train(params, ds_train, ds_valid, ds_test)
+
+
+
+train(params, ds_train, ds_test)
 
 

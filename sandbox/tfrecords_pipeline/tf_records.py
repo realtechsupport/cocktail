@@ -19,7 +19,7 @@ geojson_datapath = '/home/otbuser/all/data/newextent_1123.geojson'
 output_dir = '/home/otbuser/all/data/tf_records/'
 
 
-def clip_tiff(tiff, geojson):
+def clip_tiff(tiff, geojson = geojson_datapath):
 
     with open(geojson) as clip_geojson:
         clip_geojson = gpd.read_file(clip_geojson)

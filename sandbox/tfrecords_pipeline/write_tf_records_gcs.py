@@ -103,7 +103,7 @@ def write_tfrecords(images, labels, gcs_output_directory):
         output_file_gcs = os.path.join(gcs_output_directory, f"{image.replace(folder_path,'').replace('.tif','')}_tfrecord.tfrecord")
 
         # Open a GCS file for writing
-        with tf.io.gfile.GFile(output_file_gcs, 'wb') as gcs_writer:
+        with tf.io.gfile.GFile(output_file_gcs, 'w') as gcs_writer:
             tf_example = create_tfrecord(image, label)
             gcs_writer.write(tf_example)
 

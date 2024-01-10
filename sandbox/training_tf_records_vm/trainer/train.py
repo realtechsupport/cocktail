@@ -5,7 +5,7 @@ from tensorflow import keras
 from tensorflow.keras import layers
 import tensorflow as tf
 from google.cloud import storage
-from trainer.model_file import get_model
+from model_file import get_model
 
 # Necessary Functions------------------------------------------
 
@@ -266,8 +266,8 @@ def train(**kwargs):
     model.save(model_path + model_name)
     print("model saved locally")
 
-    upload_blob(bucket_name, model_path + model_name, "model/" + model_name)
-    print("uploaded to cloud storage successfully")
+    #upload_blob(bucket_name, model_path + model_name, "model/" + model_name)
+    #print("uploaded to cloud storage successfully")
 
 
 if __name__ == "__main__":

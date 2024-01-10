@@ -281,7 +281,7 @@ if __name__ == "__main__":
         "patch_width": 8,
         "batch_size": 32,
         "num_classes": 23,
-        "model_path": "trained_model/",
+        "model_path": "trained_models/",
     }  # makesure there is a slash at the end of the path  # Choose an appropriate batch size
 
     train(**input_params)

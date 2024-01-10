@@ -1,6 +1,7 @@
 from google.cloud import storage
 import os
 
+
 def download_files_from_gcs(bucket_name, source_folder, destination_folder):
     client = storage.Client()
 
@@ -22,9 +23,23 @@ def download_files_from_gcs(bucket_name, source_folder, destination_folder):
             else:
                 print(f"Skipped (already exists): {blob.name}")
 
-# Replace these with your specific details
+
+
+
+machine_name = 'jay' # change this to your machine name
+
+# # Replace these with your specific details
 bucket_name = 'gislogics-bucket'
 source_folder = 'area2_planetlabs_superdove/'
-destination_folder = '/Users/srikarreddy/Desktop/satellite_imagery'
+destination_folder = f'/home/{machine_name}/project/images'
 
 download_files_from_gcs(bucket_name, source_folder, destination_folder)
+
+
+
+# Replace these with your specific details
+label_bucket_name = 'tf_records_bucket'
+label_source_folder = 'labels/'
+label_destination_folder = f'/home/{machine_name}/project/labels'
+
+download_files_from_gcs(label_bucket_name, label_source_folder, label_destination_folder)

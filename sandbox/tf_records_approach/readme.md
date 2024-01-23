@@ -1,59 +1,66 @@
-> mkdir project
-> cd project
+# Project Setup
 
-## Step 1 Run the downloadImages.py script
-This will download the images in and labels in respective folder inside project directory.
+1. Create a new project directory:
+   ```bash
+   mkdir project
+   cd project
+   ```
 
+## Step 1: Download Images and Labels
 
+Run the `downloadImages.py` script to download images and labels into respective folders inside the project directory.
 
-## Step 2 Run the script write_tf_records.py
+## Step 2: Generate TF Records
 
-### How to run the script write tf_records.py
->> python write_tf_records.py --bucket_name <BUCKET_NAME>
+### Run the script `write_tf_records.py`
 
-### Example to run the script write_tf_records.py
->> python write_tf_records.py --bucket_name tf_records_bucket
+Use the following command to execute the script:
+```bash
+python write_tf_records.py --bucket_name <BUCKET_NAME>
+```
 
-This would most probably will give an error rising from google storage [Error 403] indicating either not proper permission acquired for the storage or it doesn't exist.
+Example:
+```bash
+python write_tf_records.py --bucket_name tf_records_bucket
+```
 
-#### How to solve this?
->>>> Create a new bucket (keep the same name in script's bucket_name)
+**Note:** You may encounter a Google Storage error [Error 403]. This indicates a permission issue or the bucket not existing.
 
-Run this in CLI:
->>>> gcloud init
+#### Troubleshooting:
 
-follow this link [How to initialize the google for granting access to write TF_Records in Bucket] https://cloud.google.com/sdk/docs/initializing
+1. **Create a New Bucket:**
+   If the error persists, create a new bucket with the same name as in the script's `bucket_name`.
 
-This will print some configuration and projects, choose those. 
-After granting proper access tf_records will be written to that bucket in dir tf_records/
+2. **Grant Proper Access:**
+   Run the following command to initialize Google Cloud and grant proper access:
+   ```bash
+   gcloud init
+   ```
+   Follow [this link](https://cloud.google.com/sdk/docs/initializing) for detailed instructions. Choose the displayed configuration and projects.
 
+   After granting access, TF Records will be written to the specified bucket in the `tf_records/` directory.
 
+## Before Training
 
+If you want to modify any parameters related to patches, make changes in the `create_dataset.py` script.
 
+# Model Training
 
+Run the training script after setting up the data.
 
+# Prediction
 
+To make predictions on images, use the `prediction.py` script.
 
+```bash
+python prediction.py <images_dir>/ '<number of images or all>' --output_directory <output directory where predictions are to be saved>
+```
 
-## Before training if, you want to change any paramater related to patches, please change those parameters in create_dataset.py script
-
-
-
-
-
-
-
-
-
-
-
-
-
-### How to call prediction:
-python prediction.py <images_dir>/ '<number of images or all>' -- output_directory <output directory where prediction are to saved>
-
->> -- output_directory is not necessary.
-
-### Example for prediction.py
+Example:
+```bash
 python prediction.py /home/jay/project/images/ '2' --output_directory /home/jay/project/single_image/
+```
+
+**Note:** The `--output_directory` is optional.
+
 

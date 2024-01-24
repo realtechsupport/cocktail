@@ -26,7 +26,7 @@ Run the `downloadImages.py` script to download images and labels into respective
 
 ## Step 2: Write TFRecords to GCS
 
-### Run the script `write_tf_records.py`
+Run the script `write_tf_records.py`
 
 Use the following command to execute the script:
 ```bash

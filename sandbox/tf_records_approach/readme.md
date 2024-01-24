@@ -4,6 +4,20 @@
    ```bash
    mkdir project
    cd project
+   mkdir images
+   mkdir labels
+   mkdir trained_models
+   ```
+2. Install the necesarry dependencies. Make sure you have an updated pip installed.
+   ```bash
+   python3 -m pip install google-cloud-storage
+   python3 -m pip install rasterio
+   python3 -m pip install geopandas
+   python3 -m pip install tensorflow
+   python3 -m pip install matplotlib
+   python3 -m pip install pydot
+   python3 -m pip install -U scikit-learn
+   sudo apt install graphviz
    ```
 
 ## Step 1: Download Images and Labels

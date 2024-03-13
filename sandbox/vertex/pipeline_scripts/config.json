@@ -1,0 +1,19 @@
+{
+    "model_path": "./trained_model/patch_h8_w8_batch_32_on_0530_2022.hdf5",
+    "google_storage_path": "gs://tf_records_bucket/model/",
+    "model_name": "patch_h8_w8_batch_32_on_0530_2022.hdf5",
+    "test_image_path": "gs://tf_records_bucket/labels/area2_0530_2022_8bands.tif",
+    "img_size": 8,
+    "num_bands": 8,
+    "num_classes": 23,
+    "gcs_tfrecords": "gs://tf_records_bucket/tf_records/Untitled Folder/",
+    "class_name": 18,
+    "label_path": "gs://tf_records_bucket/labels/continuous_label_raster.tif",
+    "class_optmized_model": 1,
+    "bucket_name": "tf_records_bucket",
+    "threshold_percentage": 99.9,
+    "patch_height": 8,
+    "patch_width": 8,
+    "batch_size": 32,
+    "epochs": 300
+}

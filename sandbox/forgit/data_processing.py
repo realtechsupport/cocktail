@@ -16,8 +16,8 @@ def crop_to_nearest_patch_size(datapath, input_image_path, crop_size, croppedfil
         height = src.height
 
         # Calculate the new width and height that are multiples of the patch size
-        new_width = int(np.ceil(width / crop_size)) * crop_size
-        new_height = int(np.ceil(height / crop_size)) * crop_size
+        new_width = int(np.floor(width / crop_size)) * crop_size
+        new_height = int(np.floor(height / crop_size)) * crop_size
 
         # Calculate crop window
         left = (width - new_width) // 2

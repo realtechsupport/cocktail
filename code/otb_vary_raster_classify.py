@@ -15,8 +15,8 @@ import shutil, time
 import subprocess
 from helper import *
 #-------------------------------------------------------------------------------
-datapath = '/home/marcbohlen/cocktail/data/'
-codepath = '/home/marcbohlen/cocktail/code/'
+datapath = '/home/ghemanth2578/cocktail/data/'
+codepath = '/home/ghemanth2578/cocktail/code/'
 settingsname = "settings.txt"
 orgfile = "settings_org.txt"
 infile = settingsname

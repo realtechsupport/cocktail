@@ -16,7 +16,7 @@
 #-------------------------------------------------------------------------------
 import sys, os
 import json
-import gdal
+from osgeo import gdal
 import otbApplication
 import numpy
 from PIL import Image as PILImage
@@ -25,7 +25,7 @@ from zipfile import ZipFile
 from helper import *
 
 # Local path and variables
-datapath = '/home/marcbohlen/cocktail/data/'
+datapath = '/home/ghemanth2578/cocktaildata/'
 inputsfile = datapath + 'settings.txt'
 
 #------------------------------------------------------------------------------

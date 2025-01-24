@@ -22,16 +22,16 @@
 #---------------------------------------------------------------------------
 echo "\nStarting the object based Neural Net Classifier."
 echo "Check the settings.txt file for all inputs and hyperparameters."
-python3 /home/marcbohlen/cocktail/code/settings_check.py
+python3 /home/ghemanth2578/cocktail/code/settings_check.py
 echo "Press any key to continue ... or ctrl c to exit ..."
 read var
 
 echo "\nThis process will take several minutes (32GB RAM) or about half an hour (8GB RAM)"
 echo "Proceeding with the classification"
-conda run -n OTB python3 /home/marcbohlen/cocktail/code/otb_vector_classify_1.py
-python3 /home/marcbohlen/cocktail/code/qgis_join.py
-conda run -n OTB python3 /home/marcbohlen/cocktail/code/otb_vector_classify_2.py
-python3 /home/marcbohlen/cocktail/code/qgis_render.py
+conda run -n OTB python3 /home/ghemanth2578/cocktail/code/otb_vector_classify_1.py
+python3 /home/ghemanth2578/cocktail/code/qgis_join.py
+conda run -n OTB python3 /home/ghemanth2578/cocktail/code/otb_vector_classify_2.py
+python3 /home/ghemanth2578/cocktail/code/qgis_render.py
 
 echo "\n\nNEURAL NET CLASSIFICATION - process complete\n\n"
 #---------------------------------------------------------------------------

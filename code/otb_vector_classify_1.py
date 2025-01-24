@@ -15,7 +15,7 @@
 # ----------------------------------------------------------------------------
 import sys, os
 import json
-import gdal
+from osgeo import gdal
 import otbApplication
 import numpy
 import geopandas
@@ -26,7 +26,7 @@ from helper import *
 print('\nVECTOR_CLASSIFY_1: Segmentation + Zonal Statistics\n')
 #------------------------------------------------------------------------------
 # Local path and variables
-datapath = '/home/marcbohlen/cocktail/data/'
+datapath = '/home/ghemanth2578/cocktaildata/'
 inputsfile = datapath + 'settings.txt'
 
 #collect the variables from the settings file

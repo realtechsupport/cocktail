@@ -7,13 +7,13 @@ import sys, os
 import json
 from datetime import datetime
 import pytz
-import gdal
+from osgeo import gdal
 import otbApplication
 import numpy
 
 
 print('Checking the settings\n')
-datapath = '/home/marcbohlen/data/'
+datapath = '/home/ghemanth2578/cocktail/data/'
 inputsfile = datapath + 'settings.txt'
 
 #collect the variables

@@ -8,7 +8,7 @@ import sys, os
 import json
 from datetime import datetime
 import pytz
-import gdal
+from osgeo import gdal
 import otbApplication
 import numpy
 

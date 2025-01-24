@@ -13,7 +13,7 @@ import sys, os
 import json
 from datetime import datetime
 import pytz
-import gdal
+from osgeo import gdal
 import otbApplication
 import numpy
 from PIL import Image as PILImage
@@ -22,7 +22,7 @@ from pcloud import PyCloud
 from helper import *
 
 # Local path and variables
-datapath = '/home/marcbohlen/cocktail/data/'
+datapath = '/home/ghemanth2578/cocktail/data/'
 inputsfile = datapath + 'settings.txt'
 
 #---------------------------------------------------------------------------------

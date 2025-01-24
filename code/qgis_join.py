@@ -30,7 +30,7 @@ os.environ['QT_QPA_PLATFORM'] = 'offscreen'
 qgispath = '/usr/bin/qgis'
 
 # Local path and variables
-datapath = '/home/marcbohlen/cocktail/data/'
+datapath = '/home/ghemanth2578/cocktaildata/'
 inputsfile = datapath + 'settings.txt'
 
 #collect the variables

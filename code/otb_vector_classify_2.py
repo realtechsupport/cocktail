@@ -13,7 +13,7 @@
 import sys, os, json
 from datetime import datetime
 import pytz
-import gdal
+from osgeo import gdal
 import otbApplication
 import numpy
 from PIL import Image as PILImage
@@ -23,7 +23,7 @@ print('\nVECTOR_CLASSIFY_2: Training + Classification\n')
 #------------------------------------------------------------------------------
 
 # Local path and variables
-datapath = '/home/marcbohlen/cocktail/data/'
+datapath = '/home/ghemanth2578/cocktail/data/'
 inputsfile = datapath + 'settings.txt'
 
 #collect the variables from the settings file

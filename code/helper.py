@@ -7,7 +7,7 @@
 import os, sys, numpy
 import time
 from datetime import datetime
-import gdal
+from osgeo import gdal
 from PIL import Image
 
 import pytz

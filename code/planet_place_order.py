@@ -26,7 +26,7 @@ from planet_helper import *
 from pcloud import PyCloud
 
 # Local path and variables
-datapath = '/home/marcbohlen/cocktail/data/'
+datapath = '/home/ghemanth2578/cocktail/data/'
 inputsfile = datapath + 'settings.txt'
 
 #----------------------------------------------------------------------------------------------

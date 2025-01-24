@@ -8,7 +8,7 @@ import json
 from helper import *
 
 # Local path and variables
-datapath = '/home/marcbohlen/cocktail/data/'
+datapath = '/home/ghemanth2578/cocktaildata/'
 inputsfile = datapath + 'settings.txt'
 
 mod_time = time.ctime(os.path.getmtime(inputsfile)) + ' UTC'

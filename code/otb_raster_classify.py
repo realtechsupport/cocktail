@@ -10,7 +10,7 @@ import sys, os
 import json
 from datetime import datetime
 import pytz
-import gdal
+from osgeo import gdal
 import otbApplication
 import numpy
 from PIL import Image as PILImage
@@ -18,8 +18,15 @@ from pcloud import PyCloud
 
 from helper import *
 
+
+# Set environment variables
+#os.environ['OTB_MAX_RAM_HINT'] = '4096'
+os.environ['GDAL_DRIVER_PATH'] = '/home/ghemanth2578/miniconda3/envs/OTB/lib/gdalplugins/'
+# os.environ['OTB_LOGGER_LEVEL'] = 'DEBUG'
+# Set the GDAL_DRIVER_PATH environment variable
+#os.environ['GDAL_DRIVER_PATH'] = '/home/ghemanth2578/miniconda3/envs/OTB/lib/gdalplugins'
 # Local path and variables
-datapath = '/home/marcbohlen/cocktail/data/'
+datapath = '/home/ghemanth2578/cocktail/data/'
 inputsfile = datapath + 'settings.txt'
 
 #---------------------------------------------------------------------------------
@@ -102,6 +109,8 @@ def raster_classify (input_rasterimage, input_classifier):
 	s = rastershapezipfile.split(key)
 	sf = s[0] + ".shp"
 	sfile = vectorpath + sf
+	print('\nShape file Path: ', sfile)
+	print('\nRaster Image Path: ',rimage)
 
 	print('\n\nHere are the inputs')
 	print('Rasterimage: ', rasterimage)
@@ -116,12 +125,15 @@ def raster_classify (input_rasterimage, input_classifier):
 	print('moving data from collection to the vectorfiles and rasterimages...')
 
 	try:
+		print('\n Collection Path: ',collectionpath + rasterimage)
+		print('\n RasterImage Path: ', rasterpath + rasterimage)
 		shutil.copy(collectionpath +  rasterimage, rasterpath + rasterimage)
 	except:
 		print('\nCant find the raster image... Try again...')
 		exit()
 
 	try:
+		print(collectionpath + rastershapezipfile)
 		shutil.copy(collectionpath + rastershapezipfile, vectorpath + rastershapezipfile)
 
 	except:

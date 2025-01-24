@@ -54,15 +54,6 @@ Run that file. <br>
 Add other libraries to the OTB environment as needed. Enable the OTB environment 
 
 	conda activate OTB
-
-
-And install geojson and geopandas. The geopandas install may take a bit of time. <br>
-
-	conda install -c conda-forge pillow
-	conda install -c conda-forge geojson
-	conda install -c conda-forge geopandas
-	conda install -c conda-forge sentinelsat
-
 	
 7 – Setup the directory structure <br>
 The directories code, data, results should be ready made in your repository directory.
@@ -75,9 +66,7 @@ Put analysis-ready raster and vector files (including shapefiles) into the data/
 
 Change the fake username and passwords in the auth folder according to your needs. PC.txt is for pCloud, sent.txt for sentinel and planet.txt for Planet Labs. Put data from sentinel and planet into the collection directory. Add .geojson references files (for sentinel and planet downloads) and colormaps as needed to the data directory. 
 
-
-
-  
+ 
 8 - Test<br>
 a) Test QGIS - (test scripts are in the code directory)
 
@@ -110,7 +99,6 @@ Then verify that all is ok
 
 	python3 settings_test.py
   
-  
 You can now use QGIS in the base installation and enable the conda environment to access OTB functionality. 
 You can also move across environments to access libraries from either environment with python scripts as outlined below (see vector_classify_top.sh): <br>
 
@@ -120,10 +108,7 @@ You can also move across environments to access libraries from either environmen
   	conda run -n OTB python3 /home/code/otb_code_B.py 
   	python3 /home/code/qgis_code_B.py 
 	 
-	 
-Since the directory structure you setup will be identical in both the QGIS and OTB environments, intermediate filed produced will be available to processes running in either environment, allowing for data to be shared. All settings across the script modules are stored in the 'settings.txt' resource file and imported to the individual modules.
-
-<i>Details on how to collect data from the European Space Agency's Sentinel program, how to make use of tip and cue, and how to perform various band-math operations and image classification with SVM, RF and NN classifiers is described in the Install+Use .pdf document.</i>
+<i>Details on how to collect data from the European Space Agency's Sentinel program, how to make use of tip and cue, and how to perform various band-math operations and image classification with SVM, RF and NN classifiers is described in the Install+Use document.</i>
 
 The collection directory contains some sample Sentinel2 data. Here are links to three high resolution 8-band (2022) and 4-band PlanetLab images (geoTIFF format, 500MB / 300MB each):
 
@@ -141,4 +126,6 @@ Cocktail has been used to create research artifacts presented at the following v
 [EUROCARTO-2022](https://ica-abs.copernicus.org/articles/5/44/2022/)
 <br>
 [FOSS4G-2023](https://filedn.com/lqzjnYhpY3yQ7BdfTulG1yY/temp/FOSS4G_2023_final_Liu_Iryadi_Bohlen.pdf)
+<br>
+[AIxSET-2024](https://ieeexplore.ieee.org/document/10771077)
 

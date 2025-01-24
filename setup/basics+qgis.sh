@@ -22,7 +22,6 @@ sudo apt install jupyter-notebook -y
 
 pip3 install --upgrade pip
 pip3 install --upgrade pillow
-
 pip3 install numpy
 pip3 install matplotlib
 pip3 install pandas

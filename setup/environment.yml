@@ -1,10 +1,14 @@
 name: OTB
 
 channels:
-  - terradue
   - conda-forge
+  - terradue
 dependencies:
-  - python=3.7
-  - otb=7.2.0
-  - qgis=3.16
-  - gdal=3.1.4
+  - python=3.8
+  - otb=8.0.1
+  - gdal
+  - qgis
+  - pillow
+  - geojson
+  - geopandas
+  - sentinelsat
